@@ -1,0 +1,80 @@
+<p style="text-align: center;">Добавить поле к сущности "<?php echo $data['entity']['Name']; ?>"</p>
+<form method="post" action="/<?php echo Reg::url_creator(); ?>/field/add/?entity_id=<?php echo $data['entity']['ID']; ?>">
+	<table width="90%" class="forma" align="center">
+		<tr>
+			<td width="50%" align="right">Наименование</td>
+			<td width="50%" align="left"> 
+				<input type="text" name="name" value="<?php echo $data['name']; ?>"/>
+				<?php echo Helper::warn("name"); ?>
+			</td>
+		</tr>
+		<tr>
+			<td align="right">Идентификатор</td>
+			<td align="left">
+				<input type="text" name="identified" value="<?php echo $data['identified']; ?>"/>
+				<?php echo Helper::warn("identified"); ?>
+			</td>
+		</tr>
+		<tr>
+			<td align="right">Тип</td>
+			<td align="left">
+				<select id="type_id" name="type_id" style="width: 200px;">
+					<?php foreach ($data['type'] as $val): ?>
+						<option value="<?php echo $val['ID']; ?>" <?php if($val['ID'] == $data['type_id']): ?>selected="selected"<?php endif; ?><?php if(in_array($val['Identified'], array("id","sort","enum","foreign"))): ?>style="color: #6a0a0a;"<?php endif; ?>>
+							<?php echo $val['Identified']; ?>
+						</option>
+					<?php endforeach; ?>
+				</select>
+				<?php echo Helper::warn("type_id"); ?>
+			</td>
+		</tr>
+		<tr>
+			<td align="right">Описание</td>
+			<td>
+				<textarea name="desc"><?php echo $data['desc']; ?></textarea>
+				<?php echo Helper::warn("desc"); ?>
+			</td>
+		</tr>
+		<tr id="tr_null">
+			<td align="right">NULL</td>
+			<td>
+				<input type="hidden" name="null" value="0"/>
+				<input style="width: 10px;" type="checkbox" name="null"<?php if($data['null']==true): ?> checked="checked"<?php endif; ?>/>
+			</td>
+		</tr>
+		<tr id="tr_default">
+			<td align="right">По умолчанию</td>
+			<td align="left">
+				<input type="text" name="default" value="<?php echo $data['default']; ?>"/>
+				<?php echo Helper::warn("default"); ?>
+			</td>
+		</tr>
+		<tr id="tr_foreign" style="display: none;">
+			<td align="right">Внешний ключ</td>
+			<td>
+				<select name="foreign_id" style="width: 200px;">
+					<?php foreach ($data['foreign'] as $val): ?>
+						<option disabled="disabled"><?php echo $val['Name']; ?></option>
+						<?php if(!empty ($val['field'])): ?>
+							<?php foreach ($val['field'] as $f_val): ?>
+							<option value="<?php echo $f_val['ID'];?>"<?php if($f_val['ID'] == $data['foreign_id']): ?> selected="selected"<?php endif; ?>>
+								&nbsp;&nbsp;<?php echo $f_val['Name']; ?>
+							</option>
+							<?php endforeach; ?>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td align="right">
+				<input type="submit" value="Добавить" class="knopka"/> 
+			</td>
+			<td align="left">
+				<a href="/<?php echo Reg::url_creator(); ?>/field/list/?entity_id=<?php echo $data['entity']['ID']; ?>">
+					<input type="button" value="Назад" class="knopka"/>
+				</a>
+			</td>
+		</tr>
+	</table>
+</form>

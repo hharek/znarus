@@ -1,0 +1,41 @@
+<p class="title">Сущности пакета "<?php echo $data['pack']['Name']; ?>"</p>
+<table width="90%" class="list" id="table_entity_list" align="center">
+	<colgroup>
+		<col width="40%" />
+		<col width="40%" />
+		<col width="20%" />
+	</colgroup>
+	<thead>
+		<tr>
+			<th>Идентификатор</th>
+			<th>Наименование</th>
+			<th>Ред.</th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($data['entity'] as $val): ?>
+		<tr>
+			<td>
+				<a href="/<?php echo Reg::url_creator(); ?>/field/list/?entity_id=<?php echo $val['ID']; ?>"><?php echo $val['Name']; ?></a>
+			</td>
+			<td>
+				<a href="/<?php echo Reg::url_creator(); ?>/field/list/?entity_id=<?php echo $val['ID']; ?>"><?php echo $val['Identified']; ?></a>
+			</td>
+			<td>
+				<a href="/<?php echo Reg::url_creator(); ?>/entity/edit/?id=<?php echo $val['ID']; ?>">Ред.</a>
+				&nbsp;/&nbsp;
+				<a href="/<?php echo Reg::url_creator(); ?>/entity/delete/?id=<?php echo $val['ID']; ?>">Уд.</a>
+			</td>
+		</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+<br/>
+<center>
+	<a href="/<?php echo Reg::url_creator(); ?>/entity/add/?pack_id=<?php echo $data['pack']['ID']; ?>">
+		<input type="button" value="Добавить" class="knopka"/>
+	</a>
+	<a href="/<?php echo Reg::url_creator(); ?>/pack/list/">
+		<input type="button" value="Назад" class="knopka"/>
+	</a>
+</center>

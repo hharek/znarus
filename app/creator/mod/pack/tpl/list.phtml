@@ -1,0 +1,39 @@
+<p class="title">Пакеты</p>
+<table width="90%" class="list" id="table_pack_list" align="center">
+	<colgroup>
+		<col width="40%" />
+		<col width="40%" />
+		<col width="20%" />
+	</colgroup>
+	<thead>
+		<tr>
+			<th>Идентификатор</th>
+			<th>Наименование</th>
+			<th>Ред.</th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($data as $val): ?>
+		<tr>
+			<td>
+				<a href="/<?php echo Reg::url_creator(); ?>/entity/list/?pack_id=<?php echo $val['ID']; ?>"><?php echo $val['Name']; ?></a>
+			</td>
+			<td>
+				<a href="/<?php echo Reg::url_creator(); ?>/entity/list/?pack_id=<?php echo $val['ID']; ?>"><?php echo $val['Identified']; ?></a>
+			</td>
+			<td>
+				<a href="/<?php echo Reg::url_creator(); ?>/pack/edit/?id=<?php echo $val['ID']; ?>">Ред.</a>
+				&nbsp;/&nbsp;
+				<a href="/<?php echo Reg::url_creator(); ?>/pack/delete/?id=<?php echo $val['ID']; ?>">Уд.</a>
+			</td>
+		</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+<br/>
+<center>
+	<a href="/<?php echo Reg::url_creator(); ?>/pack/add/">
+		<input type="button" value="Добавить" class="knopka"/>
+	</a>
+</center>
+

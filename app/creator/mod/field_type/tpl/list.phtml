@@ -1,0 +1,36 @@
+<p class="title">Тип полей</p>
+<table width="90%" class="list" id="table_type_list" align="center">
+	<colgroup>
+		<col width="40%" />
+		<col width="40%" />
+		<col width="20%" />
+	</colgroup>
+	<thead>
+		<tr>
+			<th>Идентификатор</th>
+			<th>Наименование</th>
+			<th>Ред.</th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($data as $val): ?>
+		<tr>
+			<td<?php if(in_array($val['Identified'], array("id","sort","enum","foreign"))): ?> style="color:#6a0a0a;"<?php endif; ?>>
+				<?php echo $val['Identified']; ?>
+			</td>
+			<td><?php echo $val['Desc']; ?></td>
+			<td>
+				<a href="/<?php echo Reg::url_creator(); ?>/field_type/edit/?id=<?php echo $val['ID']; ?>">Ред.</a>
+				&nbsp;/&nbsp;
+				<a href="/<?php echo Reg::url_creator(); ?>/field_type/delete/?id=<?php echo $val['ID']; ?>">Уд.</a>
+			</td>
+		</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+<br/>
+<center>
+	<a href="/<?php echo Reg::url_creator(); ?>/field_type/add/">
+		<input type="button" value="Добавить" class="knopka"/>
+	</a>
+</center>

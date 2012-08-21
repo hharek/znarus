@@ -1,0 +1,40 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>Конструктор сайта</title>
+		<link rel="stylesheet" type="text/css" href="/<?php echo Reg::url_creator(); ?>/file.php?path=css/default.css" />
+		<script type="text/javascript" src="/<?php echo Reg::url_creator(); ?>/file.php?path=js/jquery-1.7.1.min.js"></script>
+		<script type="text/javascript" src="/<?php echo Reg::url_creator(); ?>/file.php?path=js/default.js"></script>
+		<script type="text/javascript">$(function(){$("div#div_exe form").append("<input type=\"hidden\" name=\"csrf_key\" value=\"<?php echo $csrf_key; ?>\" />");});</script>
+		<?php echo $zn_js_content; ?>
+	</head>
+	<body>
+		<div id="div_title">Конструктор сайта</div>
+		<div id="div_menu_top">
+			
+			<div class="div_menu">
+				<div class="div_menu_title">Сборка</div>
+				<div class="div_menu_podcat">
+					<div class="div_menu_punkt"><a href="/<?php echo Reg::url_creator(); ?>/pack/list/">Пакеты</a></div>
+					<div class="div_menu_punkt"><a href="/<?php echo Reg::url_creator(); ?>/field_type/list/">Типы полей</a></div>
+				</div>
+			</div>
+			
+		</div>
+		<?php if(!empty ($zn_error_common)): ?>
+			<div id="div_error">
+				<?php echo $zn_error_common; ?>
+				<div id="knopka_error_more">
+					<img src="/<?php echo Reg::url_creator(); ?>/file.php?path=img/more.png" width="24" height="24" style="cursor: pointer; margin: 0 0 -6px 10px;" />			
+				</div>
+			</div>
+			<div id="div_error_more">
+				<?php echo $zn_error_common_more; ?>
+			</div>
+		<?php endif; ?>
+		
+		<div id="div_exe">
+			<?php echo $zn_exe; ?>
+		</div>
+	</body>
+</html>

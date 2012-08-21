@@ -1,0 +1,28 @@
+<form method="post" action="/<?php echo Reg::url_creator(); ?>/field_type/add/">
+	<table width="90%" class="forma" align="center">
+		<tr>
+			<td width="50%" align="right">Идентификатор</td>
+			<td width="50%" align="left">
+				<input type="text" name="identified" value="<?php echo $data['identified']; ?>"/>
+				<?php echo Helper::warn("identified"); ?>
+			</td>
+		</tr>
+		<tr>
+			<td align="right">Описание</td>
+			<td align="left">
+				<input type="text" name="desc" value="<?php echo $data['desc']; ?>"/>
+				<?php echo Helper::warn("desc"); ?>
+			</td>
+		</tr>
+		<tr>
+			<td align="right">
+				<input type="submit" value="Добавить" class="knopka"/> 
+			</td>
+			<td align="left">
+				<a href="/<?php echo Reg::url_creator(); ?>/field_type/list/">
+					<input type="button" value="Назад" class="knopka"/>
+				</a>
+			</td>
+		</tr>
+	</table>
+</form>
