@@ -1,5 +1,5 @@
-<p class="title">Перечисления поля "<?php echo $data['field']['Name']; ?>"</p>
-<table width="90%" class="list" id="table_enum_list" align="center">
+<p class="title">Перечисления поля "<?php echo $field['Name']; ?>"</p>
+<table width="90%" class="list" align="center">
 	<colgroup>
 		<col width="80%" />
 		<col width="20%" />
@@ -8,13 +8,13 @@
 		<tr>
 			<th>Наименование</th>
 			<th>Ред.</th>
-			<?php if(count($data['enum']) > 1): ?>
+			<?php if(count($enum) > 1): ?>
 				<th>Сорт.</th>
 			<?php endif; ?>
 		</tr>
 	</thead>
 	<tbody>
-		<?php foreach ($data['enum'] as $key=>$val): ?>
+		<?php foreach ($enum as $key=>$val): ?>
 		<tr>
 			<td>
 				<?php echo $val['Name']; ?>
@@ -24,14 +24,14 @@
 				&nbsp;/&nbsp;
 				<a href="/<?php echo Reg::url_creator(); ?>/enum/delete/?id=<?php echo $val['ID']; ?>">Уд.</a>
 			</td>
-			<?php if(count($data['enum']) > 1): ?>
+			<?php if(count($enum) > 1): ?>
 				<td>
 					<?php if($key != 0): ?>
 					<a href="/<?php echo Reg::url_creator(); ?>/enum/sort_up/?id=<?php echo $val['ID']; ?>">&DoubleUpArrow;</a>
 					<?php endif; ?>
 
 
-					<?php if($key != count($data['enum'])-1): ?>
+					<?php if($key != count($enum)-1): ?>
 					<a href="/<?php echo Reg::url_creator(); ?>/enum/sort_down/?id=<?php echo $val['ID']; ?>">&DoubleDownArrow;</a>
 					<?php endif; ?>
 				</td>
@@ -42,10 +42,10 @@
 </table>
 <br/>
 <center>
-	<a href="/<?php echo Reg::url_creator(); ?>/enum/add/?field_id=<?php echo $data['field']['ID']; ?>">
+	<a href="/<?php echo Reg::url_creator(); ?>/enum/add/?field_id=<?php echo $field['ID']; ?>">
 		<input type="button" value="Добавить" class="knopka"/>
 	</a>
-	<a href="/<?php echo Reg::url_creator(); ?>/field/list/?entity_id=<?php echo $data['entity']['ID']; ?>">
+	<a href="/<?php echo Reg::url_creator(); ?>/field/list/?entity_id=<?php echo $entity['ID']; ?>">
 		<input type="button" value="Назад" class="knopka"/>
 	</a>
 </center>

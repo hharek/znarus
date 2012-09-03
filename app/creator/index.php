@@ -2,6 +2,7 @@
 //header("Content-Type: text/plain");
 
 Reg::path_creator(Reg::path_app()."/creator");
+//Reg::file_app()->set_path(Reg::file_app()->get_path()."/constr");
 
 /***---------------------Загрузка рисунков и всего остального--------------***/
 if(mb_substr(Reg::url_path(), -8, 8, "UTF-8") == "file.php")
@@ -86,7 +87,7 @@ else
 }
 
 /***------------------------Другие классы-----------------------***/
-require (Reg::path_creator()."/sys/helper.php");
+require (Reg::path_creator()."/helper.php");
 
 /***-----------------------Основные классы----------------------***/
 require (Reg::path_creator()."/mod/pack/class/pack.php");
@@ -94,13 +95,23 @@ require (Reg::path_creator()."/mod/entity/class/entity.php");
 require (Reg::path_creator()."/mod/field_type/class/field_type.php");
 require (Reg::path_creator()."/mod/field/class/field.php");
 require (Reg::path_creator()."/mod/enum/class/enum.php");
+require (Reg::path_creator()."/mod/unique/class/unique.php");
 
 /***---------------------------SQL классы----------------------***/
-require (Reg::path_creator()."/sql/pack.php");
-require (Reg::path_creator()."/sql/entity.php");
-require (Reg::path_creator()."/sql/field.php");
+require (Reg::path_creator()."/mod/pack/sql/pack.php");
+require (Reg::path_creator()."/mod/entity/sql/entity.php");
+require (Reg::path_creator()."/mod/field/sql/field.php");
+require (Reg::path_creator()."/mod/enum/sql/enum.php");
+require (Reg::path_creator()."/mod/unique/sql/unique.php");
+require (Reg::path_creator()."/mod/constraint/sql/constraint.php");
 
-/***--------------------Загрузка файлов модуля сборочной------------------***/
+/***----------------------Класс работы с кодом-----------------***/
+require (Reg::path_creator()."/mod/pack/code/pack.php");
+require (Reg::path_creator()."/mod/entity/code/entity.php");
+
+require (Reg::path_creator()."/mod/entity/data/entity.php");
+
+/***------------Исполнение модуля сборочной (начало)-----------***/
 /* Файл действия */
 if
 (
@@ -112,69 +123,71 @@ if
 )
 {throw new Exception_Creator("Файла ".Reg::path_creator()."/mod/".Reg::mod()."/act/".Reg::act()."(_get|_post).php не существует.");}
 
-///* Шаблон действия */
-//if(!is_file(Reg::path_creator()."/mod/".Reg::mod()."/tpl/".Reg::act().".phtml"))
-//{throw new Exception_Creator("Файла ".Reg::path_creator()."/mod/".Reg::mod()."/tpl/".Reg::act().".phtml не существует.");}
-
-
-/***-----------------------Исполнение модуля сборочной----------------------***/
-/* Сбор буфера */
-ob_start();
-
-/* Окно типа list */
-if(is_file(Reg::path_creator()."/mod/".Reg::mod()."/act/".Reg::act().".php"))
+/* Помещаем в функцию чтобы закрыть глобальные переменные */
+function exe_mod()
 {
-	require (Reg::path_creator()."/mod/".Reg::mod()."/act/".Reg::act().".php");
-	$data = call_user_func("_".Reg::mod()."_".Reg::act());
-}
-/* Окно типа form */
-else
-{
-	/* GET форма */
-	require (Reg::path_creator()."/mod/".Reg::mod()."/act/".Reg::act()."_get.php");
-	$data = call_user_func("_".Reg::mod()."_".Reg::act()."_get");
-	if(is_array($data))
-	{$data = array_change_key_case($data);}
+	/* Все окна, кроме окон типа form */
+	if(is_file(Reg::path_creator()."/mod/".Reg::mod()."/act/".Reg::act().".php"))
+	{require (Reg::path_creator()."/mod/".Reg::mod()."/act/".Reg::act().".php");}
 	
-	/* POST форма */
-	if($_SERVER['REQUEST_METHOD'] == "POST")
+	/* Окно типа form */
+	else
 	{
-//		/* Проверка от CSRF */
-//		if($_SESSION['csrf_key'] != $_POST['csrf_key'])
-//		{throw new Exception_Creator("Ошибка CSRF");}
+		/***-----GET форма----***/
+		require (Reg::path_creator()."/mod/".Reg::mod()."/act/".Reg::act()."_get.php");
 		
-		try
+		/* FDATA - данные формы <input name="pole" value=$fdata['pole'] /> */
+		if(isset($fdata) and is_array($fdata))
+		{$fdata = array_change_key_case($fdata);}
+
+		/***-----POST форма----***/
+		if($_SERVER['REQUEST_METHOD'] == "POST")
 		{
-			require (Reg::path_creator()."/mod/".Reg::mod()."/act/".Reg::act()."_post.php");
-			call_user_func("_".Reg::mod()."_".Reg::act()."_post");
-		}
-		catch (Exception $e)
-		{
-			/* Ошибки */
-			$zn_error_common = $e->getMessage();
-			$zn_error_common_more = nl2br($e->__toString());
-			$zn_error = Err::get();	
-			Reg::zn_error($zn_error, true);
-		}
-		
-		/* Старые значения */
-		if(empty ($data) or !is_array($data))
-		{$data = array();}
-		foreach ($_POST as $key=>$val)
-		{
-			$key = mb_strtolower($key, "UTF-8");
-			$data[$key] = $val;
+//			/* Проверка от CSRF */
+//			if($_SESSION['csrf_key'] != $_POST['csrf_key'])
+//			{throw new Exception_Creator("Ошибка CSRF");}
+
+			try
+			{
+				require (Reg::path_creator()."/mod/".Reg::mod()."/act/".Reg::act()."_post.php");
+			}
+			/* Ошибки пользовательские */
+			catch (Exception_User $e)
+			{
+				Reg::zn_error(Err::get(), true);
+			}
+			/* Другие ошибки */
+			catch (Exception $e)
+			{
+				Reg::zn_error_common($e->getMessage());
+				Reg::zn_error_common_more(nl2br(str_replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;",$e->__toString())));
+			}
+
+			/* POST данные в переменную $fdata */
+			if(empty ($fdata) or !is_array($fdata))
+			{$fdata = array();}
+			
+			foreach ($_POST as $key=>$val)
+			{
+				$key = mb_strtolower($key, "UTF-8");
+				$fdata[$key] = $val;
+			}
 		}
 	}
+
+	/* Шаблон */
+	if(is_file(Reg::path_creator()."/mod/".Reg::mod()."/tpl/".Reg::act().".phtml"))
+	{require (Reg::path_creator()."/mod/".Reg::mod()."/tpl/".Reg::act().".phtml");}
+	
+	return true;
 }
 
-/* Шаблон */
-if(is_file(Reg::path_creator()."/mod/".Reg::mod()."/tpl/".Reg::act().".phtml"))
-{require (Reg::path_creator()."/mod/".Reg::mod()."/tpl/".Reg::act().".phtml");}
+/* Помещаем результат функции переменную через буфер  */
+ob_start();
+exe_mod();
 $zn_exe = ob_get_contents();
-
-/* Очищаем буфер */
 ob_end_clean();
+/***------------Исполнение модуля сборочной (конец)-----------***/
 
 /* CSRF */
 $csrf_key = md5(microtime(true)+mt_rand(1, 100000000));

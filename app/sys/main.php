@@ -1,14 +1,23 @@
 <?php
 //header("Content-Type: text/plain");
-session_start();
-
 try
 {
 	/*** Конфигурация и реестр ***/
 	require(dirname(__FILE__)."/reg.php");
 	require(dirname(__FILE__)."/../conf/conf.php");
 	require(dirname(__FILE__)."/../conf/options.php");
-
+	
+	/*** Общее ***/
+	if(Reg::header_utf())
+	{header("Content-type: text/html; charset=utf-8");}
+	
+	if(Reg::error_reporting())
+	{error_reporting(-1);}
+	else
+	{error_reporting(0);}
+	
+	session_start();
+	
 	/*** Основные файлы ***/
 	require(Reg::path_app()."/sys/function.php");
 	require(Reg::path_app()."/sys/exception.php");
@@ -30,8 +39,10 @@ try
 		$file_app = clone $file;
 		$file_app->set_path(Reg::ftp_path_app());
 	}
+	
 	Reg::file($file);
 	Reg::file_app($file_app);
+	
 	unset($file, $file_app);
 
 	Reg::_unset("ftp_host","ftp_user","ftp_pass","ftp_path_www","ftp_path_app","ftp_port","ftp_ssl");

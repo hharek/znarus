@@ -227,6 +227,16 @@ class Reg
 	 * @return ZN_Pgsql
 	 */
 	private static function db_creator(){}
+	
+	/**
+	 * @return ZN_FTP 
+	 */
+	private static function file(){}
+	
+	/**
+	 * @return ZN_FTP 
+	 */
+	private static function file_app(){}
 }
 
 ?>

@@ -1,16 +1,16 @@
-<form method="post" action="/<?php echo Reg::url_creator(); ?>/field_type/edit/?id=<?php echo $data['id']; ?>">
+<form method="post" action="/<?php echo Reg::url_creator(); ?>/field_type/edit/?id=<?php echo $type['ID']; ?>">
 	<table width="90%" class="forma" align="center">
 		<tr>
 			<td width="50%" align="right">Идентификатор</td>
 			<td width="50%" align="left">
-				<input type="text" name="identified" value="<?php echo $data['identified']; ?>"/>
+				<input type="text" name="identified" value="<?php echo $fdata['identified']; ?>"/>
 				<?php echo Helper::warn("identified"); ?>
 			</td>
 		</tr>
 		<tr>
 			<td align="right">Описание</td>
 			<td align="left">
-				<input type="text" name="desc" value="<?php echo $data['desc']; ?>"/>
+				<input type="text" name="desc" value="<?php echo $fdata['desc']; ?>"/>
 				<?php echo Helper::warn("desc"); ?>
 			</td>
 		</tr>

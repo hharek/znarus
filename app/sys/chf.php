@@ -6,7 +6,19 @@
 class Chf
 {
 
+	/**
+	 * Текст последней ошибки
+	 * 
+	 * @var string
+	 */
 	private static $error = "";
+	
+	/**
+	 * Максимальный размер строки в байтах (1 Мб)
+	 * 
+	 * @var type 
+	 */
+	private static $max_size = 1048576;
 
 	/**
 	 * Последняя ошибка
@@ -27,7 +39,29 @@ class Chf
 	 */
 	public static function __callStatic($func, $args)
 	{
-		if(!in_array($func, array("int","uint","float","price","string","text","html","identified","file","url","email","date","timestamp","path")))
+		$type_ar = array
+		(
+			"blob",
+			"bool",
+			"date",
+			"email",
+			"file",
+			"float",
+			"html",
+			"identified",
+			"image",
+			"int",
+			"md5",
+			"price",
+			"string",
+			"text",
+			"timestamp",
+			"uint",
+			"url",
+			"path"
+		);
+		
+		if(!in_array($func, $type_ar))
 		{
 			throw new Exception("Не найден тип \"{$func}\".");
 		}
@@ -39,7 +73,12 @@ class Chf
 		
 		try
 		{
-			self::check($args[0]);
+			if($func != "blob")
+			{
+				$args[0] = (string) $args[0];
+				self::check($args[0]);
+			}
+			
 			call_user_func("self::_".$func, $args[0]);
 		}
 		catch (Exception $e)
@@ -88,226 +127,48 @@ class Chf
 		{
 			throw new Exception("Бинарная строка, либо символы не в UTF-8.");
 		}
-
-		return true;
-	}
-
-	/**
-	 * Число со знаком
-	 * 
-	 * @param string $str
-	 * @return bool
-	 */
-	private static function _int($str)
-	{
-		if (!is_numeric($str))
+		
+		/* Превышает допустимый размер */
+		if(mb_strlen($str, "latin1") > self::$max_size)
 		{
-			throw new Exception("Не является числом.");
+			throw new Exception("Слишком большая строка.");
 		}
 
 		return true;
 	}
 
 	/**
-	 * Число без знака
+	 * Бинарная строка
 	 * 
 	 * @param string $str
-	 * @return bool 
+	 * @return boolean
 	 */
-	private static function _uint($str)
+	private static function _blob($str)
 	{
-		if (!is_numeric($str))
+		if(mb_strlen($str, "latin1") > self::$max_size)
 		{
-			throw new Exception("Не является числом.");
+			throw new Exception("Слишком большая строка.");
 		}
-
-		$str = (int) $str;
-
-		if ($str != abs($str))
-		{
-			throw new Exception("Отрицательное число.");
-		}
-
-		return true;
-	}
-
-	/**
-	 * Число с плавающей запятой
-	 * 
-	 * @param string $str
-	 * @return bool 
-	 */
-	private static function _float($str)
-	{
-		if (!is_numeric($str))
-		{
-			throw new Exception("Не является числом.");
-		}
-
-		$pos = strpos($str, ".");
-		if ($pos === false)
-		{
-			throw new Exception("Целое число.");
-		}
-
-		return true;
-	}
-
-	/**
-	 * Цена - два числа после запятой всегда положительная
-	 * 
-	 * @param string $str
-	 * @return bool 
-	 */
-	private static function _price($str)
-	{
-		if (!is_numeric($str))
-		{
-			throw new Exception("Не является числом.");
-		}
-
-		$pos = strpos($str, ".");
-		if ($pos === false)
-		{
-			throw new Exception("Целое число.");
-		}
-
-		if (substr($str, -3, 1) != ".")
-		{
-			throw new Exception("Необходимо две цифры после запятой.");
-		}
-
-		return true;
-	}
-
-	/**
-	 * Строка не более 255 символов, и без пробельных символов
-	 * 
-	 * @param string $str
-	 * @return bool 
-	 */
-	private static function _string($str)
-	{
-		$result = strpbrk($str, "\n\r\t\v\f\$\\");
-		if ($result !== false)
-		{
-			throw new Exception("Пробельные символы.");
-		}
-
-		$result = strpbrk($str, "><");
-		if ($result !== false)
-		{
-			throw new Exception("HTML-символы.");
-		}
-
-		if (mb_strlen($str, "UTF-8") > 255)
-		{
-			throw new Exception("Большая строка.");
-		}
-
-		return true;
-	}
-
-	/**
-	 * Cтрока без html-тегов
-	 * 
-	 * @param string $str
-	 * @return bool
-	 */
-	private static function _text($str)
-	{
-		$result = strpbrk($str, "><");
-		if ($result !== false)
-		{
-			throw new Exception("HTML-символы.");
-		}
-
-		return true;
-	}
-
-	/**
-	 * Строка без содержания тега <script>
-	 * 
-	 * @param string $str
-	 * @return bool
-	 */
-	private static function _html($str)
-	{
-		$result = mb_strpos($str, "<script", 0, "UTF-8");
-		if ($result !== false)
-		{
-			throw new Exception("Наличие тега <script>.");
-		}
-
-		return true;
-	}
-
-	/**
-	 * Идентификатор
-	 * 
-	 * @param string $str
-	 * @return bool
-	 */
-	private static function _identified($str)
-	{
-		if (!preg_match("#^[a-z0-9_]+$#isu", $str))
-		{
-			throw new Exception("Допускаются символы: a-z,0-9,\"_\" .");
-		}
-
-		return true;
-	}
-
-	/**
-	 * Файл
-	 * 
-	 * @param string $str
-	 * @return bool
-	 */
-	private static function _file($str)
-	{
-		if (!preg_match("#^[a-z0-9_-]+\.[a-z0-9]+$#isu", $str))
-		{
-			throw new Exception("Неодпустимые символы.");
-		}
-
-		return true;
-	}
-
-	/**
-	 * Урл
-	 * 
-	 * @param string $str
-	 * @return bool 
-	 */
-	private static function _url($str)
-	{
-		if (!preg_match("#^[\w\/]+$#isu", $str))
-		{
-			throw new Exception("Недопустимые символы.");
-		}
-
+		
 		return true;
 	}
 	
 	/**
-	 * Почтовый ящик
+	 * Булёвое значение
 	 * 
 	 * @param string $str
-	 * @return bool
+	 * @return boolean 
 	 */
-	private static function _email($str)
+	private static function _bool($str)
 	{
-		self::check($str);
-
-		if (!preg_match("#^[a-zA-Z0-9_\-\.]+@[a-zA-Z0-9\-\.]+\.[a-z]{2,}$#isu", $str))
+		if($str !== "0" and $str !== "1")
 		{
-			throw new Exception("Недопустимые символы.");
+			throw new Exception("Необходимо указать \"0\" или \"1\".");
 		}
-
+		
 		return true;
 	}
-
+	
 	/**
 	 * Дата в формате dd.mm.YYYY
 	 * 
@@ -374,7 +235,221 @@ class Chf
 
 		return true;
 	}
+	
+	/**
+	 * Почтовый ящик
+	 * 
+	 * @param string $str
+	 * @return bool
+	 */
+	private static function _email($str)
+	{
+		self::check($str);
 
+		if (!preg_match("#^[a-zA-Z0-9_\-\.]+@[a-zA-Z0-9\-\.]+\.[a-z]{2,}$#isu", $str))
+		{
+			throw new Exception("Недопустимые символы.");
+		}
+
+		return true;
+	}
+	
+	/**
+	 * Файл
+	 * 
+	 * @param string $str
+	 * @return bool
+	 */
+	private static function _file($str)
+	{
+		if (!preg_match("#^[a-z0-9_-]+\.[a-z0-9]+$#isu", $str))
+		{
+			throw new Exception("Неодпустимые символы.");
+		}
+
+		return true;
+	}
+	
+	/**
+	 * Число с плавающей запятой
+	 * 
+	 * @param string $str
+	 * @return bool 
+	 */
+	private static function _float($str)
+	{
+		if (!is_numeric($str))
+		{
+			throw new Exception("Не является числом.");
+		}
+
+		$pos = strpos($str, ".");
+		if ($pos === false)
+		{
+			throw new Exception("Целое число.");
+		}
+
+		return true;
+	}
+	
+	/**
+	 * Строка без содержания тега <script>
+	 * 
+	 * @param string $str
+	 * @return bool
+	 */
+	private static function _html($str)
+	{
+		$result = mb_strpos($str, "<script", 0, "UTF-8");
+		if ($result !== false)
+		{
+			throw new Exception("Наличие тега <script>.");
+		}
+
+		return true;
+	}
+	
+	/**
+	 * Идентификатор
+	 * 
+	 * @param string $str
+	 * @return bool
+	 */
+	private static function _identified($str)
+	{
+		if (!preg_match("#^[a-z0-9_]+$#isu", $str))
+		{
+			throw new Exception("Допускаются символы: a-z,0-9,\"_\" .");
+		}
+
+		return true;
+	}
+	
+	/**
+	 * Наименование файла рисунка
+	 * 
+	 * @param string $str
+	 * @return boolean 
+	 */
+	private static function _image($str)
+	{
+		if (!preg_match("#^[a-z0-9_\-.]+\.(gif|jpg|png)+$#isu", $str))
+		{
+			throw new Exception("Допускаются символы a-z,0-9,\"_\", \".\" в наименовании и расширение gif, jpg, png.");
+		}
+				
+		return true;
+	}
+	
+	/**
+	 * Число со знаком
+	 * 
+	 * @param string $str
+	 * @return bool
+	 */
+	private static function _int($str)
+	{
+		if (!is_numeric($str))
+		{
+			throw new Exception("Не является числом.");
+		}
+
+		return true;
+	}
+	
+	/**
+	 * Строка MD5
+	 * 
+	 * @param string $str
+	 * @return boolean 
+	 */
+	private static function _md5($str)
+	{
+		if (!preg_match("#^[a-z0-9]+$#isu", $str))
+		{
+			throw new Exception("Допускаются символы a-z,0-9.");
+		}
+
+		if(mb_strlen($str, "latin1") != 32)
+		{
+			throw new Exception("Строка должна содержать 32 символа.");
+		}
+				
+		return true;
+	}
+	
+	/**
+	 * Цена - два числа после запятой всегда положительная
+	 * 
+	 * @param string $str
+	 * @return bool 
+	 */
+	private static function _price($str)
+	{
+		if (!is_numeric($str))
+		{
+			throw new Exception("Не является числом.");
+		}
+
+		$pos = strpos($str, ".");
+		if ($pos === false)
+		{
+			throw new Exception("Целое число.");
+		}
+
+		if (substr($str, -3, 1) != ".")
+		{
+			throw new Exception("Необходимо две цифры после запятой.");
+		}
+
+		return true;
+	}
+	
+	/**
+	 * Строка не более 255 символов, и без пробельных символов
+	 * 
+	 * @param string $str
+	 * @return bool 
+	 */
+	private static function _string($str)
+	{
+		$result = strpbrk($str, "\n\r\t\v\f\$\\");
+		if ($result !== false)
+		{
+			throw new Exception("Пробельные символы.");
+		}
+
+		$result = strpbrk($str, "><");
+		if ($result !== false)
+		{
+			throw new Exception("HTML-символы.");
+		}
+
+		if (mb_strlen($str, "UTF-8") > 255)
+		{
+			throw new Exception("Большая строка.");
+		}
+
+		return true;
+	}
+	
+	/**
+	 * Cтрока без html-тегов
+	 * 
+	 * @param string $str
+	 * @return bool
+	 */
+	private static function _text($str)
+	{
+		$result = strpbrk($str, "><");
+		if ($result !== false)
+		{
+			throw new Exception("HTML-символы.");
+		}
+
+		return true;
+	}
+	
 	/**
 	 * Дата и время в формате timestamp
 	 * 
@@ -392,6 +467,45 @@ class Chf
 		return true;
 	}
 
+	/**
+	 * Число без знака
+	 * 
+	 * @param string $str
+	 * @return bool 
+	 */
+	private static function _uint($str)
+	{
+		if (!is_numeric($str))
+		{
+			throw new Exception("Не является числом.");
+		}
+
+		$str = (int) $str;
+
+		if ($str != abs($str))
+		{
+			throw new Exception("Отрицательное число.");
+		}
+
+		return true;
+	}
+
+	/**
+	 * Урл
+	 * 
+	 * @param string $str
+	 * @return bool 
+	 */
+	private static function _url($str)
+	{
+		if (!preg_match("#^[\w\/]+$#isu", $str))
+		{
+			throw new Exception("Недопустимые символы.");
+		}
+
+		return true;
+	}
+	
 	/**
 	 * Путь к файлу или каталогу
 	 * 

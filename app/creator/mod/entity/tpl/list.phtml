@@ -1,25 +1,38 @@
-<p class="title">Сущности пакета "<?php echo $data['pack']['Name']; ?>"</p>
-<table width="90%" class="list" id="table_entity_list" align="center">
+<p class="title">Сущности пакета "<?php echo $pack['Name']; ?>"</p>
+<table width="90%" class="list" align="center">
 	<colgroup>
-		<col width="40%" />
-		<col width="40%" />
-		<col width="20%" />
+		<col width="30%" />
+		<col width="30%" />
+		<col width="10%" />
+		<col width="15%" />
+		<col width="15%" />
 	</colgroup>
 	<thead>
 		<tr>
 			<th>Идентификатор</th>
 			<th>Наименование</th>
+			<th>PHP</th>
+			<th>SQL</th>
 			<th>Ред.</th>
 		</tr>
 	</thead>
 	<tbody>
-		<?php foreach ($data['entity'] as $val): ?>
+		<?php foreach ($entity as $val): ?>
 		<tr>
 			<td>
 				<a href="/<?php echo Reg::url_creator(); ?>/field/list/?entity_id=<?php echo $val['ID']; ?>"><?php echo $val['Name']; ?></a>
 			</td>
 			<td>
 				<a href="/<?php echo Reg::url_creator(); ?>/field/list/?entity_id=<?php echo $val['ID']; ?>"><?php echo $val['Identified']; ?></a>
+			</td>
+			<td>
+				<a href="/<?php echo Reg::url_creator(); ?>/entity/php/?id=<?php echo $val['ID']; ?>">php</a>
+			</td>
+			<td>
+				<a href="/<?php echo Reg::url_creator(); ?>/entity/insert/?id=<?php echo $val['ID']; ?>">ins.</a>
+				&nbsp;/&nbsp;
+				<a href="/<?php echo Reg::url_creator(); ?>/entity/truncate/?id=<?php echo $val['ID']; ?>">trn.</a>
+				&nbsp;(<?php echo $val['count']; ?>)
 			</td>
 			<td>
 				<a href="/<?php echo Reg::url_creator(); ?>/entity/edit/?id=<?php echo $val['ID']; ?>">Ред.</a>
@@ -32,10 +45,11 @@
 </table>
 <br/>
 <center>
-	<a href="/<?php echo Reg::url_creator(); ?>/entity/add/?pack_id=<?php echo $data['pack']['ID']; ?>">
+	<a href="/<?php echo Reg::url_creator(); ?>/entity/add/?pack_id=<?php echo $pack['ID']; ?>">
 		<input type="button" value="Добавить" class="knopka"/>
 	</a>
 	<a href="/<?php echo Reg::url_creator(); ?>/pack/list/">
 		<input type="button" value="Назад" class="knopka"/>
 	</a>
 </center>
+

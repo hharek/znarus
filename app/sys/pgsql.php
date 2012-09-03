@@ -491,7 +491,7 @@ class ZN_Pgsql
 		$cache_time = trim($cache_time);
 		
 		/* Берём данные из кэша */
-		if ($this->_cache == true and $is_modify == false and is_file($this->_cache_dir . "/query/" . $this->_get_cache_file_name_query($query, "assoc")))
+		if (!empty($tables) and $this->_cache == true and $is_modify == false and is_file($this->_cache_dir . "/query/" . $this->_get_cache_file_name_query($query, "assoc")))
 		{
 			$cache_result = unserialize(file_get_contents($this->_cache_dir . "/query/" . $this->_get_cache_file_name_query($query, "assoc")));
 			if(time() <= $cache_result['time'])
@@ -583,7 +583,7 @@ class ZN_Pgsql
 		$cache_time = trim($cache_time);
 
 		/* Берём данные из кэша */
-		if ($this->_cache == true and $is_modify == false and is_file($this->_cache_dir . "/query/" . $this->_get_cache_file_name_query($query, "column")))
+		if (!empty($tables) and $this->_cache == true and $is_modify == false and is_file($this->_cache_dir . "/query/" . $this->_get_cache_file_name_query($query, "column")))
 		{
 			$cache_result = unserialize(file_get_contents($this->_cache_dir . "/query/" . $this->_get_cache_file_name_query($query, "column")));
 			if(time() <= $cache_result['time'])
@@ -676,7 +676,7 @@ class ZN_Pgsql
 		$cache_time = trim($cache_time);
 
 		/* Берём данные из кэша */
-		if ($this->_cache == true and $is_modify == false and is_file($this->_cache_dir . "/query/" . $this->_get_cache_file_name_query($query, "line")))
+		if (!empty($tables) and $this->_cache == true and $is_modify == false and is_file($this->_cache_dir . "/query/" . $this->_get_cache_file_name_query($query, "line")))
 		{
 			$cache_result = unserialize(file_get_contents($this->_cache_dir . "/query/" . $this->_get_cache_file_name_query($query, "line")));
 			if(time() <= $cache_result['time'])
@@ -764,7 +764,7 @@ class ZN_Pgsql
 		$cache_time = trim($cache_time);
 
 		/* Берём данные из кэша */
-		if ($this->_cache == true and $is_modify == false and is_file($this->_cache_dir . "/query/" . $this->_get_cache_file_name_query($query, "one")))
+		if (!empty($tables) and $this->_cache == true and $is_modify == false and is_file($this->_cache_dir . "/query/" . $this->_get_cache_file_name_query($query, "one")))
 		{
 			$cache_result = unserialize(file_get_contents($this->_cache_dir . "/query/" . $this->_get_cache_file_name_query($query, "one")));
 			if(time() <= $cache_result['time'])
@@ -853,7 +853,7 @@ class ZN_Pgsql
 		$result = @pg_query($this->_db_conn, $query);
 		if ($result === false)
 		{
-			throw new Exception("Ошибка в запросе. ".pg_last_error($this->_db_conn), 113);
+			throw new Exception("Ошибка в запросе. \n {$query} \n\n".pg_last_error($this->_db_conn), 113);
 		}
 
 		pg_free_result($result);
@@ -1125,6 +1125,7 @@ SQL;
 						$replace[] = "false";
 					}
 				}
+				/* Не экранировать числа */
 				elseif (is_int($param[$val['number'] - 1]) or is_float($param[$val['number'] - 1])) 
 				{
 					$replace[] = $param[$val['number'] - 1];
@@ -1136,7 +1137,10 @@ SQL;
 				}
 			}
 		}
-
+		
+		$search = array_reverse($search);
+		$replace = array_reverse($replace);
+		
 		$query = str_replace($search, $replace, $query);
 
 		return $query;

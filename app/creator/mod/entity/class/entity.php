@@ -26,6 +26,8 @@ class ZN_Entity
 		{Err::add("Описание задано неверно. ".Chf::error(), "desc");}
 		
 		ZN_Pack::is_id($pack_id);
+		$pack = ZN_Pack::select_line_by_id($pack_id);
+		$table = ZN_SQL_Entity::get_table_name($pack['Identified'], $identified);
 		
 		Err::exception();
 		
@@ -35,15 +37,19 @@ class ZN_Entity
 		Err::exception();
 		
 		/* Выполнить SQL */
-		ZN_SQL_Entity::add($identified, $pack_id);
+		Reg::db()->multi_query(ZN_SQL_Entity::add($identified, $pack_id));
+		
+		/* Работа с кодом */
+		ZN_Code_Entity::add($name, $identified, $pack_id);
+		$md5_file = md5(Reg::file_app()->get("constr/".ZN_Code_Entity::get_file_name($pack['Identified'], $identified).".php"));
 		
 		/* Добавить */
 		$query = 
 <<<SQL
-INSERT INTO "entity"("Name", "Identified", "Desc", "Pack_ID")
-VALUES ($1, $2, $3, $4)
+INSERT INTO "entity"("Name", "Identified", "Table", "Desc", "MD5_File", "Pack_ID")
+VALUES ($1, $2, $3, $4, $5, $6)
 SQL;
-		Reg::db_creator()->query($query, array($name, $identified, $desc, $pack_id), "entity", true);
+		Reg::db_creator()->query($query, array($name, $identified, $table, $desc, $md5_file, $pack_id), "entity", true);
 		
 		return  true;
 	}
@@ -71,9 +77,6 @@ SQL;
 		if(!empty($desc) and !Chf::text($desc))
 		{Err::add("Описание задано неверно. ".Chf::error(), "desc");}
 		
-		Err::exception();
-		
-		/* Уникальность */
 		$query = 
 <<<SQL
 SELECT "Pack_ID"
@@ -81,13 +84,27 @@ FROM "entity"
 WHERE "ID" = $1
 SQL;
 		$pack_id = Reg::db_creator()->query_one($query, $id, "entity");
+		$pack = ZN_Pack::select_line_by_id($pack_id);
 		
+		$table = ZN_SQL_Entity::get_table_name($pack['Identified'], $identified);
+		
+		Err::exception();
+		
+		/* Уникальность */
 		self::_unique($name, $identified, $pack_id, $id);
 		
 		Err::exception();
 		
 		/* Выполнить SQL */
-		ZN_SQL_Entity::edit($id, $identified);
+		$sql_edit = ZN_SQL_Entity::edit($id, $identified);
+		if(mb_strlen($sql_edit, "UTF-8") > 0)
+		{
+			Reg::db()->multi_query($sql_edit);
+			ZN_Entity::set_table($id, $table);
+		}
+		
+		/* Работа с кодом */
+		ZN_Code_Entity::edit($id, $name, ZN_Code_Entity::get_class_name($pack['Identified'], $identified), ZN_Code_Entity::get_file_name($pack['Identified'], $identified));
 		
 		/* Редактировать */
 		$query = 
@@ -96,10 +113,11 @@ UPDATE "entity"
 SET 
 	"Name" = $1, 
 	"Identified" = $2,
-	"Desc" = $3
-WHERE "ID" = $4
+	"Table" = $3,
+	"Desc" = $4
+WHERE "ID" = $5
 SQL;
-		Reg::db_creator()->query($query, array($name, $identified, $desc, $id), "entity", true);
+		Reg::db_creator()->query($query, array($name, $identified, $table, $desc, $id), "entity", true);
 
 		return  true;
 	}
@@ -115,12 +133,32 @@ SQL;
 		/* Проверка */
 		self::is_id($id);
 		
-		/* Зависемости */
+		/* Нельзя удалить сущность на которую ссылаются */
+		$query = 
+<<<SQL
+SELECT COUNT(*) as count
+FROM "field"
+WHERE "Entity_ID" = $1
+AND "ID" IN 
+(
+	SELECT "Foreign_ID"
+	FROM "field"
+	WHERE "Foreign_ID" IS NOT NULL
+)
+SQL;
+		$count = Reg::db_creator()->query_one($query, $id, array("field","field_type"));
+		if($count > 0)
+		{
+			throw new Exception_Creator("Нельзя удалить сущность на которую ссылаются.");
+		}
+		
+		/* Удалить поля */
 		$query = 
 <<<SQL
 SELECT "ID"
 FROM "field"
 WHERE "Entity_ID" = $1
+ORDER BY "ID" DESC
 SQL;
 		$field = Reg::db_creator()->query_column($query, $id, "field");
 		if(!empty ($field))
@@ -130,7 +168,10 @@ SQL;
 		}
 		
 		/* Выполнить SQL */
-		ZN_SQL_Entity::delete($id);
+		Reg::db()->multi_query(ZN_SQL_Entity::delete($id));
+		
+		/* Работа с кодом */
+		ZN_Code_Entity::delete($id);
 		
 		/* Удаление */
 		$query = 
@@ -224,7 +265,7 @@ SQL;
 		
 		$query = 
 <<<SQL
-SELECT "ID", "Name", "Identified", "Desc", "Pack_ID"
+SELECT "ID", "Name", "Identified", "Table", "Desc", "Pack_ID"
 FROM "entity"
 WHERE "Pack_ID" = $1
 ORDER BY "Identified" ASC
@@ -246,13 +287,57 @@ SQL;
 		
 		$query = 
 <<<SQL
-SELECT "ID", "Name", "Identified", "Desc", "Pack_ID"
+SELECT "ID", "Name", "Identified", "Table", "Desc", "Pack_ID"
 FROM "entity"
 WHERE "ID" = $1
 SQL;
 		$entity = Reg::db_creator()->query_line($query, $id, "entity");
 		
 		return $entity;
+	}
+	
+	/**
+	 * Назначить новое наименование для таблицы
+	 * 
+	 * @param int $id
+	 * @param string $table
+	 * @return boolean 
+	 */
+	public static function set_table($id, $table)
+	{
+		self::is_id($id);
+		
+		$query = 
+<<<SQL
+UPDATE "entity"
+SET 
+	"Table" = $1
+WHERE "ID" = $2
+SQL;
+		Reg::db_creator()->query($query, array($table, $id), "entity", true);
+		
+		return true;
+	}
+	
+	/**
+	 * Получить столбец ID у таблицы
+	 * 
+	 * @param int $id
+	 * @return bool
+	 */
+	public static function get_field_id($id)
+	{
+		$query = 
+<<<SQL
+SELECT "f"."ID", "f"."Identified", "f"."Name"
+FROM "field" as "f", "field_type" as "t"
+WHERE "f"."Entity_ID" = $1
+AND "f"."Type_ID" = "t"."ID"
+AND "t"."Identified" = 'id'
+SQL;
+		$field_id = Reg::db_creator()->query_line($query, $id, array('field','field_type'));
+		
+		return $field_id;
 	}
 }
 ?>

@@ -68,6 +68,9 @@ SQL;
 		/* Выполнить SQL */
 		ZN_SQL_Pack::edit($id, $identified);
 		
+		/* Работа с кодом */
+		ZN_Code_Pack::edit($id, $identified);
+		
 		/* Редактировать */
 		$query = 
 <<<SQL
@@ -94,18 +97,7 @@ SQL;
 		self::is_id($id);
 		
 		/* Зависимости */
-		$query = 
-<<<SQL
-SELECT "ID"
-FROM "entity"
-WHERE "Pack_ID" = $1
-SQL;
-        $entity = Reg::db_creator()->query_column($query, $id, "entity");
-		if(!empty ($entity))
-		{
-			foreach ($entity as $val)
-			{ZN_Entity::delete($val);}
-		}
+		self::_delete_entity($id);
 		
 		/* Удаление */
 		$query = 
@@ -223,6 +215,55 @@ SQL;
 		$pack = Reg::db_creator()->query_line($query, $id, "pack");
 		
 		return $pack;
+	}
+	
+	/**
+	 * Рекурсивная функция удаления сущности у пакета
+	 * 
+	 * @param int $pack_id
+	 * @return boolean 
+	 */
+	private static function _delete_entity($id)
+	{
+		/* Выборка сущностей */
+		$query = 
+<<<SQL
+SELECT "ID"
+FROM "entity"
+WHERE "Pack_ID" = $1
+SQL;
+        $entity = Reg::db_creator()->query_column($query, $id, "entity");
+		
+		/* Сущностей нет выходим */
+		if(empty($entity))
+		{return true;}
+		
+		/* Поиск сущностей для удаления */
+		foreach ($entity as $val)
+		{
+			$query = 
+<<<SQL
+SELECT COUNT(*) as count
+FROM "field"
+WHERE "Entity_ID" = $1
+AND "ID" IN 
+(
+	SELECT "Foreign_ID"
+	FROM "field"
+	WHERE "Foreign_ID" IS NOT NULL
+	AND "Entity_ID" != $2
+)
+SQL;
+			$count = Reg::db_creator()->query_one($query, array($val, $val), array("field","field_type"));
+			if($count < 1)
+			{
+				ZN_Entity::delete($val);
+				self::_delete_entity($id);
+				break;
+			}
+		}
+		
+		return true;
 	}
 }
 ?>

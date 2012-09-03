@@ -1,17 +1,17 @@
-<p style="text-align: center;">Добавить поле к сущности "<?php echo $data['entity']['Name']; ?>"</p>
-<form method="post" action="/<?php echo Reg::url_creator(); ?>/field/add/?entity_id=<?php echo $data['entity']['ID']; ?>">
+<p style="text-align: center;">Добавить поле к сущности "<?php echo $entity['Name']; ?>"</p>
+<form method="post" action="/<?php echo Reg::url_creator(); ?>/field/add/?entity_id=<?php echo $entity['ID']; ?>">
 	<table width="90%" class="forma" align="center">
 		<tr>
 			<td width="50%" align="right">Наименование</td>
 			<td width="50%" align="left"> 
-				<input type="text" name="name" value="<?php echo $data['name']; ?>"/>
+				<input type="text" id="name" name="name" value="<?php echo $fdata['name']; ?>"/>
 				<?php echo Helper::warn("name"); ?>
 			</td>
 		</tr>
 		<tr>
 			<td align="right">Идентификатор</td>
 			<td align="left">
-				<input type="text" name="identified" value="<?php echo $data['identified']; ?>"/>
+				<input type="text" id="identified" name="identified" value="<?php echo $fdata['identified']; ?>"/>
 				<?php echo Helper::warn("identified"); ?>
 			</td>
 		</tr>
@@ -19,19 +19,24 @@
 			<td align="right">Тип</td>
 			<td align="left">
 				<select id="type_id" name="type_id" style="width: 200px;">
-					<?php foreach ($data['type'] as $val): ?>
-						<option value="<?php echo $val['ID']; ?>" <?php if($val['ID'] == $data['type_id']): ?>selected="selected"<?php endif; ?><?php if(in_array($val['Identified'], array("id","sort","enum","foreign"))): ?>style="color: #6a0a0a;"<?php endif; ?>>
-							<?php echo $val['Identified']; ?>
+					<?php foreach ($type as $val): ?>
+						<option value="<?php echo $val['ID']; ?>" 
+								<?php if($val['ID'] == $fdata['type_id']): ?>selected="selected"<?php endif; ?>
+								<?php if(in_array($val['Identified'], array("id","sort","enum","foreign"))): ?>style="color: #6a0a0a;"<?php endif; ?>
+								about="<?php echo $val['Desc']; ?>"
+						>
+								<?php echo $val['Identified']; ?>
 						</option>
 					<?php endforeach; ?>
 				</select>
+				<img id="img_type_about" src="/<?php echo Reg::url_creator(); ?>/file.php?path=img/about.png" width="24" height="24" style="cursor: pointer; margin: 0 0 -6px 10px;" title="" />
 				<?php echo Helper::warn("type_id"); ?>
 			</td>
 		</tr>
 		<tr>
 			<td align="right">Описание</td>
 			<td>
-				<textarea name="desc"><?php echo $data['desc']; ?></textarea>
+				<textarea name="desc"><?php echo $fdata['desc']; ?></textarea>
 				<?php echo Helper::warn("desc"); ?>
 			</td>
 		</tr>
@@ -39,39 +44,82 @@
 			<td align="right">NULL</td>
 			<td>
 				<input type="hidden" name="null" value="0"/>
-				<input style="width: 10px;" type="checkbox" name="null"<?php if($data['null']==true): ?> checked="checked"<?php endif; ?>/>
+				<input style="width: 10px;" type="checkbox" name="null" value="1"<?php if($fdata['null']=="1"): ?> checked="checked"<?php endif; ?>/>
 			</td>
 		</tr>
 		<tr id="tr_default">
 			<td align="right">По умолчанию</td>
 			<td align="left">
-				<input type="text" name="default" value="<?php echo $data['default']; ?>"/>
+				<input type="text" name="default" value="<?php echo $fdata['default']; ?>"/>
 				<?php echo Helper::warn("default"); ?>
 			</td>
 		</tr>
+		
 		<tr id="tr_foreign" style="display: none;">
 			<td align="right">Внешний ключ</td>
 			<td>
-				<select name="foreign_id" style="width: 200px;">
-					<?php foreach ($data['foreign'] as $val): ?>
-						<option disabled="disabled"><?php echo $val['Name']; ?></option>
-						<?php if(!empty ($val['field'])): ?>
-							<?php foreach ($val['field'] as $f_val): ?>
-							<option value="<?php echo $f_val['ID'];?>"<?php if($f_val['ID'] == $data['foreign_id']): ?> selected="selected"<?php endif; ?>>
-								&nbsp;&nbsp;<?php echo $f_val['Name']; ?>
-							</option>
-							<?php endforeach; ?>
-						<?php endif; ?>
+				<select id="foreign_id" name="foreign_id" style="width: 250px;">
+					<?php foreach ($foreign as $val): ?>
+						<option 
+							value="<?php echo $val['ID'];?>"
+							<?php if($val['ID'] == $fdata['foreign_id']): ?> selected="selected"<?php endif; ?>
+							entity_identified="<?php echo $val['Entity_Identified']; ?>"
+							entity_name="<?php echo $val['Entity_Name']; ?>"
+							field_identified="<?php echo $val['Identified']; ?>"
+						>
+							<?php echo $val['Entity_Name']; ?>&nbsp;(<?php echo $val['Name']; ?>)
+						</option>
 					<?php endforeach; ?>
 				</select>
+				<input type="button" id="button_foreign_all" value="др." style="width: 40px; cursor: pointer;" />
+				<input type="hidden" id="foreign_all_view" name="foreign_all_view" value="<?php echo $_POST['foreign_all_view']; ?>"/>
+				<?php echo Helper::warn("foreign_id"); ?>
 			</td>
 		</tr>
+		<tr id="tr_foreign_all">
+			<td align="right">&nbsp;</td>
+			<td>
+				<select id="foreign_id_all" name="foreign_id" style="width: 250px;" disabled="disabled">
+					<?php foreach ($foreign_all as $p_val): ?>
+						<option disabled="disabled"><?php echo $p_val['name']; ?></option>
+						<?php foreach ($p_val['field'] as $f_val): ?>
+							<option 
+								value="<?php echo $f_val['id'];?>"
+								<?php if($f_val['id'] == $fdata['foreign_id']): ?> selected="selected"<?php endif; ?>
+								entity_identified="<?php echo $f_val['entity_identified']; ?>"
+								entity_name="<?php echo $f_val['entity_name']; ?>"
+								field_identified="<?php echo $f_val['identified']; ?>"
+							>
+							&nbsp;&nbsp;<?php echo $f_val['entity_name']; ?>&nbsp;(<?php echo $f_val['name']; ?>)
+							</option>
+						<?php endforeach; ?>
+					<?php endforeach; ?>
+				</select>
+				<?php echo Helper::warn("foreign_id"); ?>
+			</td>
+		</tr>
+		<tr id="tr_foreign_change" style="display: none;">
+			<td align="right">Изменяемый внешний ключ</td>
+			<td>
+				<input type="hidden" name="foreign_change" value="0"/>
+				<input type="checkbox" name="foreign_change" id="foreign_change" style="width: 10px;" value="1"<?php if($fdata['foreign_change']=="1"): ?> checked="checked"<?php endif; ?>/>
+			</td>
+		</tr>
+		
+		<tr id="tr_is_order">
+			<td align="right">Использовать в сортировке</td>
+			<td>
+				<input type="hidden" name="is_order" value="0"/>
+				<input type="checkbox" name="is_order" id="is_order" style="width: 10px;" value="1"<?php if($fdata['is_order']=="1"): ?> checked="checked"<?php endif; ?>/>
+			</td>
+		</tr>
+		
 		<tr>
 			<td align="right">
 				<input type="submit" value="Добавить" class="knopka"/> 
 			</td>
 			<td align="left">
-				<a href="/<?php echo Reg::url_creator(); ?>/field/list/?entity_id=<?php echo $data['entity']['ID']; ?>">
+				<a href="/<?php echo Reg::url_creator(); ?>/field/list/?entity_id=<?php echo $entity['ID']; ?>">
 					<input type="button" value="Назад" class="knopka"/>
 				</a>
 			</td>

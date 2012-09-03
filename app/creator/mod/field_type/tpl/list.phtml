@@ -13,7 +13,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		<?php foreach ($data as $val): ?>
+		<?php foreach ($type as $val): ?>
 		<tr>
 			<td<?php if(in_array($val['Identified'], array("id","sort","enum","foreign"))): ?> style="color:#6a0a0a;"<?php endif; ?>>
 				<?php echo $val['Identified']; ?>

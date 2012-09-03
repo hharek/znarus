@@ -1,36 +1,43 @@
-<form method="post" action="/<?php echo Reg::url_creator(); ?>/field/edit/?id=<?php echo $data['id']; ?>">
+<form method="post" action="/<?php echo Reg::url_creator(); ?>/field/edit/?id=<?php echo $field['ID']; ?>">
 	<table width="90%" class="forma" align="center">
 		<tr>
 			<td width="50%" align="right">Наименование</td>
 			<td width="50%" align="left"> 
-				<input type="text" name="name" value="<?php echo $data['name']; ?>"/>
+				<input type="text" id="name" name="name" value="<?php echo $fdata['name']; ?>"/>
 				<?php echo Helper::warn("name"); ?>
 			</td>
 		</tr>
 		<tr>
 			<td align="right">Идентификатор</td>
 			<td align="left">
-				<input type="text" name="identified" value="<?php echo $data['identified']; ?>"/>
+				<input type="text" id="identified" name="identified" value="<?php echo $fdata['identified']; ?>"/>
 				<?php echo Helper::warn("identified"); ?>
 			</td>
 		</tr>
 		<tr>
 			<td align="right">Тип</td>
 			<td align="left">
+				<?php if(in_array($field['type'], array("id","sort","enum","foreign"))): ?>
+					<input type="hidden" name="type_id" value="<?php echo $field['Type_ID']; ?>"/>
+				<?php endif; ?>
 				<select id="type_id" name="type_id" style="width: 200px;">
-					<?php foreach ($data['type'] as $val): ?>
-						<option value="<?php echo $val['ID']; ?>" <?php if($val['ID'] == $data['type_id']): ?>selected="selected"<?php endif; ?>>
+					<?php foreach ($type as $val): ?>
+						<option value="<?php echo $val['ID']; ?>" 
+								<?php if($val['ID'] == $fdata['type_id']): ?>selected="selected"<?php endif; ?>
+								about="<?php echo $val['Desc']; ?>"
+						>
 							<?php echo $val['Identified']; ?>
 						</option>
 					<?php endforeach; ?>
 				</select>
+				<img id="img_type_about" src="/<?php echo Reg::url_creator(); ?>/file.php?path=img/about.png" width="24" height="24" style="cursor: pointer; margin: 0 0 -6px 10px;" title="" />
 				<?php echo Helper::warn("type_id"); ?>
 			</td>
 		</tr>
 		<tr>
 			<td align="right">Описание</td>
 			<td>
-				<textarea name="desc"><?php echo $data['desc']; ?></textarea>
+				<textarea name="desc"><?php echo $fdata['desc']; ?></textarea>
 				<?php echo Helper::warn("desc"); ?>
 			</td>
 		</tr>
@@ -38,7 +45,7 @@
 			<td align="right">NULL</td>
 			<td>
 				<input type="hidden" name="null" value="0"/>
-				<input style="width: 10px;" type="checkbox" name="null"<?php if($data['null']==true): ?> checked="checked"<?php endif; ?>/>
+				<input style="width: 10px;" type="checkbox" name="null" value="1"<?php if($fdata['null']==true): ?> checked="checked"<?php endif; ?>/>
 			</td>
 		</tr>
 		
@@ -46,7 +53,7 @@
 		<tr id="tr_default">
 			<td align="right">По умолчанию</td>
 			<td align="left">
-				<input type="text" name="default" value="<?php echo $data['default']; ?>"/>
+				<input type="text" name="default" value="<?php echo $fdata['default']; ?>"/>
 				<?php echo Helper::warn("default"); ?>
 			</td>
 		</tr>
@@ -56,44 +63,58 @@
 			<td align="right">По умолчанию</td>
 			<td align="left">
 				
-				<?php if(!empty($data['enum'])): ?>
+				<?php if(!empty($enum)): ?>
 					<select name="default" style="width: 200px;">
-					<?php foreach ($data['enum'] as $e_val): ?>
-						<option value="<?php echo $e_val['Name']; ?>"<?php if($data['default'] == $e_val['Name']): ?> selected="selected"<?php endif; ?>>
-							<?php echo $e_val['Name']; ?>
-						</option>
-					<?php endforeach; ?>
+						<option value=""></option>
+						<?php foreach ($enum as $e_val): ?>
+							<option value="<?php echo $e_val['Name']; ?>"
+									<?php if($fdata['default'] == $e_val['Name']): ?> selected="selected"<?php endif; ?>
+							>
+								<?php echo $e_val['Name']; ?>
+							</option>
+						<?php endforeach; ?>
 					</select>
 				<?php endif; ?>
 				
 			</td>
 		</tr>
 		
-		<tr id="tr_foreign" style="display: none;">
-			<td align="right">Внешний ключ</td>
+		<!--Внешний ключ-->
+		<input type="hidden" name="foreign_change" value="0"/>
+		<?php if($field['type'] == "foreign"): ?>
+			<tr id="tr_foreign">
+				<td align="right">Внешний ключ</td>
+				<td>
+					<?php if($entity['Pack_ID'] != $ref_pack['ID']): ?>
+						<?php echo $ref_pack['Name']; ?> \ <?php echo $ref_entity['Name']; ?> (<?php echo $ref_field['Identified']; ?>)
+					<?php else: ?>
+						<?php echo $ref_entity['Name']; ?> (<?php echo $ref_field['Identified']; ?>)
+					<?php endif; ?>
+				</td>
+			</tr>
+			
+			<tr id="tr_foreign_change">
+				<td align="right">Изменяемый внешний ключ</td>
+				<td>
+					<input type="checkbox" name="foreign_change" id="foreign_change" style="width: 10px;" value="1"<?php if($fdata['foreign_change']=="1"): ?> checked="checked"<?php endif; ?>/>
+				</td>
+			</tr>
+		<?php endif; ?>
+		
+		<tr id="tr_is_order">
+			<td align="right">Использовать в сортировке</td>
 			<td>
-				<select name="foreign_id" style="width: 200px;">
-					<?php foreach ($data['foreign'] as $val): ?>
-						<option disabled="disabled"><?php echo $val['Name']; ?></option>
-						<?php if(!empty ($val['field'])): ?>
-							<?php foreach ($val['field'] as $f_val): ?>
-								<?php if($data['id'] != $f_val['ID']): ?>
-								<option value="<?php echo $f_val['ID'];?>"<?php if($f_val['ID'] == $data['foreign_id']): ?> selected="selected"<?php endif; ?>>
-									&nbsp;&nbsp;<?php echo $f_val['Name']; ?>
-								</option>
-								<?php endif; ?>
-							<?php endforeach; ?>
-						<?php endif; ?>
-					<?php endforeach; ?>
-				</select>
+				<input type="hidden" name="is_order" value="0"/>
+				<input style="width: 10px;" type="checkbox" name="is_order" value="1"<?php if($fdata['is_order']=="1"): ?> checked="checked"<?php endif; ?>/>
 			</td>
 		</tr>
+			
 		<tr>
 			<td align="right">
 				<input type="submit" value="Изменить" class="knopka"/> 
 			</td>
 			<td align="left">
-				<a href="/<?php echo Reg::url_creator(); ?>/field/list/?entity_id=<?php echo $data['entity']['ID']; ?>">
+				<a href="/<?php echo Reg::url_creator(); ?>/field/list/?entity_id=<?php echo $entity['ID']; ?>">
 					<input type="button" value="Назад" class="knopka"/>
 				</a>
 			</td>

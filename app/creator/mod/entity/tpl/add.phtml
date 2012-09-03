@@ -1,23 +1,23 @@
-<form method="post" action="/<?php echo Reg::url_creator(); ?>/entity/add/?pack_id=<?php echo $data['pack']['ID']; ?>">
+<form method="post" action="/<?php echo Reg::url_creator(); ?>/entity/add/?pack_id=<?php echo $pack['ID']; ?>">
 	<table width="90%" class="forma" align="center">
 		<tr>
 			<td width="50%" align="right">Наименование</td>
 			<td width="50%" align="left"> 
-				<input type="text" name="name" value="<?php echo $data['name']; ?>"/>
+				<input type="text" id="name" name="name" value="<?php echo $fdata['name']; ?>"/>
 				<?php echo Helper::warn("name"); ?>
 			</td>
 		</tr>
 		<tr>
 			<td align="right">Идентификатор</td>
 			<td align="left">
-				<input type="text" name="identified" value="<?php echo $data['identified']; ?>"/>
+				<input type="text" id="identified" name="identified" value="<?php echo $fdata['identified']; ?>"/>
 				<?php echo Helper::warn("identified"); ?>
 			</td>
 		</tr>
 		<tr>
 			<td align="right">Описание</td>
 			<td>
-				<textarea name="desc"><?php echo $data['desc']; ?></textarea>
+				<textarea name="desc"><?php echo $fdata['desc']; ?></textarea>
 				<?php echo Helper::warn("desc"); ?>
 			</td>
 		</tr>
@@ -26,7 +26,7 @@
 				<input type="submit" value="Добавить" class="knopka"/> 
 			</td>
 			<td align="left">
-				<a href="/<?php echo Reg::url_creator(); ?>/entity/list/?pack_id=<?php echo $data['pack']['ID']; ?>">
+				<a href="/<?php echo Reg::url_creator(); ?>/entity/list/?pack_id=<?php echo $pack['ID']; ?>">
 					<input type="button" value="Назад" class="knopka"/>
 				</a>
 			</td>

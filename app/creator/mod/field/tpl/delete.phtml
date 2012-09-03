@@ -1,14 +1,14 @@
-<form method="post" action="/<?php echo Reg::url_creator(); ?>/field/delete/?id=<?php echo $data['id']; ?>">
+<form method="post" action="/<?php echo Reg::url_creator(); ?>/field/delete/?id=<?php echo $field['ID']; ?>">
 	<table width="90%" class="forma" align="center">
 		<tr>
-			<td align="center" colspan="2">Вы действительно хотите удалить поле "<?php echo $data['name']; ?>" ?</td>
+			<td align="center" colspan="2">Вы действительно хотите удалить поле "<?php echo $field['Name']; ?>" ?</td>
 		</tr>
 		<tr>
 			<td align="right">
 				<input type="submit" value="Да" class="knopka"/> 
 			</td>
 			<td align="left">
-				<a href="/<?php echo Reg::url_creator(); ?>/field/list/?entity_id=<?php echo $data['entity_id']; ?>">
+				<a href="/<?php echo Reg::url_creator(); ?>/field/list/?entity_id=<?php echo $entity['ID']; ?>">
 					<input type="button" value="Назад" class="knopka"/>
 				</a>
 			</td>

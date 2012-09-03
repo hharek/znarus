@@ -1,9 +1,9 @@
-<form method="post" action="/<?php echo Reg::url_creator(); ?>/enum/add/?field_id=<?php echo $data['field']['ID']; ?>">
+<form method="post" action="/<?php echo Reg::url_creator(); ?>/enum/add/?field_id=<?php echo $field['ID']; ?>">
 	<table width="90%" class="forma" align="center">
 		<tr>
 			<td width="50%" align="right">Наименование</td>
 			<td width="50%" align="left"> 
-				<input type="text" name="name" value="<?php echo $data['name']; ?>"/>
+				<input type="text" name="name" value="<?php echo $fdata['name']; ?>"/>
 				<?php echo Helper::warn("name"); ?>
 			</td>
 		</tr>
@@ -12,7 +12,7 @@
 				<input type="submit" value="Добавить" class="knopka"/> 
 			</td>
 			<td align="left">
-				<a href="/<?php echo Reg::url_creator(); ?>/enum/list/?field_id=<?php echo $data['field']['ID']; ?>">
+				<a href="/<?php echo Reg::url_creator(); ?>/enum/list/?field_id=<?php echo $field['ID']; ?>">
 					<input type="button" value="Назад" class="knopka"/>
 				</a>
 			</td>

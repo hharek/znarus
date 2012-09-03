@@ -1,7 +1,12 @@
 <?php
-
 /* Версия */
 Reg::version("4.0.1", true);
+
+/* Отображение ошибок */
+Reg::error_reporting(true);
+
+/* Прописывать заголовок UTF-8 */
+Reg::header_utf(false);
 
 /* Домен */
 Reg::domain($_SERVER['SERVER_NAME'], true);
@@ -12,7 +17,7 @@ Reg::path_www($_SERVER['DOCUMENT_ROOT'], true);
 Reg::path_tmp(sys_get_temp_dir(), true);
 
 /* Тип файлового менеджера (sys|ftp) */
-Reg::file_manager("sys", true);
+Reg::file_manager("ftp", true);
 
 /* Данные для подключения по FTP */
 Reg::ftp_port(21);
@@ -27,7 +32,7 @@ Reg::db_ssl("disable"); // (disable | prefer | require)
 Reg::error_404("/error/404", true);
 Reg::error_403("/error/403", true);
 
-/* Наименование путей для конструктора и админки */
+/* Наименование путей для конструктора и админки (не забудь про robots.txt) */
 Reg::url_creator("creator", true);
 Reg::url_constr("constr", true);
 Reg::url_admin("admin", true);

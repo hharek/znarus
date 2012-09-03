@@ -1,5 +1,5 @@
 <p class="title">Пакеты</p>
-<table width="90%" class="list" id="table_pack_list" align="center">
+<table width="90%" class="list" align="center">
 	<colgroup>
 		<col width="40%" />
 		<col width="40%" />
@@ -13,7 +13,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		<?php foreach ($data as $val): ?>
+		<?php foreach ($pack as $val): ?>
 		<tr>
 			<td>
 				<a href="/<?php echo Reg::url_creator(); ?>/entity/list/?pack_id=<?php echo $val['ID']; ?>"><?php echo $val['Name']; ?></a>

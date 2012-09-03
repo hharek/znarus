@@ -26,6 +26,9 @@ class ZN_Enum
 		
 		Err::exception();
 		
+		/* Выполнить SQL код */
+		Reg::db()->multi_query(ZN_SQL_Enum::add($name, $field_id));
+		
 		/* Добавить */
 		$query = 
 <<<SQL
@@ -54,6 +57,14 @@ SQL;
 		
 		Err::exception();
 		
+		/* Проверить не является ли по умолчанию */
+		$enum = self::select_line_by_id($id);
+		$field = ZN_Field::select_line_by_id($enum['Field_ID']);
+		if($enum['Name'] == $field['Default'])
+		{
+			throw new Exception_Creator("Невозможно редактировать, т.к. он указан по умолчанию.");
+		}
+		
 		/* Уникальность */
 		$query = 
 <<<SQL
@@ -66,6 +77,9 @@ SQL;
 		self::_unique($name, $field_id, $id);
 		
 		Err::exception();
+		
+		/* Выполнить SQL код */
+		Reg::db()->multi_query(ZN_SQL_Enum::edit($id, $name));
 		
 		/* Редактировать */
 		$query = 
@@ -91,6 +105,17 @@ SQL;
 		/* Проверка */
 		self::is_id($id);
 		
+		/* Проверить не является ли по умолчанию */
+		$enum = self::select_line_by_id($id);
+		$field = ZN_Field::select_line_by_id($enum['Field_ID']);
+		if($enum['Name'] == $field['Default'])
+		{
+			throw new Exception_Creator("Невозможно удалить, т.к. он указан по умолчанию.");
+		}
+		
+		/* Выполнить SQL код */
+		Reg::db()->multi_query(ZN_SQL_Enum::delete($id));
+		
 		/* Удалить */
 		$query = 
 <<<SQL
@@ -99,6 +124,33 @@ FROM "enum"
 WHERE "ID" = $1
 SQL;
 		Reg::db_creator()->query($query, $id, "enum", true);
+		
+		return true;
+	}
+	
+	/**
+	 * Удалить все перечисления у поля
+	 * 
+	 * @param int $field_id
+	 * @return boolean 
+	 */
+	public static function delete_all($field_id)
+	{
+		/* Выполнить SQL */
+		Reg::db()->multi_query(ZN_SQL_Enum::drop_type($field_id));
+
+		/* Удалить */
+		$enum = self::select_list_by_field_id($field_id);
+		foreach ($enum as $val)
+		{
+			$query = 
+<<<SQL
+DELETE
+FROM "enum"
+WHERE "ID" = $1
+SQL;
+			Reg::db_creator()->query($query, $val['ID'], "enum", true);
+		}
 		
 		return true;
 	}
@@ -314,6 +366,26 @@ SQL;
 		return $enum;
 	}
 	
-	
+	/**
+	 * Выборка элементов перечислений в столбец
+	 * 
+	 * @param int $field_id
+	 * @return array
+	 */
+	public static function select_column_by_field_id($field_id)
+	{
+		ZN_Field::is_id($field_id);
+		
+		$query = 
+<<<SQL
+SELECT "Name"
+FROM "enum"
+WHERE "Field_ID" = $1
+ORDER BY "Sort" ASC
+SQL;
+        $enum = Reg::db_creator()->query_column($query, $field_id, "enum");
+		
+		return $enum;
+	}
 }
 ?>

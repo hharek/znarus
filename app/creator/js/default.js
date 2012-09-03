@@ -32,3 +32,13 @@ $(function()
 	);
 	
 });
+
+/**
+ * Выводит строку с большой буквы
+ */
+function ucfirst (str) 
+{
+    str += '';
+    var f = str.charAt(0).toUpperCase();
+    return f + str.substr(1);
+}
