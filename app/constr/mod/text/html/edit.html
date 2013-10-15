@@ -1,0 +1,39 @@
+<form action="#text/edit_post?id=<?php echo $text['ID']; ?>">
+	<table class="forma">
+		<tr>
+			<td>Наименование</td>
+			<td>
+				<input type="text" name="Name" value="<?php echo htmlspecialchars($text['Name']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Идентификатор</td>
+			<td>
+				<input type="text" name="Identified" value="<?php echo htmlspecialchars($text['Identified']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Значение</td>
+			<td>
+				<textarea name="Value"><?php echo htmlspecialchars($text['Value']); ?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="knopka submit">
+					<div class="icon_edit"></div>
+					Редактировать
+				</div>
+			</td>
+			<td>
+				<a class="knopka" href="#module/edit?id=<?php echo $module['ID']; ?>#structure_text">
+					<div class="icon_back"></div>
+					Назад
+				</a>
+			</td>
+		</tr>
+	</table>
+</form>
+
+<!-- Кнопка удалить -->
+<div class="icon_delete delete" url="#text/delete_post?id=<?php echo $text['ID']; ?>" mess="Вы действительно хотите удалить text «<?php echo $text['Identified']; ?> (<?php echo $text['Name']; ?>)» ?" style="position: absolute; top: 15px; right: 12px; cursor: pointer;"></div>

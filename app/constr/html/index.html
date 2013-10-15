@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>Коструктор</title>
+		<link rel="stylesheet" type="text/css" href="css/default.css" />
+		<link rel="stylesheet" type="text/css" href="css/icon.css" />
+		<script src="js/jquery-2.0.0.min.js"></script>
+		<script src="js/default.js"></script>
+		<style id="exe_css"></style>
+	</head>
+	<body>
+		
+		<!-- Левая панель -->
+		<div id="left">
+			<a href="#">
+				<img  src="img/logo.png" />
+			</a>
+		</div>
+		
+		<!-- Правая панель -->
+		<div id="right">
+			<a class="icon_exit" href="exit" title="Выход"></a>
+		</div>
+		
+		<!-- Центральная панель -->
+		<div id="center">
+			
+			<!-- Верхнее меню -->
+			<div id="menu_top">
+				<div class="menu" id="menu_module">
+					<div class="title" style="width: 88px;" onclick="window.location.hash='#module/list';">Модули</div>
+					<div class="add">
+						<a href="#module/add" class="icon_add" title="Добавить"></a>
+					</div>
+					<div class="install">
+						<a href="#module/install" class="icon_install" title="Установить"></a>
+					</div>				
+					<div class="podcat" style="width: 230px;"></div>
+				</div>
+
+				<div class="menu" id="menu_html">
+					<div class="title" onclick="window.location.hash='#html/list';">Шаблоны</div>
+					<div class="add">
+						<a href="#html/add" class="icon_add"></a>
+					</div>
+					<div class="podcat"></div>
+				</div>
+
+				<div class="menu" id="menu_user">
+					<div class="title" onclick="window.location.hash='#user/list';">Пользователи</div>
+					<div class="add">
+						<a href="#user/user_add" class="icon_add"></a>
+					</div>
+					<div class="podcat"></div>
+				</div>
+
+				<div class="menu" id="menu_packjs">
+					<div class="title" onclick="window.location.hash='#packjs/list';">Javascript</div>
+					<div class="add">
+						<a href="#packjs/add" class="icon_add"></a>
+					</div>
+					<div class="podcat">
+						<div style="color: #ccc; margin-left: 10px;">------- Editor -------</div>
+						<a href="#11">Fckeditor</a>
+						<a href="#12">elRTE</a>
+						<div style="color: #ccc; margin-left: 10px;">---- Jquery Mode ----</div>
+						<a href="#21">serializeObject</a>
+						<a href="#22">center</a>
+						<div style="color: #ccc; margin-left: 10px;">---- Jquery Pack ----</div>
+						<a href="#31">Lightbox</a>
+						<a href="#32">Slider</a>
+						<div style="color: #ccc; margin-left: 10px;">------ Other ------</div>
+						<a href="#41">md5</a>
+						<a href="#42">bcrypt</a>
+					</div>
+				</div>
+
+				<div class="menu" id="menu_lib">
+					<div class="title" onclick="window.location.hash='#lib/list';">Библиотеки</div>
+					<div class="add">
+						<a href="#lib/add" class="icon_add"></a>
+					</div>
+					<div class="podcat">
+						<a href="#1">phpmailer - PHPMailer</a>
+						<a href="#2">zn_image - ZN_Image</a>
+						<a href="#3">pdf_creator - PDF Creator</a>
+					</div>
+				</div>
+
+				<div class="menu" style="width: 75px;">
+					<div class="title" style="width: 72px;">Другое</div>
+					<div class="podcat" style="width: 140px; left: -65px;">
+						<a href="#1">Настройки</a>
+						<a href="#2">Переменный урл</a>
+						<a href="#3">Типы полей</a>
+					</div>
+				</div>
+				
+			</div>
+			
+			<!-- Путь -->
+			<div id="path"></div>
+			
+		</div>
+		
+		
+		<!-- Основной вывод -->
+		<div style="clear: both;"></div>
+		
+		<div id="primary">
+			
+			<!-- Сообщение об удачном выполнении -->
+			<div id="mess_ok">
+				<div class="icon_active"></div>
+				<div onclick="$('#mess_ok').hide();">x</div>
+				<div id="mess_ok_text"></div>			
+			</div>
+			
+			<!-- Основной вывод -->
+			<div id="exe"></div>
+			
+		</div>
+			
+		
+		
+		<!-- Перекрытие -->
+		<div id="overlay"></div>
+		
+		<!-- Загрузка -->
+		<div id="load">
+			<img src="img/load_line.gif" width="220" height="19"/>
+		</div>
+		
+		<!-- Окно с предупреждением -->
+		<div id="okno_delete" style="display: none;">
+			<form>
+				<input type="hidden" name="do_post" value="1"/>
+				<div class="str"></div>
+				<div class="knopka_all">
+					<div class="knopka">
+						<div class="icon_delete"></div>
+						Удалить
+					</div>
+					<div class="knopka">
+						<div class="icon_back"></div>
+						Отмена
+					</div>
+				</div>
+			</form>
+		</div>
+	</body>
+</html>

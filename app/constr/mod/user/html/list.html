@@ -1,0 +1,42 @@
+<table class="list" align="center" style="width: 500px;">
+	<col width="40%"/>
+	<col width="60%"/>
+	<thead>
+		<tr>
+			<td colspan="2">Группы и пользователи</td>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($group as $g_val): ?>
+			<tr url="#user/group_edit?id=<?php echo $g_val['ID']; ?>">
+				<td colspan="2" style="text-align: left; padding-left: 20px;">
+					<?php echo $g_val['Name']; ?>
+				</td>
+			</tr>
+			<?php foreach ($user as $u_val): ?>
+				<?php if($g_val['ID'] === $u_val['Group_ID']): ?>
+					<tr url="#user/user_edit?id=<?php echo $u_val['ID']; ?>">
+						<td style="text-align: left; padding-left: 40px;">
+							<?php echo $u_val['Email']; ?>
+						</td>
+						<td>
+							<?php echo $u_val['Name']; ?>
+						</td>
+					</tr>
+				<?php endif; ?>
+			<?php endforeach; ?>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+
+<br/>
+<center>
+	<a href="#user/group_add" class="knopka">
+		<div class="icon_add"></div>
+		Добавить группу
+	</a>
+	<a href="#user/user_add" class="knopka">
+		<div class="icon_add"></div>
+		Добавить пользователя
+	</a>
+</center>

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Класс для работы с файлами
  * 
@@ -36,11 +35,11 @@ class ZN_File
 	public function __construct($path = "/")
 	{
 		$path = trim($path);
-		if (mb_strlen($path, "UTF-8") < 1)
+		if (mb_strlen($path) < 1)
 		{
 			throw new Exception("Корневая папка не задана.", 11);
 		}
-		if (mb_substr($path, 0, 1, "UTF-8") != "/")
+		if (mb_substr($path, 0, 1) != "/")
 		{
 			throw new Exception("Корневая папка \"" . func_get_arg(0) . "\" задана неверно.", 12);
 		}
@@ -70,7 +69,7 @@ class ZN_File
 		}
 
 		$path = trim($path);
-		if (mb_substr($path, 0, 1, "UTF-8") != "/")
+		if (mb_substr($path, 0, 1) != "/")
 		{
 			throw new Exception("Наименование папки \"" . func_get_arg(0) . "\" задано неверно.", 21);
 		}
@@ -179,12 +178,12 @@ class ZN_File
 			throw new Exception("Тип \"" . func_get_arg(1) . "\" задан неверно. Необходимо указать: (all|file|dir).", 31);
 		}
 
-		if ($type != "file" and mb_strlen($ext, "UTF-8") > 0)
+		if ($type != "file" and mb_strlen($ext) > 0)
 		{
 			throw new Exception("Расширение можно задать только для файлов", 32);
 		}
 
-		if (mb_strlen($ext, "UTF-8") > 0 and !preg_match("#^[a-zA-Z0-9]{1,5}$#isu", $ext))
+		if (mb_strlen($ext) > 0 and !preg_match("#^[a-zA-Z0-9]{1,5}$#isu", $ext))
 		{
 			throw new Exception("Расширение \"" . func_get_arg(2) . "\" задано неверно", 33);
 		}
@@ -242,7 +241,7 @@ class ZN_File
 							if ($file_type == "file")
 							{
 								/* Поиск по расширению */
-								if (mb_substr($val, mb_strlen($val, "UTF-8") - mb_strlen($ext, "UTF-8"), mb_strlen($ext, "UTF-8"), "UTF-8") == $ext)
+								if (mb_substr($val, mb_strlen($val) - mb_strlen($ext), mb_strlen($ext)) == $ext)
 								{
 									$ls[] = array("name" => $val, "type" => "file");
 								}
@@ -342,9 +341,9 @@ class ZN_File
 		$this->_check_chroot($dest);
 
 		/* cp /home/dir1 /home/dir1/dir2 */
-		if (mb_substr($dest, 0, mb_strlen($source, "UTF-8"), "UTF-8") == $source)
+		if (mb_substr($dest, 0, mb_strlen($source)) == $source)
 		{
-			if (mb_substr($dest, mb_strlen($source, "UTF-8"), 1, "UTF-8") == "/")
+			if (mb_substr($dest, mb_strlen($source), 1) == "/")
 			{
 				throw new Exception("Файл источник \"" . func_get_arg(0) . "\" не должен входить в файл назначения \"" . func_get_arg(1) . "\" ", 61);
 			}
@@ -523,7 +522,7 @@ class ZN_File
 	{
 		/* Проверка источника */
 		$source = trim($source);
-		if (mb_substr($source, 0, 1, "UTF-8") != "/")
+		if (mb_substr($source, 0, 1) != "/")
 		{
 			throw new Exception("Имя файла источника \"" . func_get_arg(0) . "\" задано неверно.", 111);
 		}
@@ -574,10 +573,10 @@ class ZN_File
 			throw new Exception("Файла \"" . func_get_arg(0) . "\" не существует.", 121);
 		}
 
-		if (mb_strlen($dest, "UTF-8") > 0)
+		if (mb_strlen($dest) > 0)
 		{
 			$dest = trim($dest);
-			if (mb_substr($dest, 0, 1, "UTF-8") != "/")
+			if (mb_substr($dest, 0, 1) != "/")
 			{
 				throw new Exception("Имя файла \"" . func_get_arg(1) . "\" задано неверно.", 122);
 			}
@@ -592,7 +591,7 @@ class ZN_File
 		}
 
 		/* Скачать */
-		if (mb_strlen($dest, "UTF-8") < 1)
+		if (mb_strlen($dest) < 1)
 		{
 			header("Content-Type: application/octet-stream");
 			header("Content-Disposition: attachment; filename=\"" . basename($source) . "\"");
@@ -687,7 +686,7 @@ class ZN_File
 		}
 
 		/* filename */
-		if (mb_strlen($file_name, "UTF-8") < 1)
+		if (mb_strlen($file_name) < 1)
 		{
 			$file_name = "default.zip";
 		}
@@ -701,10 +700,10 @@ class ZN_File
 		$file_name = basename($file_name);
 
 		/* zip_file */
-		if (mb_strlen($zip_file, "UTF-8") > 0)
+		if (mb_strlen($zip_file) > 0)
 		{
 			$zip_file = trim($zip_file);
-			if (mb_substr($zip_file, 0, 1, "UTF-8") != "/")
+			if (mb_substr($zip_file, 0, 1) != "/")
 			{
 				throw new Exception("Наименование zip-файла \"" . func_get_arg(2) . "\" задано неверно.", 135);
 			}
@@ -747,7 +746,7 @@ class ZN_File
 
 		/* Выдать */
 		$func_args = func_get_args();
-		if (mb_strlen($func_args[2], "UTF-8") < 1)
+		if (mb_strlen($func_args[2]) < 1)
 		{
 			header("Content-Type: application/octet-stream");
 			header("Content-Disposition: attachment; filename=\"{$file_name}\"");
@@ -779,7 +778,7 @@ class ZN_File
 
 		/* Пустая строка */
 		$path = trim($path);
-		if (mb_strlen($path, "UTF-8") < 1)
+		if (mb_strlen($path) < 1)
 		{
 			throw new Exception("Путь задан неверно. Пустая строка.", 141);
 		}
@@ -791,9 +790,9 @@ class ZN_File
 		}
 
 		/* Строка с нулевым символом */
-		$strlen_before = mb_strlen($path, "UTF-8");
+		$strlen_before = mb_strlen($path);
 		$path = str_replace(chr(0), '', $path);
-		$strlen_after = mb_strlen($path, "UTF-8");
+		$strlen_after = mb_strlen($path);
 		if ($strlen_before != $strlen_after)
 		{
 			throw new Exception("Путь задан неверно. Нулевой символ.", 142);
@@ -807,7 +806,7 @@ class ZN_File
 		}
 
 		/* Очень большая строка */
-		if (mb_strlen($path, "UTF-8") > 1024)
+		if (mb_strlen($path) > 1024)
 		{
 			throw new Exception("Путь задан неверно. Очень большая строка.", 144);
 		}
@@ -820,14 +819,14 @@ class ZN_File
 		}
 
 		/* Срезаем символы слэша в начале и конце */
-		if (mb_substr($path, 0, 1, "UTF-8") == "/")
+		if (mb_substr($path, 0, 1) == "/")
 		{
-			$path = mb_substr($path, 1, mb_strlen($path, "UTF-8") - 1, "UTF-8");
+			$path = mb_substr($path, 1, mb_strlen($path) - 1);
 		}
 
-		if (mb_substr($path, mb_strlen($path, "UTF-8") - 1, 1, "UTF-8") == "/")
+		if (mb_substr($path, mb_strlen($path) - 1, 1) == "/")
 		{
-			$path = mb_substr($path, 0, mb_strlen($path, "UTF-8") - 1, "UTF-8");
+			$path = mb_substr($path, 0, mb_strlen($path) - 1);
 		}
 
 		/* Разбор */
@@ -841,8 +840,8 @@ class ZN_File
 			}
 
 			/* Строка с начальными или конечными пробелами */
-			$strlen = mb_strlen($val, "UTF-8");
-			$strlen_trim = mb_strlen(trim($val), "UTF-8");
+			$strlen = mb_strlen($val);
+			$strlen_trim = mb_strlen(trim($val));
 			if ($strlen != $strlen_trim)
 			{
 				throw new Exception("Путь \"" . func_get_arg(0) . "\" задан неверно. Пробелы в начале или в конце имени файла.", 147);
@@ -850,7 +849,7 @@ class ZN_File
 
 			/* Не указано имя файла */
 			$val_trim = trim($val);
-			if (mb_strlen($val_trim, "UTF-8") < 1)
+			if (mb_strlen($val_trim) < 1)
 			{
 				throw new Exception("Путь \"" . func_get_arg(0) . "\" задан неверно. Не задано имя файла.", 148);
 			}
@@ -885,14 +884,14 @@ class ZN_File
 		}
 
 		/* Нормализация */
-		if (mb_substr($path, 0, 1, "UTF-8") != "/")
+		if (mb_substr($path, 0, 1) != "/")
 		{
 			$path = $this->_path . "/" . $path;
 		}
 
-		if (mb_substr($path, mb_strlen($path, "UTF-8") - 1, 1, "UTF-8") == "/")
+		if (mb_substr($path, mb_strlen($path) - 1, 1) == "/")
 		{
-			$path = mb_substr($path, 0, mb_strlen($path, "UTF-8") - 1);
+			$path = mb_substr($path, 0, mb_strlen($path) - 1);
 		}
 
 		return $path;
@@ -1059,14 +1058,14 @@ class ZN_File
 	{
 		if ($this->_chroot)
 		{
-			if (mb_substr($path, 0, mb_strlen($this->_path, "UTF-8"), "UTF-8") != $this->_path)
+			if (mb_substr($path, 0, mb_strlen($this->_path)) != $this->_path)
 			{
 				throw new Exception("Путь \"{$path}\" вышел за пределы chroot.", 181);
 			}
 
-			if (mb_strlen($path, "UTF-8") > mb_strlen($this->_path, "UTF-8"))
+			if (mb_strlen($path) > mb_strlen($this->_path))
 			{
-				if (mb_substr($path, mb_strlen($this->_path, "UTF-8"), 1, "UTF-8") != "/")
+				if (mb_substr($path, mb_strlen($this->_path), 1) != "/")
 				{
 					throw new Exception("Путь \"{$path}\" вышел за пределы chroot.", 182);
 				}

@@ -1,0 +1,9 @@
+<?php
+/**
+ * {Name}
+ */
+class {Identified}
+{
+	
+}
+?>

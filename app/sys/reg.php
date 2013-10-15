@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Глобальный реестр
  */
@@ -11,7 +10,7 @@ class Reg
      * 
      * @var array
      */
-    public static $_data = array();
+    private static $_data = array();
 
     /**
      * Список константов
@@ -224,19 +223,13 @@ class Reg
 	private static function db_core(){}
 	
 	/**
-	 * @return ZN_Pgsql
-	 */
-	private static function db_creator(){}
-	
-	/**
-	 * @return ZN_FTP 
+	 * @return ZN_File
 	 */
 	private static function file(){}
 	
 	/**
-	 * @return ZN_FTP 
+	 * @return ZN_File
 	 */
 	private static function file_app(){}
 }
-
 ?>

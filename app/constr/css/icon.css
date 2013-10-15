@@ -1,0 +1,187 @@
+/*
+	Icons from the site http://www.fatcow.com/free-icons
+*/
+
+.icon_list
+{
+	background: url("../img/icon.png") no-repeat 0px 0px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+.icon_add
+{
+	background: url("../img/icon.png") no-repeat -24px 0px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+.icon_edit
+{
+	background: url("../img/icon.png") no-repeat -48px 0px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+.icon_delete
+{
+	background: url("../img/icon.png") no-repeat -72px 0px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+.icon_active
+{
+	background: url("../img/icon.png") no-repeat -96px 0px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+.icon_deactive
+{
+	background: url("../img/icon.png") no-repeat 0px -24px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+.icon_up
+{
+	background: url("../img/icon.png") no-repeat -24px -24px;
+	width: 20px;
+	height: 20px;
+	display: inline-block;
+}
+
+.icon_down
+{
+	background: url("../img/icon.png") no-repeat -48px -24px;
+	width: 20px;
+	height: 20px;
+	display: inline-block;
+}
+
+.icon_view
+{
+	background: url("../img/icon.png") no-repeat -72px -24px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+.icon_warn
+{
+	background: url("../img/icon.png") no-repeat -96px -24px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+.icon_more
+{
+	background: url("../img/icon.png") no-repeat 0px -48px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+.icon_image
+{
+	background: url("../img/icon.png") no-repeat -24px -48px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+.icon_password
+{
+	background: url("../img/icon.png") no-repeat -48px -48px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+.icon_html
+{
+	background: url("../img/icon.png") no-repeat -72px -48px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+.icon_php
+{
+	background: url("../img/icon.png") no-repeat -96px -48px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+.icon_exit
+{
+	background: url("../img/icon.png") no-repeat 0px -72px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+.icon_install
+{
+	background: url("../img/icon.png") no-repeat -24px -72px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+.icon_back
+{
+	background: url("../img/icon.png") no-repeat -48px -72px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+.icon_creator
+{
+	background: url("../img/icon.png") no-repeat -72px -72px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+.icon_constr
+{
+	background: url("../img/icon.png") no-repeat -96px -72px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+.icon_form
+{
+	background: url("../img/icon.png") no-repeat 0px -96px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+.icon_cancel
+{
+	background: url("../img/icon.png") no-repeat -24px -96px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+.icon_login
+{
+	background: url("../img/icon.png") no-repeat -48px -96px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}

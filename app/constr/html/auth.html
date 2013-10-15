@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Авторизация</title>
+		<link rel="stylesheet" type="text/css" href="/<?php echo Reg::url_constr(); ?>/css/default.css" />
+		<link rel="stylesheet" type="text/css" href="/<?php echo Reg::url_constr(); ?>/css/icon.css" />
+		<script src="/<?php echo Reg::url_constr(); ?>/js/jquery-2.0.0.min.js"></script>
+		<script src="/<?php echo Reg::url_constr(); ?>/js/jsencrypt.min.js"></script>
+		<script src="/<?php echo Reg::url_constr(); ?>/js/auth.js"></script>
+	</head>
+	<body>
+		<form>
+			<input type="hidden" name="url" value="/<?php echo Reg::url_constr(); ?>/auth"/>
+			<input type="hidden" name="token" value="<?php echo $_SESSION['constr_auth_token']; ?>"/>
+			<input type="hidden" id="public_key" value="<?php echo file_get_contents(__DIR__ . "/../../conf/public.pem"); ?>"/>
+			<div id="auth">
+				<div class="container">
+					<div class="load">
+						<img src="/<?php echo Reg::url_constr(); ?>/img/load.gif"/>
+					</div>
+					<div>
+						<div class="name">Имя:</div>
+						<div class="pole">
+							<input type="text" name="name" value="" />
+						</div>
+					</div>
+					<div>
+						<div class="name">Пароль:</div>
+						<div class="pole">
+							<input type="password" name="password" value="" /> 
+						</div>
+					</div>
+					<div class="knopka">
+						<div class="icon_login"></div>
+						Вход
+					</div>
+					
+					<div class="logo">
+						<img src="/<?php echo Reg::url_constr(); ?>/img/logo.png"/>
+					</div>
+					
+					<!-- для firefox -->
+					<input type="submit" value="" style="display: none;"/>
+				</div>
+			</div>
+		</form>
+	</body>
+</html>

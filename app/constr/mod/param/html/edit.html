@@ -1,0 +1,49 @@
+<form action="#param/edit_post?id=<?php echo $param['ID']; ?>">
+	<table class="forma">
+		<tr>
+			<td>Наименование</td>
+			<td>
+				<input type="text" name="Name" value="<?php echo htmlspecialchars($param['Name']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Идентификатор</td>
+			<td>
+				<input type="text" name="Identified" value="<?php echo htmlspecialchars($param['Identified']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Тип</td>
+			<td>
+				<select name="Type">
+					<option<?php if($param['Type'] == "string"): ?> selected="selected"<?php endif; ?>>string</option>
+					<option<?php if($param['Type'] == "int"): ?> selected="selected"<?php endif; ?>>int</option>
+					<option<?php if($param['Type'] == "bool"): ?> selected="selected"<?php endif; ?>>bool</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>Значение</td>
+			<td>
+				<input type="text" name="Value" value="<?php echo htmlspecialchars($param['Value']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="knopka submit">
+					<div class="icon_edit"></div>
+					Редактировать
+				</div>
+			</td>
+			<td>
+				<a class="knopka" href="#module/edit?id=<?php echo $module['ID']; ?>#structure_param">
+					<div class="icon_back"></div>
+					Назад
+				</a>
+			</td>
+		</tr>
+	</table>
+</form>
+
+<!-- Кнопка удалить -->
+<div class="icon_delete delete" url="#param/delete_post?id=<?php echo $param['ID']; ?>" mess="Вы действительно хотите удалить param «<?php echo $param['Identified']; ?> (<?php echo $param['Name']; ?>)» ?" style="position: absolute; top: 15px; right: 12px; cursor: pointer;"></div>

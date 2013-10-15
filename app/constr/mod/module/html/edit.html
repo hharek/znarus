@@ -1,0 +1,400 @@
+<div style="width: 31%; float: left;">
+	<div class="knopka" id="knopka_creator" style="display: block; width: 150px; margin: 0px auto;">
+		<div class="icon_creator"></div>
+		Сборка
+	</div>
+</div>
+<div style="width: 31%; float: right;">
+	<div class="knopka" id="knopka_structure" style="display: block; width: 150px; margin: 0px auto;">
+		<div class="icon_constr"></div>
+		Структура
+	</div>
+</div>
+<div style="width: 31%; margin: 0px 32% 0px 34%;">
+	<div class="knopka" id="knopka_data" style="display: block; width: 150px; margin: 0px auto;">
+		<div class="icon_form"></div>
+		Данные
+	</div>
+</div>
+
+<br/>
+<!-- ------------------------------ Данные ------------------------------- -->
+<div id="okno_data" style="display: none;">
+	<form action="#module/edit_post?id=<?php echo $module['ID']; ?>">
+		<table class="forma" align="center">
+			<tr>
+				<td>Наименование</td>
+				<td>
+					<input type="text" name="Name" value="<?php echo htmlspecialchars($module['Name']); ?>"/>
+				</td>
+			</tr>		
+			<tr>
+				<td>Идентификатор</td>
+				<td>
+					<input type="text"name="Identified" value="<?php echo htmlspecialchars($module['Identified']); ?>"/>
+				</td>
+			</tr>
+			<tr>
+				<td>Описание</td>
+				<td>
+					<textarea name="Desc"><?php echo htmlspecialchars($module['Desc']); ?></textarea>
+				</td>
+			</tr>		
+			<tr>
+				<td>Версия</td>
+				<td>
+					<input type="text" name="Version" value="<?php echo htmlspecialchars($module['Version']); ?>"/>
+				</td>
+			</tr>
+			<tr>
+				<td>URL</td>
+				<td>
+					<input type="text" name="Url" value="<?php echo htmlspecialchars($module['Url'])?>"/>
+				</td>
+			</tr>
+			<tr>
+				<td>Шаблон</td>
+				<td>
+					<select name="Html_ID">
+						<option value="0">Нет</option>
+						<?php foreach ($html as $val): ?>
+							<option value="<?php echo $val['ID']; ?>"<?php if($val['ID'] === $module['Html_ID']): ?> selected="selected"<?php endif; ?>><?php echo $val['Identified']; ?> (<?php echo $val['Name']; ?>)</option>
+						<?php endforeach; ?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>Активность</td>
+				<td>
+					<input type="hidden" name="Active" value="0"/>
+					<input type="checkbox" name="Active" value="1"<?php if($module['Active']=="1"): ?> checked="checked"<?php endif; ?>/>
+				</td>
+			</tr>	
+			<tr>
+				<td colspan="2">
+					<center>
+						<div class="knopka submit" style="width: 250px;">
+							<div class="icon_edit"></div>
+							Изменить
+						</div>
+					</center>
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+
+<!-- ------------------------------ Сборка ------------------------------- -->
+<div id="okno_creator" style="display: none; position: relative;">
+	
+	<div style=
+	"
+		width: 100px;
+		margin: 100px auto 0px auto;
+		text-align: center;
+		padding: 5px 0px 5px 0px;
+	">Сборка</div>
+	
+	
+	<!--
+	<div class="entity">
+		<table>
+			<thead>
+				<tr title="Категория">
+					<td colspan="2">category</td>
+				</tr>
+			</thead>
+			<tbody>
+				<tr title="ID">
+					<td>ID</td>
+					<td>int</td>
+				</tr>
+				<tr title="Наименование">
+					<td>Name</td>
+					<td>int</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	
+	<div class="entity">
+		<table>
+			<thead>
+				<tr title="Товар">
+					<td colspan="2">tovar</td>
+				</tr>
+			</thead>
+			<tbody>
+				<tr title="ID">
+					<td>ID</td>
+					<td>int</td>
+				</tr>
+				<tr title="Наименование">
+					<td>Name</td>
+					<td>string</td>
+				</tr>
+				<tr title="Цена">
+					<td>Price</td>
+					<td>price</td>
+				</tr>
+				<tr title="Количество">
+					<td>Count</td>
+					<td>int</td>
+				</tr>
+				<tr title="Привязка к категории">
+					<td>Category_ID</td>
+					<td>foreign</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	-->
+	
+</div>
+
+<!-- ------------------------------ Структура ------------------------------- -->
+<div id="okno_structure">
+	
+	<!-- Панель -->
+	<div id="panel">
+		
+		<div id="knopka_all" class="knopka" title="Показать все">Показать все</div>
+		<div id="knopka_phpclass" class="knopka" title="Классы">
+			phpclass (<?php echo count($phpclass); ?>)
+			<a href="#phpclass/add?module_id=<?php echo $module['ID']; ?>" class="icon_add" title="Добавить класс"></a>
+		</div>
+		<div id="knopka_param" class="knopka" title="Параметры">
+			param (<?php echo count($param); ?>)
+			<a href="#param/add?module_id=<?php echo $module['ID']; ?>" class="icon_add" title="Добавить параметр"></a>
+		</div>
+		<div id="knopka_admin" class="knopka" title="Админки">
+			admin (<?php echo count($admin); ?>)
+			<a href="#admin/add?module_id=<?php echo $module['ID']; ?>" class="icon_add" title="Добавить админку"></a>
+		</div>
+		<div id="knopka_exe" class="knopka" title="Исполнители">
+			exe (<?php echo count($exe); ?>)
+			<a href="#exe/add?module_id=<?php echo $module['ID']; ?>" class="icon_add" title="Добавить исполнителя"></a>
+		</div>
+		<div id="knopka_inc" class="knopka" title="Инки">
+			inc (<?php echo count($inc); ?>)
+			<a href="#inc/add?module_id=<?php echo $module['ID']; ?>" class="icon_add" title="Добавить инка"></a>
+		</div>
+		<div id="knopka_text" class="knopka" title="Тексты">
+			text (<?php echo count($text); ?>)
+			<a href="#text/add?module_id=<?php echo $module['ID']; ?>" class="icon_add" title="Добавить текст"></a>
+		</div>
+		
+		<!--
+		<div id="knopka_ajax" class="knopka" title="Аяксы">
+			ajax (3)
+			<a href="#ajax/add?module_id=<?php echo $module['ID']; ?>" class="icon_add" title="Добавить аякс"></a>
+		</div>
+		-->
+		
+	</div>
+	
+	<!-- --------------------------- Окно ----------------- -->
+	<div class="okno">
+		
+		<!-- phpclass -->
+		<?php if(!empty($phpclass)): ?>
+			<table id="structure_phpclass" class="list" style="width: 500px;" align="center">
+				<colgroup>
+					<col width="40%"/>
+					<col width="60%"/>
+				</colgroup>
+				<thead>
+					<tr>
+						<td colspan="2" title="Классы">phpclass</td>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ($phpclass as $val): ?>
+						<tr url="#phpclass/edit?id=<?php echo $val['ID']; ?>">
+							<td><?php echo $val['Identified']; ?></td>
+							<td><?php echo $val['Name']; ?></td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		<?php endif; ?>
+		
+		<!-- param -->
+		<?php if(!empty($param)): ?>
+			<table id="structure_param" class="list" style="width: 750px;" align="center">
+				<colgroup>
+					<col width="25%" />
+					<col width="30%" />
+					<col width="10%" />
+					<col width="25%" />
+				</colgroup>
+				<thead>
+					<tr>
+						<td colspan="4" title="Параметры">param</td>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ($param as $val): ?>
+						<tr url="#param/edit?id=<?php echo $val['ID']; ?>">
+							<td><?php echo $val['Identified']; ?></td>
+							<td><?php echo $val['Name']; ?></td>
+							<td><?php echo $val['Type']; ?></td>
+							<?php if(mb_strlen($val['Value']) > 24): ?>
+								<td title="<?php echo $val['Value']; ?>">
+									<?php echo mb_substr($val['Value'], 0, 24); ?>
+								</td>
+							<?php else: ?>
+								<td>
+									<?php echo $val['Value']; ?>
+								</td>
+							<?php endif; ?>
+							
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		<?php endif; ?>
+		
+		<!-- admin-->
+		<?php if(!empty($admin)): ?>
+			<table id="structure_admin" class="list" style="width: 600px;" align="center">
+				<colgroup>
+					<col width="35%" />
+					<col width="50%" />
+					<col width="15%" />
+				</colgroup>
+				<thead>
+					<tr>
+						<td colspan="3" title="Админки">admin</td>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ($admin as $key=>$val): ?>
+					<tr url="#admin/edit?id=<?php echo $val['ID']; ?>"<?php if($val['Visible']): ?> style="color: indigo;"<?php endif; ?>>
+							<td><?php echo $val['Identified']; ?></td>
+							<td><?php echo $val['Name']; ?></td>
+							<td>
+								<div onclick="zn('#admin/sort_up_post', { id: <?php echo $val['ID']; ?>});" class="icon_up up"></div>
+								<div onclick="zn('#admin/sort_down_post', { id: <?php echo $val['ID']; ?>});" class="icon_down down"></div>
+							</td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		<?php endif; ?>
+		
+		<!-- exe -->
+		<?php if(!empty($exe)): ?>
+			<table id="structure_exe" class="list" style="width: 600px; " align="center">
+				<colgroup>
+					<col width="35%"/>
+					<col width="50%"/>
+					<col width="15%"/>
+				</colgroup>
+				<thead>
+					<tr>
+						<td colspan="3" title="Исполнители">exe</td>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ($exe as $key => $val): ?>
+						<tr<?php if($val['Active'] === "0"): ?> style="color: #a0a0a0;"<?php endif; ?>>
+							<td url="#exe/edit?id=<?php echo $val['ID']; ?>"><?php echo $val['Identified']; ?></td>
+							<td url="#exe/edit?id=<?php echo $val['ID']; ?>"><?php echo $val['Name']; ?></td>
+							<td>				
+								<div onclick="zn('#exe/priority_up_post', { id: <?php echo $val['ID']; ?>});" class="icon_up up"></div>
+								<div onclick="zn('#exe/priority_down_post', { id: <?php echo $val['ID']; ?>});" class="icon_down down"></div>
+							</td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		<?php endif; ?>
+		
+		<!-- inc -->
+		<?php if(!empty($inc)): ?>
+			<table id="structure_inc" class="list" style="width: 500px;" align="center">
+				<colgroup>
+					<col width="40%"/>
+					<col width="60%"/>
+				</colgroup>
+				<thead>
+					<tr>
+						<td colspan="2" title="Инки">inc</td>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ($inc as $key=>$val): ?>
+						<tr url="#inc/edit?id=<?php echo $val['ID']; ?>"<?php if($val['Active'] === "0"): ?> style="color: #a0a0a0;"<?php endif; ?>>
+							<td><?php echo $val['Identified']; ?></td>
+							<td><?php echo $val['Name']; ?></td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		<?php endif; ?>
+		
+		<!-- text -->
+		<?php if(!empty($text)): ?>
+			<table id="structure_text" class="list" style="width: 500px;" align="center">
+				<colgroup>
+					<col width="40%"/>
+					<col width="60%"/>
+				</colgroup>
+				<thead>
+					<tr>
+						<td colspan="2" title="Тексты">text</td>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ($text as $val): ?>
+						<tr url="#text/edit?id=<?php echo $val['ID']; ?>">
+							<td><?php echo $val['Identified']; ?></td>
+							<td><?php echo $val['Name']; ?></td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		<?php endif; ?>
+		
+		
+		
+		<!-- ajax -->
+		<!--
+		<table id="structure_ajax" class="list" style="width: 600px;" align="center">
+			<colgroup>
+				<col width="35%" />
+				<col width="50%" />
+				<col width="15%" />
+			</colgroup>
+			<thead>
+				<tr>
+					<td colspan="3" title="Аяксы">ajax</td>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>backet</td>
+					<td>Корзина</td>
+					<td>passive</td>
+				</tr>
+				<tr>
+					<td>backet_add</td>
+					<td>Добавить товар в корзину</td>
+					<td>active</td>
+				</tr>
+				<tr>
+					<td>tovar_status</td>
+					<td>Статус товара</td>
+					<td>okno</td>
+				</tr>
+			</tbody>
+		</table>
+		-->
+		
+	</div>
+	
+</div>
+
+<!-- Кнопка удалить -->
+<div class="icon_delete delete" url="#module/delete_post?id=<?php echo $module['ID']; ?>" mess="Вы действительно хотите удалить модуль «<?php echo $module['Name']; ?>» ?" style="position: absolute; top: 15px; right: 12px; cursor: pointer;"></div>

@@ -1,0 +1,40 @@
+<form action="#admin/edit_post?id=<?php echo $admin['ID']; ?>">
+	<table class="forma">
+		<tr>
+			<td>Наименование</td>
+			<td>
+				<input type="text" name="Name" value="<?php echo htmlspecialchars($admin['Name']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Идентификатор</td>
+			<td>
+				<input type="text" name="Identified" value="<?php echo htmlspecialchars($admin['Identified']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Видимость</td>
+			<td>
+				<input type="hidden" name="Visible" value="0"/>
+				<input type="checkbox" name="Visible" value="1"<?php if($admin['Visible'] === "1"): ?> checked="checked"<?php endif; ?>/>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="knopka submit">
+					<div class="icon_edit"></div>
+					Редактировать
+				</div>
+			</td>
+			<td>
+				<a class="knopka" href="#module/edit?id=<?php echo $module['ID']; ?>#structure_admin">
+					<div class="icon_back"></div>
+					Назад
+				</a>
+			</td>
+		</tr>
+	</table>
+</form>
+
+<!-- Кнопка удалить -->
+<div class="icon_delete delete" url="#admin/delete_post?id=<?php echo $admin['ID']; ?>" mess="Вы действительно хотите удалить admin «<?php echo $admin['Identified']; ?> (<?php echo $admin['Name']; ?>)» ?" style="position: absolute; top: 15px; right: 12px; cursor: pointer;"></div>

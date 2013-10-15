@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Checker Field - проверщик полей формы
  */
@@ -105,7 +104,7 @@ class Chf
 		if ($trim)
 		{
 			$str = trim($str);
-			if (mb_strlen($str, "UTF-8") < 1)
+			if (mb_strlen($str) < 1)
 			{
 				throw new Exception("Пустая строка.");
 			}
@@ -113,9 +112,9 @@ class Chf
 
 		/* Строка с нулевым символом */
 		$str_temp = $str;
-		$strlen_before = mb_strlen($str_temp, "UTF-8");
+		$strlen_before = mb_strlen($str_temp);
 		$str_temp = str_replace(chr(0), '', $str_temp);
-		$strlen_after = mb_strlen($str_temp, "UTF-8");
+		$strlen_after = mb_strlen($str_temp);
 		if ($strlen_before != $strlen_after)
 		{
 			throw new Exception("Нулевой символ.");
@@ -248,7 +247,7 @@ class Chf
 
 		if (!preg_match("#^[a-zA-Z0-9_\-\.]+@[a-zA-Z0-9\-\.]+\.[a-z]{2,}$#isu", $str))
 		{
-			throw new Exception("Недопустимые символы.");
+			throw new Exception("Допускается строка в формате [a-z]@[a-z].[a-z].");
 		}
 
 		return true;
@@ -300,10 +299,10 @@ class Chf
 	 */
 	private static function _html($str)
 	{
-		$result = mb_strpos($str, "<script", 0, "UTF-8");
+		$result = mb_strpos($str, "<script", 0);
 		if ($result !== false)
 		{
-			throw new Exception("Наличие тега <script>.");
+			throw new Exception("Наличие тега «script».");
 		}
 
 		return true;
@@ -317,11 +316,13 @@ class Chf
 	 */
 	private static function _identified($str)
 	{
-		if (!preg_match("#^[a-z0-9_]+$#isu", $str))
+		$str = mb_strtolower($str);
+		$str = strtr($str, "abcdefghijklmnopqrstuvwxyz_0123456789 ", "                                     _");
+		if(strlen(trim($str)) != 0)
 		{
 			throw new Exception("Допускаются символы: a-z,0-9,\"_\" .");
 		}
-
+		
 		return true;
 	}
 	
@@ -425,7 +426,7 @@ class Chf
 			throw new Exception("HTML-символы.");
 		}
 
-		if (mb_strlen($str, "UTF-8") > 255)
+		if (mb_strlen($str) > 255)
 		{
 			throw new Exception("Большая строка.");
 		}
@@ -498,7 +499,7 @@ class Chf
 	 */
 	private static function _url($str)
 	{
-		if (!preg_match("#^[\w\/]+$#isu", $str))
+		if (!preg_match("#^[a-zа-я0-9\_]+$#isu", $str))
 		{
 			throw new Exception("Недопустимые символы.");
 		}
@@ -521,14 +522,14 @@ class Chf
 		}
 		
 		/* Срезаем символы слэша в начале и конце */
-		if (mb_substr($str, 0, 1, "UTF-8") == "/")
+		if (mb_substr($str, 0, 1) == "/")
 		{
-			$str = mb_substr($str, 1, mb_strlen($str, "UTF-8") - 1, "UTF-8");
+			$str = mb_substr($str, 1, mb_strlen($str) - 1);
 		}
 
-		if (mb_substr($str, mb_strlen($str, "UTF-8") - 1, 1, "UTF-8") == "/")
+		if (mb_substr($str, mb_strlen($str) - 1, 1) == "/")
 		{
-			$str = mb_substr($str, 0, mb_strlen($str, "UTF-8") - 1, "UTF-8");
+			$str = mb_substr($str, 0, mb_strlen($str) - 1);
 		}
 
 		/* Разбор */
@@ -542,8 +543,8 @@ class Chf
 			}
 
 			/* Строка с начальными или конечными пробелами */
-			$strlen = mb_strlen($val, "UTF-8");
-			$strlen_trim = mb_strlen(trim($val), "UTF-8");
+			$strlen = mb_strlen($val);
+			$strlen_trim = mb_strlen(trim($val));
 			if ($strlen != $strlen_trim)
 			{
 				throw new Exception("Путь \"" . func_get_arg(0) . "\" задан неверно. Пробелы в начале или в конце имени файла.");
@@ -551,7 +552,7 @@ class Chf
 
 			/* Не указано имя файла */
 			$val_trim = trim($val);
-			if (mb_strlen($val_trim, "UTF-8") < 1)
+			if (mb_strlen($val_trim) < 1)
 			{
 				throw new Exception("Путь \"" . func_get_arg(0) . "\" задан неверно. Не задано имя файла.");
 			}

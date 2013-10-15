@@ -1,0 +1,33 @@
+<form action="#html/edit_post?id=<?php echo $html['ID']; ?>">
+	<table class="forma">
+		<tr>
+			<td>Наименование</td>
+			<td>
+				<input type="text" name="Name" value="<?php echo htmlspecialchars($html['Name']); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td>Идентификатор</td>
+			<td>
+				<input type="text" name="Identified" value="<?php echo htmlspecialchars($html['Identified']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="knopka submit">
+					<div class="icon_edit"></div>
+					Редактировать
+				</div>
+			</td>
+			<td>
+				<a class="knopka" href="#html/list">
+					<div class="icon_back"></div>
+					Назад
+				</a>
+			</td>
+		</tr>
+	</table>
+</form>
+
+<!-- Кнопка удалить -->
+<div class="icon_delete delete" url="#html/delete_post?id=<?php echo $html['ID']; ?>" mess="Вы действительно хотите удалить шаблон «<?php echo $html['Identified']; ?> (<?php echo $html['Name']; ?>)» ?" style="position: absolute; top: 15px; right: 12px; cursor: pointer;"></div>

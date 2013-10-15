@@ -114,7 +114,7 @@ class ZN_FTP
 		{
 			throw new Exception("Корневая папка для FTP-сервера не задана.", 13);
 		}
-		if (mb_substr($path, 0, 1, "UTF-8") != "/")
+		if (mb_substr($path, 0, 1) != "/")
 		{
 			throw new Exception("Корневая папка \"{$path}\" для FTP-сервера задана неверно.", 14);
 		}
@@ -260,7 +260,7 @@ class ZN_FTP
 		}
 		
 		$path = trim($path);
-		if (mb_substr($path, 0, 1, "UTF-8") != "/")
+		if (mb_substr($path, 0, 1) != "/")
 		{
 			throw new Exception("Наименование FTP-папки \"" . func_get_arg(0) . "\" задано неверно.", 31);
 		}
@@ -398,7 +398,7 @@ class ZN_FTP
 		}
 		
 		$ext = trim($ext);
-		if ($type != "file" and mb_strlen($ext, "UTF-8") > 0)
+		if ($type != "file" and mb_strlen($ext) > 0)
 		{
 			throw new Exception("Расширение можно задать только для файлов.", 42);
 		}
@@ -450,7 +450,7 @@ class ZN_FTP
 					{
 						if ($file_settings['type'] == "file")
 						{
-							if (mb_substr($file_settings['name'], mb_strlen($file_settings['name'], "UTF-8") - mb_strlen($ext, "UTF-8"), mb_strlen($ext, "UTF-8"), "UTF-8") == $ext)
+							if (mb_substr($file_settings['name'], mb_strlen($file_settings['name']) - mb_strlen($ext), mb_strlen($ext)) == $ext)
 							{
 								$ls[] = $file_settings;
 							}
@@ -832,7 +832,7 @@ class ZN_FTP
 	{
 		/* Проверка */
 		$file = trim($file);
-		if (mb_substr($file, 0, 1, "UTF-8") != "/")
+		if (mb_substr($file, 0, 1) != "/")
 		{
 			throw new Exception("Имя файла \"" . func_get_arg(0) . "\" задано неверно.", 131);
 		}
@@ -908,7 +908,7 @@ class ZN_FTP
 	{
 		/* Проверка папки */
 		$dir = trim($dir);
-		if (mb_substr($dir, 0, 1, "UTF-8") != "/")
+		if (mb_substr($dir, 0, 1) != "/")
 		{
 			throw new Exception("Наименование папки \"" . func_get_arg(0) . "\" задано неверно.", 141);
 		}
@@ -992,10 +992,10 @@ class ZN_FTP
 		$ftp_file = $this->_normalize_path($ftp_file);
 		$this->_check_chroot($ftp_file);
 
-		if (mb_strlen($file, "UTF-8") > 0)
+		if (mb_strlen($file) > 0)
 		{
 			$file = trim($file);
-			if (mb_substr($file, 0, 1, "UTF-8") != "/")
+			if (mb_substr($file, 0, 1) != "/")
 			{
 				throw new Exception("Имя файла \"" . func_get_arg(1) . "\" задано неверно.", 151);
 			}
@@ -1023,7 +1023,7 @@ class ZN_FTP
 		fseek($tmp_file, 0);
 
 		/* Выгрузить */
-		if (mb_strlen($file, "UTF-8") < 1)
+		if (mb_strlen($file) < 1)
 		{
 			header("Content-Type: application/octet-stream");
 			header("Content-Disposition: attachment; filename=\"" . basename($ftp_file) . "\"");
@@ -1071,7 +1071,7 @@ class ZN_FTP
 		}
 
 		$dir = trim($dir);
-		if (mb_substr($dir, 0, 1, "UTF-8") != "/")
+		if (mb_substr($dir, 0, 1) != "/")
 		{
 			throw new Exception("Наименование папки \"" . func_get_arg(1) . "\" задано неверно.", 162);
 		}
@@ -1165,7 +1165,7 @@ class ZN_FTP
 		}
 
 		/* filename */
-		if (mb_strlen($file_name, "UTF-8") < 1)
+		if (mb_strlen($file_name) < 1)
 		{
 			$file_name = "default.zip";
 		}
@@ -1179,10 +1179,10 @@ class ZN_FTP
 		$file_name = basename($file_name);
 
 		/* zip_file */
-		if (mb_strlen($zip_file, "UTF-8") > 0)
+		if (mb_strlen($zip_file) > 0)
 		{
 			$zip_file = trim($zip_file);
-			if (mb_substr($zip_file, 0, 1, "UTF-8") != "/")
+			if (mb_substr($zip_file, 0, 1) != "/")
 			{
 				throw new Exception("Наименование zip-файла \"" . func_get_arg(2) . "\" задано неверно.", 175);
 			}
@@ -1234,7 +1234,7 @@ class ZN_FTP
 
 		/* Выдать */
 		$func_args = func_get_args();
-		if (mb_strlen($func_args[2], "UTF-8") < 1)
+		if (mb_strlen($func_args[2]) < 1)
 		{
 			header("Content-Type: application/octet-stream");
 			header("Content-Disposition: attachment; filename=\"{$file_name}\"");
@@ -1266,7 +1266,7 @@ class ZN_FTP
 
 		/* Пустая строка */
 		$path = trim($path);
-		if (mb_strlen($path, "UTF-8") < 1)
+		if (mb_strlen($path) < 1)
 		{
 			throw new Exception("Путь задан неверно. Пустая строка.", 181);
 		}
@@ -1278,9 +1278,9 @@ class ZN_FTP
 		}
 
 		/* Строка с нулевым символом */
-		$strlen_before = mb_strlen($path, "UTF-8");
+		$strlen_before = mb_strlen($path);
 		$path = str_replace(chr(0), '', $path);
-		$strlen_after = mb_strlen($path, "UTF-8");
+		$strlen_after = mb_strlen($path);
 		if ($strlen_before != $strlen_after)
 		{
 			throw new Exception("Путь задан неверно. Нулевой символ.", 182);
@@ -1294,7 +1294,7 @@ class ZN_FTP
 		}
 
 		/* Очень большая строка */
-		if (mb_strlen($path, "UTF-8") > 1024)
+		if (mb_strlen($path) > 1024)
 		{
 			throw new Exception("Путь задан неверно. Очень большая строка.", 184);
 		}
@@ -1307,14 +1307,14 @@ class ZN_FTP
 		}
 
 		/* Срезаем символы слэша в начале и конце */
-		if (mb_substr($path, 0, 1, "UTF-8") == "/")
+		if (mb_substr($path, 0, 1) == "/")
 		{
-			$path = mb_substr($path, 1, mb_strlen($path, "UTF-8") - 1, "UTF-8");
+			$path = mb_substr($path, 1, mb_strlen($path) - 1);
 		}
 
-		if (mb_substr($path, mb_strlen($path, "UTF-8") - 1, 1, "UTF-8") == "/")
+		if (mb_substr($path, mb_strlen($path) - 1, 1) == "/")
 		{
-			$path = mb_substr($path, 0, mb_strlen($path, "UTF-8") - 1, "UTF-8");
+			$path = mb_substr($path, 0, mb_strlen($path) - 1);
 		}
 
 		/* Разбор */
@@ -1328,8 +1328,8 @@ class ZN_FTP
 			}
 
 			/* Строка с начальными или конечными пробелами */
-			$strlen = mb_strlen($val, "UTF-8");
-			$strlen_trim = mb_strlen(trim($val), "UTF-8");
+			$strlen = mb_strlen($val);
+			$strlen_trim = mb_strlen(trim($val));
 			if ($strlen != $strlen_trim)
 			{
 				throw new Exception("Путь \"" . func_get_arg(0) . "\" задан неверно. Пробелы в начале или в конце имени файла.", 187);
@@ -1337,7 +1337,7 @@ class ZN_FTP
 
 			/* Не указано имя файла */
 			$val_trim = trim($val);
-			if (mb_strlen($val_trim, "UTF-8") < 1)
+			if (mb_strlen($val_trim) < 1)
 			{
 				throw new Exception("Путь \"" . func_get_arg(0) . "\" задан неверно. Не задано имя файла.", 188);
 			}
@@ -1372,14 +1372,14 @@ class ZN_FTP
 		}
 
 		/* Нормализация */
-		if (mb_substr($path, 0, 1, "UTF-8") != "/")
+		if (mb_substr($path, 0, 1) != "/")
 		{
 			$path = $this->_path . "/" . $path;
 		}
 
-		if (mb_substr($path, mb_strlen($path, "UTF-8") - 1, 1, "UTF-8") == "/")
+		if (mb_substr($path, mb_strlen($path) - 1, 1) == "/")
 		{
-			$path = mb_substr($path, 0, mb_strlen($path, "UTF-8") - 1);
+			$path = mb_substr($path, 0, mb_strlen($path) - 1);
 		}
 
 		return $path;
@@ -1446,7 +1446,7 @@ class ZN_FTP
 		}
 
 		$file_settings = array();
-		if (mb_substr($sovpal[1], 0, 1, "UTF-8") == "d")
+		if (mb_substr($sovpal[1], 0, 1) == "d")
 		{
 			$file_settings['type'] = "dir";
 		}
@@ -1846,14 +1846,14 @@ class ZN_FTP
 	{
 		if ($this->_chroot)
 		{
-			if (mb_substr($path, 0, mb_strlen($this->_path, "UTF-8"), "UTF-8") != $this->_path)
+			if (mb_substr($path, 0, mb_strlen($this->_path)) != $this->_path)
 			{
 				throw new Exception("Путь \"{$path}\" вышел за пределы chroot.", 251);
 			}
 
-			if (mb_strlen($path, "UTF-8") > mb_strlen($this->_path, "UTF-8"))
+			if (mb_strlen($path) > mb_strlen($this->_path))
 			{
-				if (mb_substr($path, mb_strlen($this->_path, "UTF-8"), 1, "UTF-8") != "/")
+				if (mb_substr($path, mb_strlen($this->_path), 1) != "/")
 				{
 					throw new Exception("Путь \"{$path}\" вышел за пределы chroot.", 252);
 				}
