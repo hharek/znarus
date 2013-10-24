@@ -13,6 +13,20 @@
 			</td>
 		</tr>
 		<tr>
+			<td>GET</td>
+			<td>
+				<div style="width: 50px; float:left;">
+					<input type="hidden" name="Get" value="0"/>
+					<input type="checkbox" name="Get" value="1" checked="checked"<?php if($admin['Get'] === "1"): ?> checked="checked"<?php endif; ?>/>
+				</div>
+				<div style="width: 150px; float: left;">
+					POST
+					<input type="hidden" name="Post" value="0"/>
+					<input type="checkbox" name="Post" value="1" style="margin: 3px 3px 3px 18px;" <?php if($admin['Post'] === "1"): ?> checked="checked"<?php endif; ?>/>
+				</div>
+			</td>
+		</tr>
+		<tr>
 			<td>Видимость</td>
 			<td>
 				<input type="hidden" name="Visible" value="0"/>

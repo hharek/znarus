@@ -39,6 +39,13 @@ class ZN_Module
 		
 		Err::exception();
 		
+		/* Префикс «zn_» */
+		if($type === "smod" and mb_substr($identified, 0, 3) !== "zn_")
+		{Err::add("Системный модуль должен начинаться на «zn_»", "Identified");}
+		elseif($type === "mod" and mb_substr($identified, 0, 3) === "zn_")
+		{Err::add("Модуль не должен начинаться на «zn_»", "Identified");}
+		Err::exception();
+		
 		/* Уникальность */
 		self::_unique($name, $identified);
 		
@@ -96,6 +103,12 @@ class ZN_Module
 		
 		Err::check_field($active, "bool", false, "Active", "Активен");
 		
+		Err::exception();
+		
+		/* Префикс «zn_» */
+		$module = self::select_line_by_id($id);
+		if($module['Type'] === "mod" and mb_substr($identified, 0, 3) === "zn_")
+		{Err::add("Модуль не должен начинаться на «zn_»", "Identified");}
 		Err::exception();
 		
 		/* Уникальность */

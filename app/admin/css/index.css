@@ -1,0 +1,265 @@
+/* Меню */
+.zn_menu .menu
+{
+	width: 180px;
+	height: 28px;
+	float: left;
+	margin: 0px 0px 2px 4px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	background-color: #edfac8;
+	position: relative;
+}
+
+.zn_menu .menu .icon
+{
+	width: 24px;
+	margin: 2px;
+	float: left;
+}
+
+.zn_menu .menu .title
+{
+	height: 24px;
+	margin: 4px 2px 2px 35px;
+	overflow:  hidden;
+}
+
+.zn_menu .menu .podmenu
+{
+	min-width: 180px;
+	position: absolute;
+	top: 28px;
+	left: 0px;
+	background-color: #edfac8;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	padding: 0px 0px 3px 0px;
+	z-index: 5;
+	overflow: hidden;
+	white-space: nowrap;
+	display: none;
+}
+
+.zn_menu .menu .podmenu a
+{
+	display: block;
+	color: #000;
+	padding: 3px 3px 0px 5px;
+}
+
+.zn_menu .menu .podmenu a:hover
+{
+	background-color: #fff;
+}
+
+.zn_menu .menu .module
+{
+	width: 180px;
+	position: absolute;
+	top: 28px;
+	left: 0px;
+	background-color: #edfac8;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	z-index: 5;
+	padding: 0px 0px 3px 0px;
+	display: none;
+}
+
+.zn_menu .menu .module .mod
+{
+	position: relative;
+}
+
+.zn_menu .menu .module .mod .name
+{
+	padding: 3px 3px 0px 5px;
+}
+
+.zn_menu .menu .module .mod .name:hover
+{
+	background-color: #fff;
+}
+
+.zn_menu .menu .module .mod .admin
+{
+	width: 180px;
+	position: absolute;
+	top: -3px;
+	left: 181px;
+	background-color: #edfac8;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	padding: 0px 0px 3px 0px;
+	display: none;
+}
+
+.zn_menu .menu .module .mod .admin a
+{
+	display: block;
+	color: black;
+	padding: 3px 3px 0px 5px;
+}
+
+.zn_menu .menu .module .mod .admin a:hover
+{
+	background-color: #fff;
+}
+
+/* Путь */
+.zn_path .path
+{
+	width: 120px;
+	height: 19px;
+	float: left;
+	background-color: #f6e8b6;
+	border: 1px solid #ccc;
+	border-radius: 7px;
+	overflow: hidden;
+	padding: 2px 5px;
+	text-align: center;
+	white-space: nowrap;
+	color: #000;
+}
+
+.zn_path .join
+{
+	width: 10px;
+	border: 1px solid #ccc;
+	display: block;
+	float: left;
+	margin: 12px 0px 0px 0px;
+}
+
+.zn_path .path:last-child
+{
+	font-weight: bold;
+	background-color: #f6e39f;
+}
+
+/* Сообщение */
+.zn_mess .icon
+{
+	float: left;
+	margin: 2px 0px 0px 0px;
+}
+
+.zn_mess .close
+{
+	float: right;
+	cursor: pointer;
+	color: #ccc;
+}
+
+.zn_mess .text
+{
+	margin: 3px 20px 0px 30px;
+}
+
+/* Кнопки */
+.zn_button .icon_home
+{
+	float: left;
+	margin: 0px 3px 5px 3px;
+}
+
+.zn_button .icon_exit
+{
+	float: right;
+	margin: 0px 3px 5px 3px;
+}
+
+.zn_button .icon_task
+{
+	float: left;
+	margin: 0px 3px 5px 3px;
+	text-align: center;
+}
+
+.zn_button .icon_notification
+{
+	float: right;
+	margin: 0px 3px 5px 3px;
+	text-align: center;
+}
+
+/* Окна */
+.zn_load
+{
+	width: 220px;
+	height: 19px;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	margin-left: -110px;
+	margin-top: -10px;
+	z-index: 11;
+	display: none;
+}
+
+.zn_overlay
+{
+	width: 100%;
+	height: 100%;
+	z-index: 10;
+	background-color: #ccc;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	opacity: 0.3;
+	display: none;
+}
+
+.zn_okno_delete
+{
+	width: 340px;
+	height: 150px;
+	
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	margin-left: -200px;
+	margin-top: -100px;
+	
+	border: 1px solid #000;
+	border-radius: 20px;
+	background-color: #fff;
+	z-index: 11;
+	
+	display: none;
+}
+
+.zn_okno_delete .str
+{
+	width: 308px;
+	min-height: 64px;
+	
+	margin: 14px auto;
+	text-align: center;
+}
+
+.zn_okno_delete .down
+{
+	width: 316px;
+	margin: 30px auto;
+}
+
+.zn_okno_delete .down .delete
+{
+	float: left;
+	margin: 0px;
+}
+
+.zn_okno_delete .down .back
+{
+	float: right;
+	margin: 0px;
+}
+
+/* Сообщение об ошибке в форме */
+.error_mess
+{
+	color: #d90000;
+	font-size: 13px;
+}

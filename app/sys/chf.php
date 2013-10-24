@@ -162,7 +162,7 @@ class Chf
 	{
 		if($str !== "0" and $str !== "1")
 		{
-			throw new Exception("Необходимо указать \"0\" или \"1\".");
+			throw new Exception("Необходимо указать «0» или «1».");
 		}
 		
 		return true;

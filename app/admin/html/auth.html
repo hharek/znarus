@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Авторизация</title>
+		<link rel="stylesheet" href="css/icon.css" />
+		<link rel="stylesheet" href="css/basic.css" />
+		<link rel="stylesheet" href="css/std.css" />
+		<link rel="stylesheet" href="css/auth.css" />
+		<script src="js/jquery-2.0.3.min_1.js"></script>
+		<script src="js/jsencrypt.min.js"></script>
+		<script src="js/auth.js"></script>
+	</head>
+	<body>
+		<form>
+			<input type="hidden" name="url" value="/<?php echo Reg::url_admin(); ?>/auth"/>
+			<input type="hidden" name="token" value="<?php echo $_SESSION['admin_auth_token']; ?>"/>
+			<input type="hidden" id="public_key" value="<?php echo file_get_contents(__DIR__ . "/../../conf/public.pem"); ?>"/>
+			<div id="auth" class="auth">
+				<div class="container">
+					
+					<div class="load">
+						<img src="img/load.gif"/>
+					</div>
+					<div class="logo">
+						<img src="img/logo.png"/>
+					</div>
+					
+					<div>
+						<div class="name">E-mail:</div>
+						<div class="pole">
+							<input type="text" name="email" value="" />
+						</div>
+					</div>
+					<div>
+						<div class="name">Пароль:</div>
+						<div class="pole">
+							<input type="password" name="password" value="" /> 
+						</div>
+					</div>
+					<div id="auth_button" class="std_button">
+						<div class="icon_login"></div>
+						Вход
+					</div>
+					
+					<!-- для firefox -->
+					<input type="submit" value="" style="display: none;"/>
+					
+				</div>				
+			</div>
+		</form>
+	</body>
+</html>

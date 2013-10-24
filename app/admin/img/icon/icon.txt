@@ -1,0 +1,28 @@
+- list
+- add
+- edit
+- delete
+- active
+- deactive
+- up
+- down
+- view
+- warn
+- more
+- image
+- password
+- html
+- php
+- home
+- exit
+- help
+- bookmark
+- task
+- task_add
+- error
+- feedback
+- notice
+- settings
+- notification
+
+7 * 4

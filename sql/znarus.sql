@@ -77,8 +77,10 @@ CREATE TABLE admin (
     "ID" integer NOT NULL,
     "Name" character varying(255) DEFAULT ''::character varying NOT NULL,
     "Identified" character varying(127) DEFAULT ''::character varying NOT NULL,
-    "Visible" boolean DEFAULT false NOT NULL,
     "Sort" integer NOT NULL,
+    "Get" boolean DEFAULT true NOT NULL,
+    "Post" boolean DEFAULT false NOT NULL,
+    "Visible" boolean DEFAULT false NOT NULL,
     "Module_ID" integer NOT NULL
 );
 
@@ -114,17 +116,31 @@ COMMENT ON COLUMN admin."Identified" IS 'Идентификатор';
 
 
 --
--- Name: COLUMN admin."Visible"; Type: COMMENT; Schema: core; Owner: znarus
---
-
-COMMENT ON COLUMN admin."Visible" IS 'Видимость';
-
-
---
 -- Name: COLUMN admin."Sort"; Type: COMMENT; Schema: core; Owner: znarus
 --
 
 COMMENT ON COLUMN admin."Sort" IS 'Сортировка';
+
+
+--
+-- Name: COLUMN admin."Get"; Type: COMMENT; Schema: core; Owner: znarus
+--
+
+COMMENT ON COLUMN admin."Get" IS 'Обработка GET данных';
+
+
+--
+-- Name: COLUMN admin."Post"; Type: COMMENT; Schema: core; Owner: znarus
+--
+
+COMMENT ON COLUMN admin."Post" IS 'Обработка POST данных';
+
+
+--
+-- Name: COLUMN admin."Visible"; Type: COMMENT; Schema: core; Owner: znarus
+--
+
+COMMENT ON COLUMN admin."Visible" IS 'Видимость';
 
 
 --
@@ -907,7 +923,7 @@ CREATE TABLE user_session (
     "Date" timestamp without time zone DEFAULT now() NOT NULL,
     "IP" character varying(15) NOT NULL,
     "Browser" character varying(255) NOT NULL,
-    "User_ID" integer NOT NULL
+    "User_ID" integer
 );
 
 
@@ -952,7 +968,7 @@ COMMENT ON COLUMN user_session."Browser" IS 'Строка USER_AGENT брауз�
 -- Name: COLUMN user_session."User_ID"; Type: COMMENT; Schema: core; Owner: znarus
 --
 
-COMMENT ON COLUMN user_session."User_ID" IS 'Привязка к пользователю';
+COMMENT ON COLUMN user_session."User_ID" IS 'Привязка к пользователю, если NULL то root';
 
 
 --
@@ -1043,31 +1059,12 @@ ALTER TABLE ONLY user_group ALTER COLUMN "ID" SET DEFAULT nextval('user_group_se
 -- Data for Name: admin; Type: TABLE DATA; Schema: core; Owner: znarus
 --
 
-COPY admin ("ID", "Name", "Identified", "Visible", "Sort", "Module_ID") FROM stdin;
-1	Настройки	settings	t	8	2
-5	Удалить	delete	f	7	2
-8	Редактировать	list	t	1	2
-7	Редактировать статью	edit	f	5	2
-4	Добавить	add	f	4	2
-13	Категория. Сортировка вверх	category_sort_up	f	13	13
-14	Категория. Сортировка вниз	category_sort_down	f	14	13
-15	Категория. Активация	category_active	f	15	13
-10	Категория. Добавить	category_add	f	10	13
-11	Категория. Редактировать	category_edit	f	11	13
-12	Категория. Удалить	category_delete	f	12	13
-9	Редактировать	category	t	9	13
-16	Категория. Деактивировать	category_deactive	f	16	13
-17	Товары	tovar	f	17	13
-18	Товар. Добавить	tovar_add	f	18	13
-19	Товар. Редактировать	tovar_edit	f	19	13
-20	Товар. Удалить	tovar_delete	f	20	13
-21	Товар. Сортировка вверх	tovar_sort_up	f	21	13
-22	Товар. Сортировка вниз	tovar_sort_down	f	22	13
-23	Товар. Активировать	tovar_active	f	23	13
-24	Товар. Деактивировать	tovar_deactive	f	24	13
-26	Акции	action	t	25	13
-25	Настройки	settings	t	27	13
-27	Акции. Удалить	action_delete	f	26	13
+COPY admin ("ID", "Name", "Identified", "Sort", "Get", "Post", "Visible", "Module_ID") FROM stdin;
+1	Модули	module	1	t	f	t	1
+3	Сведения о PHP	php	3	t	f	t	1
+2	Сведения о системе	sys	2	t	f	t	1
+5	phpinfo	phpinfo	4	t	f	f	1
+4	Сведения о PostgreSQL	pgsql	5	t	f	t	1
 \.
 
 
@@ -1075,7 +1072,7 @@ COPY admin ("ID", "Name", "Identified", "Visible", "Sort", "Module_ID") FROM std
 -- Name: admin_seq; Type: SEQUENCE SET; Schema: core; Owner: znarus
 --
 
-SELECT pg_catalog.setval('admin_seq', 29, true);
+SELECT pg_catalog.setval('admin_seq', 5, true);
 
 
 --
@@ -1083,15 +1080,6 @@ SELECT pg_catalog.setval('admin_seq', 29, true);
 --
 
 COPY exe ("ID", "Name", "Identified", "Module_ID", "Priority", "Active") FROM stdin;
-2	Описание	desc	2	3	t
-12	Один	odin	2	2	t
-6	Список	list	2	6	f
-3	Категории	category	2	12	t
-13	Главная страница	glav	13	13	t
-14	Категория	category	13	14	t
-15	Товар	tovar	13	15	t
-16	Акции	action	13	16	t
-17	Личный кабинет	kabinet	13	17	t
 \.
 
 
@@ -1099,7 +1087,7 @@ COPY exe ("ID", "Name", "Identified", "Module_ID", "Priority", "Active") FROM st
 -- Name: exe_seq; Type: SEQUENCE SET; Schema: core; Owner: znarus
 --
 
-SELECT pg_catalog.setval('exe_seq', 19, true);
+SELECT pg_catalog.setval('exe_seq', 1, false);
 
 
 --
@@ -1107,14 +1095,6 @@ SELECT pg_catalog.setval('exe_seq', 19, true);
 --
 
 COPY html ("ID", "Name", "Identified") FROM stdin;
-6	По умолчанию	default
-7	Новости	news
-8	Ошибка 404	404
-10	Главная страница	home
-11	Каталог	catalog
-1	Статьи	articles
-3	Авторизация	auth
-9	Ошибка 403	403
 \.
 
 
@@ -1122,7 +1102,7 @@ COPY html ("ID", "Name", "Identified") FROM stdin;
 -- Name: html_seq; Type: SEQUENCE SET; Schema: core; Owner: znarus
 --
 
-SELECT pg_catalog.setval('html_seq', 14, true);
+SELECT pg_catalog.setval('html_seq', 1, false);
 
 
 --
@@ -1130,13 +1110,6 @@ SELECT pg_catalog.setval('html_seq', 14, true);
 --
 
 COPY inc ("ID", "Name", "Identified", "Module_ID", "Active") FROM stdin;
-3	Меню	left	2	t
-1	Случайная статья	rand	2	t
-6	Корзина	basket	2	f
-7	Новый инк	inc1	2	t
-8	Меню слева	menu_left	13	t
-9	Акции	action	13	t
-10	Инициализация корзины	basket_init	13	t
 \.
 
 
@@ -1144,7 +1117,7 @@ COPY inc ("ID", "Name", "Identified", "Module_ID", "Active") FROM stdin;
 -- Name: inc_seq; Type: SEQUENCE SET; Schema: core; Owner: znarus
 --
 
-SELECT pg_catalog.setval('inc_seq', 12, true);
+SELECT pg_catalog.setval('inc_seq', 1, false);
 
 
 --
@@ -1152,17 +1125,7 @@ SELECT pg_catalog.setval('inc_seq', 12, true);
 --
 
 COPY module ("ID", "Name", "Identified", "Desc", "Version", "Type", "Url", "Html_ID", "Active") FROM stdin;
-12	Страницы	page		1.0	mod		\N	t
-16	Глоссарий	glossary		1.0	mod		\N	f
-2	Статьи	articles	Описание статьей	1.10	mod	статьи	\N	t
-19	Меню	menu	Описание меню	2.1	mod	menu	\N	t
-23	Пользователи	user	Управление пользователями и привилегиями	2.1	smod	user	\N	t
-24	Мета	meta	Управление метой	3.1	smod	meta	\N	t
-25	Вёрстка	design	Вёрстка шаблонов и прочее	1.0	smod	design	\N	t
-13	Каталог	catalog		2.0	mod		\N	t
-27	Облако тэгов	tag		1.0	smod	tag	\N	t
-28	Поиск	search	Поиск	2.1	smod	search	\N	t
-29	Портфолио	portfolio	Портфолио	2.0	mod	portfolio	\N	t
+1	Сервис	zn_service	Сведения о модулях\r\nСведение о системе\r\nСведения о PHP\r\nСведения о PostgreSQL	1.0	smod		\N	t
 \.
 
 
@@ -1170,7 +1133,7 @@ COPY module ("ID", "Name", "Identified", "Desc", "Version", "Type", "Url", "Html
 -- Name: module_seq; Type: SEQUENCE SET; Schema: core; Owner: znarus
 --
 
-SELECT pg_catalog.setval('module_seq', 35, true);
+SELECT pg_catalog.setval('module_seq', 1, true);
 
 
 --
@@ -1178,12 +1141,6 @@ SELECT pg_catalog.setval('module_seq', 35, true);
 --
 
 COPY param ("ID", "Name", "Identified", "Type", "Value", "Module_ID") FROM stdin;
-6	Отображать	visible	bool	1	2
-3	Кол-во статьей на страницу	str_count	int	5	2
-4	Просто строка	stroka	string	Всё может быть, что быть не может, и даже то что может быть. И даже то что быть не может, всё тоже очень даже может быть.	2
-7	Кол-во товаров на страницу	tovar_str	int	10	13
-8	Почтовый ящик для оповещения	email_notify	string	test@znarus.ru	13
-9	Дата последнего заказа	zakaz_data_last	string	10.09.2013	13
 \.
 
 
@@ -1191,7 +1148,7 @@ COPY param ("ID", "Name", "Identified", "Type", "Value", "Module_ID") FROM stdin
 -- Name: param_seq; Type: SEQUENCE SET; Schema: core; Owner: znarus
 --
 
-SELECT pg_catalog.setval('param_seq', 11, true);
+SELECT pg_catalog.setval('param_seq', 1, false);
 
 
 --
@@ -1199,11 +1156,6 @@ SELECT pg_catalog.setval('param_seq', 11, true);
 --
 
 COPY phpclass ("ID", "Name", "Identified", "Module_ID") FROM stdin;
-10	Статья	Articles	2
-12	Категория	Articles_Category	2
-13	Категория	Catalog_Category	13
-14	Товар	Catalog_Tovar	13
-16	Корзина	Category_Basket	13
 \.
 
 
@@ -1211,7 +1163,7 @@ COPY phpclass ("ID", "Name", "Identified", "Module_ID") FROM stdin;
 -- Name: phpclass_seq; Type: SEQUENCE SET; Schema: core; Owner: znarus
 --
 
-SELECT pg_catalog.setval('phpclass_seq', 18, true);
+SELECT pg_catalog.setval('phpclass_seq', 1, false);
 
 
 --
@@ -1219,11 +1171,6 @@ SELECT pg_catalog.setval('phpclass_seq', 18, true);
 --
 
 COPY text ("ID", "Name", "Identified", "Value", "Module_ID") FROM stdin;
-8	Приветсвтенная страница	home	Добро пожаловать	2
-9	Бегущая строка	running_man	Всё может быть что быть не может и даже то что может быть.	2
-10	Текст при оформлении заказа	zakaz	Вы оформили заказ, всего хорошего.	13
-11	Текст на главной	glav	Добро пожаловать в наш каталог	13
-12	Просто текст	prosto	Всё может быть, что быть не может.\r\n	13
 \.
 
 
@@ -1231,7 +1178,7 @@ COPY text ("ID", "Name", "Identified", "Value", "Module_ID") FROM stdin;
 -- Name: text_seq; Type: SEQUENCE SET; Schema: core; Owner: znarus
 --
 
-SELECT pg_catalog.setval('text_seq', 14, true);
+SELECT pg_catalog.setval('text_seq', 1, false);
 
 
 --
@@ -1239,10 +1186,8 @@ SELECT pg_catalog.setval('text_seq', 14, true);
 --
 
 COPY "user" ("ID", "Name", "Email", "Password", "Group_ID", "Active") FROM stdin;
-5	Пользователь 5	email5@znarus.znt	9f406368f742eadadef944d3315837cc	3	f
-3	Пользователь 3	test@znarus.ru	decb50efb72e7577b968417f776c8c81	3	t
-6	Комбайнёр	kombain@znarus.znt	a91269733f5b1d55974d537e9147e775	3	f
-7	Один	odin@znarus.znt	f4c95d547fbff32e2326355af37f7524	5	f
+1	Один	odin@znarus.znt	f4c95d547fbff32e2326355af37f7524	1	t
+2	Два	dva@znarus.znt	a91269733f5b1d55974d537e9147e775	1	f
 \.
 
 
@@ -1251,10 +1196,7 @@ COPY "user" ("ID", "Name", "Email", "Password", "Group_ID", "Active") FROM stdin
 --
 
 COPY user_group ("ID", "Name") FROM stdin;
-3	Группа 3
-4	Группа 4
-5	Группа 5
-7	Тестеры
+1	Операторы
 \.
 
 
@@ -1262,7 +1204,7 @@ COPY user_group ("ID", "Name") FROM stdin;
 -- Name: user_group_seq; Type: SEQUENCE SET; Schema: core; Owner: znarus
 --
 
-SELECT pg_catalog.setval('user_group_seq', 8, true);
+SELECT pg_catalog.setval('user_group_seq', 1, true);
 
 
 --
@@ -1270,51 +1212,11 @@ SELECT pg_catalog.setval('user_group_seq', 8, true);
 --
 
 COPY user_priv ("Admin_ID", "Group_ID") FROM stdin;
-9	3
-9	4
-9	5
-10	3
-10	4
-10	5
-11	3
-11	5
-12	3
-12	5
-13	3
-13	5
-14	3
-14	5
-15	3
-15	5
-16	3
-16	5
-17	3
-17	5
-18	3
-18	5
-19	3
-19	5
-20	3
-20	5
-21	3
-21	5
-22	3
-22	5
-23	3
-23	5
-24	3
-24	5
-26	3
-26	5
-27	3
-27	5
-25	3
-25	5
-8	4
-4	4
-7	4
-5	4
-1	4
+1	1
+2	1
+3	1
+5	1
+4	1
 \.
 
 
@@ -1322,7 +1224,7 @@ COPY user_priv ("Admin_ID", "Group_ID") FROM stdin;
 -- Name: user_seq; Type: SEQUENCE SET; Schema: core; Owner: znarus
 --
 
-SELECT pg_catalog.setval('user_seq', 9, true);
+SELECT pg_catalog.setval('user_seq', 2, true);
 
 
 --
@@ -1330,7 +1232,8 @@ SELECT pg_catalog.setval('user_seq', 9, true);
 --
 
 COPY user_session ("ID", "Date", "IP", "Browser", "User_ID") FROM stdin;
-454d1eb34fe968609b2622b5517ad42c	2013-09-29 03:12:59.072791	127.0.0.1	Opera/9.80 (X11; Linux i686) Presto/2.12.388 Version/12.16	3
+b3ddcc9bc37adcaa8d20ac60bd3f5abf	2013-10-24 22:05:14.673337	127.0.0.1	Opera/9.80 (X11; Linux i686) Presto/2.12.388 Version/12.16	\N
+d6b367d04eb7f5aedfc5b402d0df5660	2013-10-24 22:05:27.124636	127.0.0.1	Opera/9.80 (X11; Linux i686) Presto/2.12.388 Version/12.16	1
 \.
 
 

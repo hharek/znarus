@@ -25,6 +25,13 @@
 			</td>
 		</tr>
 		<tr>
+			<td>Активен</td>
+			<td>
+				<input type="hidden" name="Active" value="0"/>
+				<input type="checkbox" name="Active" value="1"<?php if($user['Active'] === "1"): ?> checked="checked"<?php endif; ?>/>
+			</td>
+		</tr>
+		<tr>
 			<td>
 				<div class="knopka submit">
 					<div class="icon_edit"></div>

@@ -11,9 +11,10 @@ class ZN_User
 	 * @param string $email
 	 * @param string $password
 	 * @param int $group_id
+	 * @param bool $active
 	 * @return array
 	 */
-	public static function add($name, $email, $password, $group_id)
+	public static function add($name, $email, $password, $group_id, $active)
 	{
 		/* Проверка */
 		Err::check_field($name, "string", false, "Name", "Наименование");
@@ -27,6 +28,7 @@ class ZN_User
 		{Err::add("Пароль не должен быть больше " . Reg::password_length_max() . " символов.", "Password");}
 		
 		ZN_User_Group::is_id($group_id);
+		Err::check_field($active, "bool", false, "Active", "Активен");
 		Err::exception();
 		
 		/* Уникальность */
@@ -39,7 +41,8 @@ class ZN_User
 			"Name" => $name,
 			"Email" => $email,
 			"Password" => self::password_hash($password),
-			"Group_ID" => $group_id
+			"Group_ID" => $group_id,
+			"Active" => $active
 		];
 		$id = Reg::db_core()->insert("user", $data, "ID");
 		
@@ -54,9 +57,10 @@ class ZN_User
 	 * @param string $name
 	 * @param string $email
 	 * @param int $group_id
+	 * @param bool $active
 	 * @return array
 	 */
-	public static function edit($id, $name, $email, $group_id)
+	public static function edit($id, $name, $email, $group_id, $active)
 	{
 		/* Проверка */
 		self::is_id($id);
@@ -64,6 +68,7 @@ class ZN_User
 		Err::check_field($email, "email", false, "Email", "E-mail");
 		ZN_User_Group::is_id($group_id);
 		Err::exception();
+		Err::check_field($active, "bool", false, "Active", "Активен");
 		
 		/* Уникальность */
 		self::_unique($name, $email, $id);
@@ -74,7 +79,8 @@ class ZN_User
 		[
 			"Name" => $name,
 			"Email" => $email,
-			"Group_ID" => $group_id
+			"Group_ID" => $group_id,
+			"Active" => $active
 		];
 		Reg::db_core()->update("user", $data, array("ID" => $id));
 		
@@ -125,38 +131,6 @@ SQL;
 		$count = Reg::db_core()->query_one($query, $id, "user");
 		if($count < 1)
 		{throw new Exception_Constr("Пользователя с номером «{$id}» не существует.");}
-	}
-	
-	/**
-	 * Активировать
-	 * 
-	 * @param int $id
-	 */
-	public static function active($id)
-	{
-		self::is_id($id);
-		
-		$data =
-		[
-			"Active" => 1
-		];
-		Reg::db_core()->update("user", $data, array("ID" => $id));
-	}
-	
-	/**
-	 * Деактивировать
-	 * 
-	 * @param int $id
-	 */
-	public static function deactive($id)
-	{
-		self::is_id($id);
-		
-		$data =
-		[
-			"Active" => 0
-		];
-		Reg::db_core()->update("user", $data, array("ID" => $id));
 	}
 	
 	/**
@@ -276,7 +250,7 @@ SELECT
 	"Name",
 	"Email", 
 	"Group_ID",
-	"Active"
+	"Active"::int
 FROM 
 	"user"
 ORDER BY 

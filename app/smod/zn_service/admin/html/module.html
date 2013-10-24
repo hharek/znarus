@@ -1,0 +1,24 @@
+<?php foreach ($module as $m_val): ?>
+<div class="module">
+	<div class="title"><?php echo $m_val['Name']; ?></div>
+	<div class="center">
+		<div class="image">
+			<img src="img/module_icon/default.png" width="32" height="32"/>
+		</div>
+		<div class="admin">
+			<ul>
+				<?php foreach ($m_val['admin'] as $a_val): ?>
+					<li>
+						<a href="#<?php echo $m_val['Identified']; ?>/<?php echo $a_val['Identified']; ?>"><?php echo $a_val['Name']; ?></a>
+					</li>
+				<?php endforeach; ?>
+			</ul>
+		</div>
+	</div>
+	<div class="desc"><?php echo $m_val['Desc']; ?></div>
+</div>
+<?php endforeach; ?>
+
+
+
+

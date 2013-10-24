@@ -1,0 +1,132 @@
+/* Элементы формы */
+.std_form input[type="text"]
+{
+	min-width: 350px;
+	border: 1px solid #a19d9a;
+	border-radius: 4px;
+}
+
+.std_form input[type="password"]
+{
+	min-width: 350px;
+	border: 1px solid #a19d9a;
+	border-radius: 4px;
+}
+
+.std_form textarea
+{
+	min-width: 350px;
+	min-height: 100px;
+	border: 1px solid #a19d9a;
+	border-radius: 4px;
+}
+
+.std_form select
+{
+	min-width: 150px;
+}
+
+.std_form input.sort
+{
+	width: 35px;
+	text-align: right;
+}
+
+/* Таблица для формы */
+table.std_form
+{
+	width: 90%;
+}
+
+table.std_form td
+{
+	padding: 10px 10px;
+	vertical-align: top;
+}
+
+table.std_form td:nth-child(odd)
+{
+	text-align: right;
+	width: 50%;
+} 
+
+table.std_form td:nth-child(even)
+{
+	text-align: left;
+	width: 50%;
+}
+
+/* Список */
+table.std_list
+{
+	width: 90%;
+	clear: both;
+	border-collapse: collapse;
+}
+
+table.std_list thead td
+{
+	text-align: center;
+	border: solid 1px #c0c0c0;
+	background-color: #e2eeb4;
+}
+
+table.std_list tbody tr
+{
+	background-color: #ffffff;
+}
+
+table.std_list tbody tr:nth-child(even)
+{
+	background-color: #eff0ec;
+}
+
+table.std_list tbody tr:hover
+{
+	background-color: #f9fac5;
+}
+
+table.std_list tbody td
+{
+	text-align: center;
+	border: solid 1px #ccc;
+}
+
+table.std_list tbody td *
+{
+	vertical-align: middle;
+}
+
+table.std_list tbody tr .up,.down
+{
+	cursor: pointer;
+}
+
+/* Кнопки */
+.std_button
+{
+	border: 1px solid #c0c0c0;
+	border-radius: 10px;
+	display: inline-block;
+	background-color: #e3e3e3;
+	min-width: 120px;
+	height: 22px;
+	cursor: pointer;
+	padding: 4px 10px 4px 6px;
+	margin-left: 10px;
+	margin: 5px 10px 5px 0px;
+	color: #000;
+	text-align: center;
+}
+
+.std_button:hover
+{
+	background-color: #f0f0f0;
+}
+
+.std_button div
+{
+	float: left;
+	margin: 0px 5px 0px 0px;
+}
+

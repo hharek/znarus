@@ -7,11 +7,19 @@ class ZN_User_Action
 	/**
 	 * Авторизация
 	 * 
+	 * @return bool
 	 * @param string $email
 	 * @param string $password
 	 */
 	public static function auth($email, $password)
 	{
+		/* Проверка на root */
+		if($email === Reg::root_name() and $password === Reg::root_password())
+		{
+			self::session_create_root();
+			return true;
+		}
+		
 		/* Проверка E-mail */
 		$email = trim($email);
 		
@@ -37,7 +45,7 @@ class ZN_User_Action
 		{throw new Exception_Form("Пароль не должен быть больше " . Reg::password_length_max() . " символов.");}
 		
 		$password = ZN_User::password_hash($password);
-				
+		
 		/* Проверка по БД */
 		$query = 
 <<<SQL
@@ -56,6 +64,7 @@ SQL;
 		
 		/* Создание сессии */
 		self::session_create($user_id);
+		return true;
 	}
 	
 	/**
@@ -104,6 +113,48 @@ SQL;
 			"IP" => $_SERVER['REMOTE_ADDR'], 
 			"Browser" => $_SERVER['HTTP_USER_AGENT'], 
 			"User_ID" => $user_id
+		];
+		$sid = Reg::db_core()->insert("user_session", $data, "ID");
+		
+		/* Создание сессии */
+		setcookie("sid", $sid, time() + Reg::session_time_admin(), "/" . urlencode(Reg::url_admin()), null, false, true);
+	
+		/* Создание токена */
+		$token = md5(microtime(true) + mt_rand(1, 1000000));
+		setcookie("token", $token, time() + Reg::session_time_admin(), "/" . urlencode(Reg::url_admin()));
+	}
+	
+	/**
+	 * Создать сессию для root-а
+	 */
+	public static function session_create_root()
+	{
+		/* Удаление старый сессий */
+		$query = 
+<<<SQL
+SELECT 
+	"ID"
+FROM 
+	"user_session"
+WHERE 
+	"User_ID" IS NULL
+SQL;
+		$sid_old = Reg::db_core()->query_column($query, null, "user_session");
+		if(!empty($sid_old))
+		{
+			foreach ($sid_old as $val)
+			{
+				Reg::db_core()->delete("user_session", array("ID" => $val));
+			}
+		}
+		
+		/* Добавить */
+		$data = 
+		[
+			"ID" => md5(microtime() . mt_rand(0, 1000000)), 
+			"IP" => $_SERVER['REMOTE_ADDR'], 
+			"Browser" => $_SERVER['HTTP_USER_AGENT'], 
+			"User_ID" => null
 		];
 		$sid = Reg::db_core()->insert("user_session", $data, "ID");
 		
@@ -203,13 +254,14 @@ SQL;
 		{throw new Exception_Admin("sid указан неверно.");}
 		
 		/* Данные по пользователю */
-		$query = 
+		if(!empty($session['User_ID']))
+		{
+			$query = 
 <<<SQL
 SELECT 
 	"u"."ID", 
 	"u"."Name", 
 	"u"."Email",
-	"u"."Password",
 	"g"."ID" as "Group_ID",
 	"g"."Name" as "Group_Name"
 FROM 
@@ -220,7 +272,16 @@ WHERE
 	"u"."ID" = $1 AND
 	"u"."Group_ID" = "g"."ID"
 SQL;
-		$user = Reg::db_core()->query_line($query, $session['User_ID'], "table");
+			$user = Reg::db_core()->query_line($query, $session['User_ID'], "table");
+		}
+		else
+		{
+			$user['ID'] = "0";
+			$user['Name'] = "root";
+			$user['Email'] = "root";
+			$user['Group_ID'] = "0";
+			$user['Group_Name'] = "root";
+		}
 		
 		$user['IP'] = $session['IP'];
 		$user['Browser'] = $session['Browser'];

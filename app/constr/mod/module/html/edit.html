@@ -184,13 +184,6 @@
 			<a href="#text/add?module_id=<?php echo $module['ID']; ?>" class="icon_add" title="Добавить текст"></a>
 		</div>
 		
-		<!--
-		<div id="knopka_ajax" class="knopka" title="Аяксы">
-			ajax (3)
-			<a href="#ajax/add?module_id=<?php echo $module['ID']; ?>" class="icon_add" title="Добавить аякс"></a>
-		</div>
-		-->
-		
 	</div>
 	
 	<!-- --------------------------- Окно ----------------- -->
@@ -198,145 +191,191 @@
 		
 		<!-- phpclass -->
 		<?php if(!empty($phpclass)): ?>
-			<table id="structure_phpclass" class="list" style="width: 500px;" align="center">
-				<colgroup>
-					<col width="40%"/>
-					<col width="60%"/>
-				</colgroup>
-				<thead>
-					<tr>
-						<td colspan="2" title="Классы">phpclass</td>
-					</tr>
-				</thead>
-				<tbody>
-					<?php foreach ($phpclass as $val): ?>
-						<tr url="#phpclass/edit?id=<?php echo $val['ID']; ?>">
-							<td><?php echo $val['Identified']; ?></td>
-							<td><?php echo $val['Name']; ?></td>
+			<div id="structure_phpclass" class="structure_element">
+				<table  class="list" style="width: 500px;" align="center">
+					<colgroup>
+						<col width="40%"/>
+						<col width="60%"/>
+					</colgroup>
+					<thead>
+						<tr>
+							<td colspan="2" title="Классы">phpclass</td>
 						</tr>
-					<?php endforeach; ?>
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+						<?php foreach ($phpclass as $val): ?>
+							<tr url="#phpclass/edit?id=<?php echo $val['ID']; ?>">
+								<td><?php echo $val['Identified']; ?></td>
+								<td><?php echo $val['Name']; ?></td>
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+				<center>
+					<a class="knopka" href="#phpclass/add?module_id=<?php echo $module['ID']; ?>">
+						<div class="icon_add"></div>
+						Добавить
+					</a>
+				</center>
+			</div>
 		<?php endif; ?>
 		
 		<!-- param -->
 		<?php if(!empty($param)): ?>
-			<table id="structure_param" class="list" style="width: 750px;" align="center">
-				<colgroup>
-					<col width="25%" />
-					<col width="30%" />
-					<col width="10%" />
-					<col width="25%" />
-				</colgroup>
-				<thead>
-					<tr>
-						<td colspan="4" title="Параметры">param</td>
-					</tr>
-				</thead>
-				<tbody>
-					<?php foreach ($param as $val): ?>
-						<tr url="#param/edit?id=<?php echo $val['ID']; ?>">
-							<td><?php echo $val['Identified']; ?></td>
-							<td><?php echo $val['Name']; ?></td>
-							<td><?php echo $val['Type']; ?></td>
-							<?php if(mb_strlen($val['Value']) > 24): ?>
-								<td title="<?php echo $val['Value']; ?>">
-									<?php echo mb_substr($val['Value'], 0, 24); ?>
-								</td>
-							<?php else: ?>
-								<td>
-									<?php echo $val['Value']; ?>
-								</td>
-							<?php endif; ?>
-							
+			<div id="structure_param" class="structure_element">
+				<table class="list" style="width: 750px;" align="center">
+					<colgroup>
+						<col width="25%" />
+						<col width="30%" />
+						<col width="10%" />
+						<col width="25%" />
+					</colgroup>
+					<thead>
+						<tr>
+							<td colspan="4" title="Параметры">param</td>
 						</tr>
-					<?php endforeach; ?>
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+						<?php foreach ($param as $val): ?>
+							<tr url="#param/edit?id=<?php echo $val['ID']; ?>">
+								<td><?php echo $val['Identified']; ?></td>
+								<td><?php echo $val['Name']; ?></td>
+								<td><?php echo $val['Type']; ?></td>
+								<?php if(mb_strlen($val['Value']) > 24): ?>
+									<td title="<?php echo $val['Value']; ?>">
+										<?php echo mb_substr($val['Value'], 0, 24); ?>
+									</td>
+								<?php else: ?>
+									<td>
+										<?php echo $val['Value']; ?>
+									</td>
+								<?php endif; ?>
+
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+				<center>
+					<a class="knopka" href="#param/add?module_id=<?php echo $module['ID']; ?>">
+						<div class="icon_add"></div>
+						Добавить
+					</a>
+				</center>
+			</div>
 		<?php endif; ?>
 		
 		<!-- admin-->
 		<?php if(!empty($admin)): ?>
-			<table id="structure_admin" class="list" style="width: 600px;" align="center">
-				<colgroup>
-					<col width="35%" />
-					<col width="50%" />
-					<col width="15%" />
-				</colgroup>
-				<thead>
-					<tr>
-						<td colspan="3" title="Админки">admin</td>
-					</tr>
-				</thead>
-				<tbody>
-					<?php foreach ($admin as $key=>$val): ?>
-					<tr url="#admin/edit?id=<?php echo $val['ID']; ?>"<?php if($val['Visible']): ?> style="color: indigo;"<?php endif; ?>>
-							<td><?php echo $val['Identified']; ?></td>
-							<td><?php echo $val['Name']; ?></td>
-							<td>
-								<div onclick="zn('#admin/sort_up_post', { id: <?php echo $val['ID']; ?>});" class="icon_up up"></div>
-								<div onclick="zn('#admin/sort_down_post', { id: <?php echo $val['ID']; ?>});" class="icon_down down"></div>
-							</td>
+			<div id="structure_admin" class="structure_element">
+				<table class="list" style="width: 700px;" align="center">
+					<colgroup>
+						<col width="25%" />
+						<col width="40%" />
+						<col width="20%"/>
+						<col width="15%" />
+					</colgroup>
+					<thead>
+						<tr>
+							<td colspan="4" title="Админки">admin</td>
 						</tr>
-					<?php endforeach; ?>
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+						<?php foreach ($admin as $key=>$val): ?>
+						<tr url="#admin/edit?id=<?php echo $val['ID']; ?>"<?php if($val['Visible']): ?> style="color: indigo;"<?php endif; ?>>
+								<td><?php echo $val['Identified']; ?></td>
+								<td><?php echo $val['Name']; ?></td>
+								<td>
+									<?php if($val['Get'] === "1"): ?>GET<?php endif; ?><?php if($val['Get'] === "1" and $val['Post'] === "1"): ?>, <?php endif; ?>
+									<?php if($val['Post'] === "1"): ?>POST<?php endif; ?>
+								</td>
+								<td>
+									<div onclick="zn('#admin/sort_up_post', { id: <?php echo $val['ID']; ?>});" class="icon_up up"></div>
+									<div onclick="zn('#admin/sort_down_post', { id: <?php echo $val['ID']; ?>});" class="icon_down down"></div>
+								</td>
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+				<center>
+					<a class="knopka" href="#admin/add?module_id=<?php echo $module['ID']; ?>">
+						<div class="icon_add"></div>
+						Добавить
+					</a>
+				</center>
+			</div>
 		<?php endif; ?>
 		
 		<!-- exe -->
 		<?php if(!empty($exe)): ?>
-			<table id="structure_exe" class="list" style="width: 600px; " align="center">
-				<colgroup>
-					<col width="35%"/>
-					<col width="50%"/>
-					<col width="15%"/>
-				</colgroup>
-				<thead>
-					<tr>
-						<td colspan="3" title="Исполнители">exe</td>
-					</tr>
-				</thead>
-				<tbody>
-					<?php foreach ($exe as $key => $val): ?>
-						<tr<?php if($val['Active'] === "0"): ?> style="color: #a0a0a0;"<?php endif; ?>>
-							<td url="#exe/edit?id=<?php echo $val['ID']; ?>"><?php echo $val['Identified']; ?></td>
-							<td url="#exe/edit?id=<?php echo $val['ID']; ?>"><?php echo $val['Name']; ?></td>
-							<td>				
-								<div onclick="zn('#exe/priority_up_post', { id: <?php echo $val['ID']; ?>});" class="icon_up up"></div>
-								<div onclick="zn('#exe/priority_down_post', { id: <?php echo $val['ID']; ?>});" class="icon_down down"></div>
-							</td>
+			<div id="structure_exe" class="structure_element">
+				<table class="list" style="width: 600px; " align="center">
+					<colgroup>
+						<col width="35%"/>
+						<col width="50%"/>
+						<col width="15%"/>
+					</colgroup>
+					<thead>
+						<tr>
+							<td colspan="3" title="Исполнители">exe</td>
 						</tr>
-					<?php endforeach; ?>
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+						<?php foreach ($exe as $key => $val): ?>
+							<tr<?php if($val['Active'] === "0"): ?> style="color: #a0a0a0;"<?php endif; ?>>
+								<td url="#exe/edit?id=<?php echo $val['ID']; ?>"><?php echo $val['Identified']; ?></td>
+								<td url="#exe/edit?id=<?php echo $val['ID']; ?>"><?php echo $val['Name']; ?></td>
+								<td>				
+									<div onclick="zn('#exe/priority_up_post', { id: <?php echo $val['ID']; ?>});" class="icon_up up"></div>
+									<div onclick="zn('#exe/priority_down_post', { id: <?php echo $val['ID']; ?>});" class="icon_down down"></div>
+								</td>
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+				<center>
+					<a class="knopka" href="#exe/add?module_id=<?php echo $module['ID']; ?>">
+						<div class="icon_add"></div>
+						Добавить
+					</a>
+				</center>
+			</div>
 		<?php endif; ?>
 		
 		<!-- inc -->
 		<?php if(!empty($inc)): ?>
-			<table id="structure_inc" class="list" style="width: 500px;" align="center">
-				<colgroup>
-					<col width="40%"/>
-					<col width="60%"/>
-				</colgroup>
-				<thead>
-					<tr>
-						<td colspan="2" title="Инки">inc</td>
-					</tr>
-				</thead>
-				<tbody>
-					<?php foreach ($inc as $key=>$val): ?>
-						<tr url="#inc/edit?id=<?php echo $val['ID']; ?>"<?php if($val['Active'] === "0"): ?> style="color: #a0a0a0;"<?php endif; ?>>
-							<td><?php echo $val['Identified']; ?></td>
-							<td><?php echo $val['Name']; ?></td>
+			<div id="structure_inc" class="structure_element">
+				<table class="list" style="width: 500px;" align="center">
+					<colgroup>
+						<col width="40%"/>
+						<col width="60%"/>
+					</colgroup>
+					<thead>
+						<tr>
+							<td colspan="2" title="Инки">inc</td>
 						</tr>
-					<?php endforeach; ?>
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+						<?php foreach ($inc as $key=>$val): ?>
+							<tr url="#inc/edit?id=<?php echo $val['ID']; ?>"<?php if($val['Active'] === "0"): ?> style="color: #a0a0a0;"<?php endif; ?>>
+								<td><?php echo $val['Identified']; ?></td>
+								<td><?php echo $val['Name']; ?></td>
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+				<center>
+					<a class="knopka" href="#inc/add?module_id=<?php echo $module['ID']; ?>">
+						<div class="icon_add"></div>
+						Добавить
+					</a>
+				</center>
+			</div>
 		<?php endif; ?>
 		
 		<!-- text -->
 		<?php if(!empty($text)): ?>
-			<table id="structure_text" class="list" style="width: 500px;" align="center">
+		<div id="structure_text" class="structure_element">
+			<table class="list" style="width: 500px;" align="center">
 				<colgroup>
 					<col width="40%"/>
 					<col width="60%"/>
@@ -355,43 +394,14 @@
 					<?php endforeach; ?>
 				</tbody>
 			</table>
+			<center>
+				<a class="knopka" href="#text/add?module_id=<?php echo $module['ID']; ?>">
+					<div class="icon_add"></div>
+					Добавить
+				</a>
+			</center>
+		</div>
 		<?php endif; ?>
-		
-		
-		
-		<!-- ajax -->
-		<!--
-		<table id="structure_ajax" class="list" style="width: 600px;" align="center">
-			<colgroup>
-				<col width="35%" />
-				<col width="50%" />
-				<col width="15%" />
-			</colgroup>
-			<thead>
-				<tr>
-					<td colspan="3" title="Аяксы">ajax</td>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>backet</td>
-					<td>Корзина</td>
-					<td>passive</td>
-				</tr>
-				<tr>
-					<td>backet_add</td>
-					<td>Добавить товар в корзину</td>
-					<td>active</td>
-				</tr>
-				<tr>
-					<td>tovar_status</td>
-					<td>Статус товара</td>
-					<td>okno</td>
-				</tr>
-			</tbody>
-		</table>
-		-->
-		
 	</div>
 	
 </div>

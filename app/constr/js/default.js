@@ -269,11 +269,20 @@ function zn(url, post)
 			/* JS error form */
 			$("table.forma input,textarea").css("border-color", "");
 			$(".error_mess").remove();
+			
+			$("table.forma input[type=checkbox]") /* checkbox */
+				.css("border", "")
+				.removeAttr("title");	
 
 			for(var key in data.form_error)
 			{
-				$("table.forma [name='" + key + "']").css("border-color","#d90000");
-				$("table.forma [name='" + key + "']").after("<div class=\"error_mess\">" + data.form_error[key] + "</div>");
+				$("table.forma [name='" + key + "']:not(input[type=hidden],input[type=checkbox])")
+					.css("border-color","#d90000")
+					.after("<div class=\"error_mess\">" + data.form_error[key] + "</div>");
+				
+				$("table.forma input[type=checkbox][name='" + key + "']")  /* checkbox */
+					.css("border","1px solid #d90000")
+					.attr("title", data.form_error[key]);		
 			}
 
 			/* Обновить меню */
@@ -603,7 +612,14 @@ function menu_create(type, data)
 				html += "<a href=\"#user/group_edit?id=" + data[i].ID + "\">" + data[i].Name + "</a>";
 				for(var u = 0; u < data[i].user.length; u++)
 				{
-					html += "<a href=\"#user/user_edit?id=" + data[i].user[u].ID + "\" style=\"margin-left: 10px;\">" + data[i].user[u].Email + "</a>";
+					if(data[i].user[u].Active === "1")
+					{
+						html += "<a href=\"#user/user_edit?id=" + data[i].user[u].ID + "\" style=\"margin-left: 10px;\">" + data[i].user[u].Email + "</a>";
+					}
+					else
+					{
+						html += "<a href=\"#user/user_edit?id=" + data[i].user[u].ID + "\" style=\"margin-left: 10px; color: #ccc;\">" + data[i].user[u].Email + "</a>";
+					}
 				}
 			}
 			

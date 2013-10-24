@@ -80,12 +80,12 @@
 	margin: 0px 180px 0px 0px;
 }
 
-#okno_structure TABLE.list
+#okno_structure .okno .structure_element
 {
 	margin-bottom: 24px; 
 }
 
-#okno_structure TABLE.list THEAD TD
+#okno_structure .okno .structure_element TABLE.list THEAD TD
 {
 	font-weight: bold;
 }

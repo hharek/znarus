@@ -24,7 +24,13 @@
 				<!-- Адмники -->
 				<?php foreach ($m_val['admin'] as $a_val): ?>
 					<tr class="priv_body" mod="<?php echo $m_val['ID']; ?>">
-						<td><?php echo $a_val['ID']; ?>. <?php echo $a_val['Name']; ?></td>
+						<td>
+							<?php if($a_val['Visible'] === "1"): ?>
+								<span style="color:indigo;"><?php echo $a_val['Name']; ?></span>
+							<?php else: ?>
+								<?php echo $a_val['Name']; ?>
+							<?php endif; ?>
+						</td>
 						<?php foreach ($a_val['group_priv'] as $gp_val): ?>
 							<td>
 								<input name="priv_<?php echo $a_val['ID']; ?>_<?php echo $gp_val['group_id']; ?>" type="checkbox" value="1"<?php if($gp_val['priv']): ?>checked="checked"<?php endif; ?>/>

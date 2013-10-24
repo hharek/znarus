@@ -24,7 +24,8 @@ $query =
 SELECT 
 	"ID", 
 	"Name",
-	"Module_ID"
+	"Module_ID",
+	"Visible"::int
 FROM 
 	"admin" 
 ORDER BY 

@@ -9,39 +9,52 @@ class ZN_Admin
 	 * 
 	 * @param string $name
 	 * @param string $identified
+	 * @param bool $get
+	 * @param bool $post
+	 * @param bool $visible
 	 * @param int $module_id
-	 * @return array
+	 * @return string
 	 */
-	public static function add($name, $identified, $module_id)
+	public static function add($name, $identified, $get, $post, $visible, $module_id)
 	{
 		/* Проверка */
 		Err::check_field($name, "string", false, "Name", "Наименование");
 		Err::check_field($identified, "identified", false, "Identified", "Идентификатор");
+		$identified = strtolower($identified);
+		Err::check_field($get, "bool", false, "Get", "Метод GET");
+		Err::check_field($post, "bool", false, "Post", "Метод POST");
+		if($get === "0" and $post === "0")
+		{
+			Err::add("Необходимо выбрать метод GET или метод POST", "Get");
+			Err::add("Необходимо выбрать метод GET или метод POST", "Post");
+		}
+		Err::check_field($visible, "bool", false, "Visible", "Видимость");
 		ZN_Module::is_id($module_id);
-		
 		Err::exception();
 		
 		/* Уникальность */
 		self::_unique($name, $identified, $module_id);
-		
 		Err::exception();
 		
 		/* Файлы */
-		$module = ZN_Module::select_line_by_id($module_id);
+		if($get === "1")
+		{
+			self::file_add($identified, "get", $module_id);
+		}
 		
-		if(!Reg::file_app()->is_dir("{$module['Type']}/{$module['Identified']}/admin"))
-		{Reg::file_app()->mkdir("{$module['Type']}/{$module['Identified']}/admin");}
-		
-		if(!Reg::file_app()->is_dir("{$module['Type']}/{$module['Identified']}/admin/act"))
-		{Reg::file_app()->mkdir("{$module['Type']}/{$module['Identified']}/admin/act");}
-		
-		Reg::file_app()->put("{$module['Type']}/{$module['Identified']}/admin/act/{$identified}.php", "");
+		if ($post === "1") 
+		{
+			self::file_add($identified, "post", $module_id);
+		}
 		
 		/* SQL */
 		$data = 
 		[
 			"Name" => $name,
 			"Identified" => $identified,
+			"Get" => $get,
+			"Post" => $post,
+			"Visible" => $visible,
 			"Module_ID" => $module_id
 		];
 		$id = Reg::db_core()->insert("admin", $data, "ID");
@@ -56,40 +69,65 @@ class ZN_Admin
 	 * @param int $id
 	 * @param string $name
 	 * @param string $identified
+	 * @param bool $get
+	 * @param bool $post
 	 * @param bool $visible
 	 * @return array
 	 */
-	public static function edit($id, $name, $identified, $visible)
+	public static function edit($id, $name, $identified, $get, $post, $visible)
 	{
 		/* Проверка */
 		self::is_id($id);
 		Err::check_field($name, "string", false, "Name", "Наименование");
 		Err::check_field($identified, "identified", false, "Identified", "Идентификатор");
+		$identified = strtolower($identified);
+		Err::check_field($get, "bool", false, "Get", "Метод GET");
+		Err::check_field($post, "bool", false, "Post", "Метод POST");
+		if($get === "0" and $post === "0")
+		{
+			Err::add("Необходимо выбрать метод GET или метод POST", "Get");
+			Err::add("Необходимо выбрать метод GET или метод POST", "Post");
+		}
 		Err::check_field($visible, "bool", false, "Visible", "Видимость");
-		
 		Err::exception();
 		
 		/* Уникальность */
 		$admin = self::select_line_by_id($id);
 		self::_unique($name, $identified, $admin['Module_ID'], $id);
-		
 		Err::exception();
 		
-		/* Файлы */
-		$module = ZN_Module::select_line_by_id($admin['Module_ID']);
-		Reg::file_app()->mv
-		(
-			"{$module['Type']}/{$module['Identified']}/admin/act/{$admin['Identified']}.php",
-			"{$module['Type']}/{$module['Identified']}/admin/act/{$identified}.php"
-		);
-		
-		if(Reg::file_app()->is_file("{$module['Type']}/{$module['Identified']}/admin/html/{$admin['Identified']}.html"))
+		/* Файлы GET */
+		if($admin['Get'] === "0" and $get === "1")
 		{
-			Reg::file_app()->mv
-			(
-				"{$module['Type']}/{$module['Identified']}/admin/html/{$admin['Identified']}.html",
-				"{$module['Type']}/{$module['Identified']}/admin/html/{$identified}.html"
-			);
+			self::file_add($identified, "get", $admin['Module_ID']);
+		}
+		elseif($admin['Get'] === "1" and $get === "1")
+		{
+			if($admin['Identified'] !== $identified)
+			{
+				self::file_edit($admin['Identified'], $identified, "get", $admin['Module_ID']);
+			}
+		}
+		elseif($admin['Get'] === "1" and $get === "0")
+		{
+			self::file_delete($admin['Identified'], "get", $admin['Module_ID']);
+		}
+		
+		/* Файлы POST */
+		if($admin['Post'] === "0" and $post === "1")
+		{
+			self::file_add($identified, "post", $admin['Module_ID']);
+		}
+		elseif($admin['Post'] === "1" and $post === "1")
+		{
+			if($admin['Identified'] !== $identified)
+			{
+				self::file_edit($admin['Identified'], $identified, "post", $admin['Module_ID']);
+			}
+		}
+		elseif($admin['Post'] === "1" and $post === "0")
+		{
+			self::file_delete($admin['Identified'], "post", $admin['Module_ID']);
 		}
 		
 		/* SQL */
@@ -97,6 +135,8 @@ class ZN_Admin
 		[
 			"Name" => $name,
 			"Identified" => $identified,
+			"Get" => $get,
+			"Post" => $post,
 			"Visible" => $visible
 		];
 		Reg::db_core()->update("admin", $data, array("ID" => $id));
@@ -115,22 +155,16 @@ class ZN_Admin
 	{
 		/* Проверка */
 		$admin = self::select_line_by_id($id);
-		$module = ZN_Module::select_line_by_id($admin['Module_ID']);
 		
 		/* Файлы */
-		Reg::file_app()->rm("{$module['Type']}/{$module['Identified']}/admin/act/{$admin['Identified']}.php");
-		if(Reg::file_app()->is_file("{$module['Type']}/{$module['Identified']}/admin/html/{$admin['Identified']}.html"))
+		if($admin['Get'] === "1")
 		{
-			Reg::file_app()->rm("{$module['Type']}/{$module['Identified']}/admin/html/{$admin['Identified']}.html");
+			self::file_delete($admin['Identified'], "get", $admin['Module_ID']);
 		}
 		
-		if(count(Reg::file_app()->ls("{$module['Type']}/{$module['Identified']}/admin/act")) === 0)
-		{Reg::file_app()->rm("{$module['Type']}/{$module['Identified']}/admin/act");}
-		
-		if(Reg::file_app()->is_dir("{$module['Type']}/{$module['Identified']}/admin/html"))
+		if($admin['Post'] === "1")
 		{
-			if(count(Reg::file_app()->ls("{$module['Type']}/{$module['Identified']}/admin/html")) === 0)
-			{Reg::file_app()->rm("{$module['Type']}/{$module['Identified']}/admin/html");}
+			self::file_delete($admin['Identified'], "post", $admin['Module_ID']);
 		}
 		
 		/* Удалить привилегии */
@@ -183,6 +217,8 @@ SELECT
 	"ID",
 	"Name",
 	"Identified",
+	"Get"::int,
+	"Post"::int,
 	"Visible"::int,
 	"Module_ID",
 	"Sort"
@@ -192,7 +228,7 @@ WHERE
 	"ID" = $1
 SQL;
 		$admin = Reg::db_core()->query_line($query, $id, "admin");
-		
+				
 		return $admin;
 	}
 	
@@ -212,6 +248,8 @@ SELECT
 	"ID",
 	"Name",
 	"Identified",
+	"Get"::int,
+	"Post"::int,
 	"Visible"::int,
 	"Module_ID",
 	"Sort"
@@ -307,6 +345,115 @@ SQL;
 				"Sort" => $sort_int_next
 			];
 			Reg::db_core()->update("admin", $data, array("ID" => $id_next));
+		}
+	}
+	
+	/**
+	 * Добавить файл
+	 * 
+	 * @param string $identified
+	 * @param string $type
+	 * @param int $module_id
+	 */
+	private static function file_add($identified, $type, $module_id)
+	{
+		$module = ZN_Module::select_line_by_id($module_id);
+		$path_admin = "{$module['Type']}/{$module['Identified']}/admin";
+		
+		if(!Reg::file_app()->is_dir($path_admin))
+		{Reg::file_app()->mkdir($path_admin);}
+		
+		if(!Reg::file_app()->is_dir($path_admin . "/act"))
+		{Reg::file_app()->mkdir($path_admin . "/act");}
+		
+		if($type === "get")
+		{
+			Reg::file_app()->put($path_admin . "/act/{$identified}.php", "<?php\n?>");
+			
+			if(!Reg::file_app()->is_dir($path_admin . "/html"))
+			{Reg::file_app()->mkdir($path_admin . "/html");}
+			
+			Reg::file_app()->put($path_admin . "/html/{$identified}.html", "");
+		}
+		elseif ($type === "post") 
+		{
+			Reg::file_app()->put($path_admin . "/act/{$identified}_post.php", "<?php\n?>");
+		}
+	}
+	
+	/**
+	 * Переименовать файлы
+	 * 
+	 * @param string $old
+	 * @param string $identified_old
+	 * @param string $identified_new
+	 * @param string $type
+	 * @param int $module_id
+	 */
+	private static function file_edit($identified_old, $identified_new, $type, $module_id)
+	{
+		$module = ZN_Module::select_line_by_id($module_id);
+		$path_admin = "{$module['Type']}/{$module['Identified']}/admin";
+		
+		if($type === "get")
+		{
+			Reg::file_app()->mv
+			(
+				$path_admin . "/act/{$identified_old}.php",
+				$path_admin . "/act/{$identified_new}.php"
+			);
+
+			Reg::file_app()->mv
+			(
+				$path_admin . "/html/{$identified_old}.html",
+				$path_admin . "/html/{$identified_new}.html"
+			);
+			
+		}
+		elseif($type === "post")
+		{
+			Reg::file_app()->mv
+			(
+				$path_admin . "/act/{$identified_old}_post.php",
+				$path_admin . "/act/{$identified_new}_post.php"
+			);
+		}
+	}
+	
+	/**
+	 * Удалить файлы
+	 * 
+	 * @param type $identified
+	 * @param type $type
+	 * @param type $module_id
+	 */
+	private static function file_delete($identified, $type, $module_id)
+	{
+		$module = ZN_Module::select_line_by_id($module_id);
+		$path_admin = "{$module['Type']}/{$module['Identified']}/admin";
+		
+		if($type === "get")
+		{
+			Reg::file_app()->rm($path_admin . "/act/{$identified}.php");
+			Reg::file_app()->rm($path_admin . "/html/{$identified}.html");
+			
+		}
+		elseif($type === "post")
+		{
+			Reg::file_app()->rm($path_admin . "/act/{$identified}_post.php");
+		}
+		
+		/* Удалить папку если админок больше нет */
+		if(Reg::file_app()->is_dir($path_admin . "/html"))
+		{
+			if(count(Reg::file_app()->ls($path_admin . "/html")) === 0)
+			{Reg::file_app()->rm($path_admin . "/html");}
+		}
+		
+		if(count(Reg::file_app()->ls($path_admin . "/act")) === 0)
+		{
+			Reg::file_app()->rm($path_admin . "/act");
+			Reg::file_app()->rm($path_admin);
 		}
 	}
 	

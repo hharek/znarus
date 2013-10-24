@@ -35,6 +35,7 @@ if (mb_substr(Reg::url(), 0, mb_strlen(Reg::url_constr()) + 2) === "/" . Reg::ur
 /* Админка */
 elseif (mb_substr(Reg::url(), 0, mb_strlen(Reg::url_admin()) + 2) === "/" . Reg::url_admin(). "/")
 {
+	Reg::url_admin_path("/" . implode("/", array_slice(Reg::url_path_ar(), 1)));
 	Reg::location("admin");
 	require Reg::path_app()."/admin/index.php";
 }

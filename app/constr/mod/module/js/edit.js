@@ -51,6 +51,11 @@ function show_type(type)
 		}
 	}
 	
+	if(type === "structure")
+	{
+		$(".structure_element .knopka").hide();
+	}
+	
 	window.location.hash = "#" + hash_url + "#" + type;
 }
 
@@ -69,6 +74,8 @@ function structure_element(type)
 			$("#structure_" + element_all[i]).hide();
 		}
 		$("#structure_" + type).show();
+		$("#structure_" + type + " .knopka").show();
+		window.location.hash = "#" + hash_url + "#structure_" + type;
 	}
 	else
 	{
@@ -76,6 +83,9 @@ function structure_element(type)
 		{
 			$("#structure_" + element_all[i]).show();
 		}
+		
+		$(".structure_element .knopka").hide();
 	}
 }
+
 
