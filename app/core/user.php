@@ -117,7 +117,7 @@ class ZN_User
 	public static function is_id($id)
 	{
 		if(!Chf::uint($id))
-		{throw new Exception_Constr("Номер у пользователя задан неверно. ".Chf::error());}
+		{throw new Exception_Admin("Номер у пользователя задан неверно. ".Chf::error());}
 		
 		$query = 
 <<<SQL
@@ -130,7 +130,7 @@ WHERE
 SQL;
 		$count = Reg::db_core()->query_one($query, $id, "user");
 		if($count < 1)
-		{throw new Exception_Constr("Пользователя с номером «{$id}» не существует.");}
+		{throw new Exception_Admin("Пользователя с номером «{$id}» не существует.");}
 	}
 	
 	/**

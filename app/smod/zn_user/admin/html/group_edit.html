@@ -1,0 +1,28 @@
+<form action="#zn_user/group_edit_post?id=<?php echo $group['ID']; ?>">
+	<table class="std_form">
+		<tr>
+			<td>Наименование</td>
+			<td colspan="2">
+				<input type="text" name="Name" value="<?php echo htmlspecialchars($group['Name']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="std_button submit">
+					<div class="icon_edit"></div>
+					Редактировать
+				</div>
+			</td>
+			<td>
+				<a class="std_button" href="#zn_user/user">
+					<div class="icon_back"></div>
+					Назад
+				</a>
+				
+				<div class="icon_delete delete" 
+					 url="#zn_user/group_delete_post?id=<?php echo $group['ID']; ?>" 
+				>Вы действительно хотите удалить группу «<?php echo htmlspecialchars($group['Name']); ?>» ?</div>
+			</td>
+		</tr>
+	</table>
+</form>

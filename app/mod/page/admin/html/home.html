@@ -1,0 +1,29 @@
+<h1 style="text-align: center;">Главная страница</h1>
+<form action="#page/home_post">
+	<table class="std_form" align="center">
+		<tr>
+			<td colspan="2" style="text-align: center;">
+				<input type="text" name="Title" value="<?php echo htmlspecialchars(P::get("page","home_title")); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<textarea style="width: 100%; height: 450px;" name="Content"><?php echo htmlspecialchars(T::get("page", "home_content")); ?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="std_button submit">
+					<div class="icon_edit"></div>
+					Редактировать
+				</div>
+			</td>
+			<td>
+				<a class="std_button" href="#page/other">
+					<div class="icon_back"></div>
+					Назад
+				</a>
+			</td>
+		</tr>
+	</table>
+</form>

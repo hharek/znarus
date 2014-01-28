@@ -20,7 +20,11 @@ class ZN_Text
 		Err::check_field($identified, "identified", false, "Identified", "Идентификатор");
 		Err::check_field($value, "html", true, "Value", "Значение");
 		
-		ZN_Module::is_id($module_id);
+		$module_id = (int)$module_id;
+		if(!empty($module_id))
+		{ZN_Module::is_id($module_id);}
+		else
+		{$module_id = null;}
 		
 		Err::exception();
 		

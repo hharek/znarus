@@ -62,7 +62,7 @@ function show_type(type)
 /* Показать элемент структуры */
 function structure_element(type)
 {
-	var element_all = ["phpclass","param","admin","exe","inc","text"];
+	var element_all = ["phpclass","param","admin","exe","inc","proc_start","proc_end","text"];
 	
 	if(type !== "all")
 	{

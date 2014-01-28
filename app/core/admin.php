@@ -72,9 +72,11 @@ class ZN_Admin
 	 * @param bool $get
 	 * @param bool $post
 	 * @param bool $visible
+	 * @param bool $window
+	 * @param bool $allow_all
 	 * @return array
 	 */
-	public static function edit($id, $name, $identified, $get, $post, $visible)
+	public static function edit($id, $name, $identified, $get, $post, $visible, $window, $allow_all)
 	{
 		/* Проверка */
 		self::is_id($id);
@@ -89,6 +91,8 @@ class ZN_Admin
 			Err::add("Необходимо выбрать метод GET или метод POST", "Post");
 		}
 		Err::check_field($visible, "bool", false, "Visible", "Видимость");
+		Err::check_field($window, "bool", false, "Window", "В новом окне");
+		Err::check_field($allow_all, "bool", false, "Allow_All", "Разрешино всем");
 		Err::exception();
 		
 		/* Уникальность */
@@ -137,7 +141,9 @@ class ZN_Admin
 			"Identified" => $identified,
 			"Get" => $get,
 			"Post" => $post,
-			"Visible" => $visible
+			"Visible" => $visible,
+			"Window" => $window,
+			"Allow_All" => $allow_all
 		];
 		Reg::db_core()->update("admin", $data, array("ID" => $id));
 		
@@ -221,14 +227,16 @@ SELECT
 	"Post"::int,
 	"Visible"::int,
 	"Module_ID",
-	"Sort"
+	"Sort",
+	"Window"::int,
+	"Allow_All"::int
 FROM 
 	"admin"
 WHERE 
 	"ID" = $1
 SQL;
 		$admin = Reg::db_core()->query_line($query, $id, "admin");
-				
+		
 		return $admin;
 	}
 	
@@ -252,7 +260,9 @@ SELECT
 	"Post"::int,
 	"Visible"::int,
 	"Module_ID",
-	"Sort"
+	"Sort",
+	"Window"::int,
+	"Allow_All"::int
 FROM 
 	"admin"
 WHERE 
@@ -368,7 +378,7 @@ SQL;
 		
 		if($type === "get")
 		{
-			Reg::file_app()->put($path_admin . "/act/{$identified}.php", "<?php\n?>");
+			Reg::file_app()->put($path_admin . "/act/{$identified}.php", "<?php\n\n?>");
 			
 			if(!Reg::file_app()->is_dir($path_admin . "/html"))
 			{Reg::file_app()->mkdir($path_admin . "/html");}
@@ -377,7 +387,7 @@ SQL;
 		}
 		elseif ($type === "post") 
 		{
-			Reg::file_app()->put($path_admin . "/act/{$identified}_post.php", "<?php\n?>");
+			Reg::file_app()->put($path_admin . "/act/{$identified}_post.php", "<?php\n\n?>");
 		}
 	}
 	

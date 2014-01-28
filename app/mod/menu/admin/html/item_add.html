@@ -1,0 +1,65 @@
+<?php
+/**
+ * Показать пункты меню
+ * 
+ * @param array $item
+ * @param int $level
+ */
+function parent_html($item, $level, $current)
+{
+?>
+
+<?php foreach ($item as $val): ?>
+	
+	<option value="<?php echo $val['ID']; ?>"<?php if($val['ID'] == $current): ?> selected="selected"<?php endif; ?>>
+		<?php echo str_repeat("&nbsp;", $level * 4) . $val['Name']; ?>
+	</option>
+	
+	<?php parent_html($val['Child'], $level + 1, $current); ?>
+	
+<?php endforeach; ?>
+
+<?php
+}
+?>
+
+
+<form action="#menu/item_add_post?menu_id=<?php echo $menu['ID']; ?>">
+	<table class="std_form">
+		<tr>
+			<td>Наименование</td>
+			<td>
+				<input type="text" name="Name" value="" />
+			</td>
+		</tr>
+		<tr>
+			<td>Адрес</td>
+			<td>
+				<input type="text" name="Url" value="" />
+			</td>
+		</tr>
+		<tr>
+			<td>Корень</td>
+			<td>
+				<select name="Parent">
+					<option value="0"></option>
+					<?php parent_html($item_all, 0, 0); ?>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="std_button submit">
+					<div class="icon_add"></div>
+					Добавить
+				</div>
+			</td>
+			<td>
+				<a class="std_button" href="#menu/item?menu_id=<?php echo $menu['ID']; ?>">
+					<div class="icon_back"></div>
+					Назад
+				</a>
+			</td>
+		</tr>
+	</table>
+</form>

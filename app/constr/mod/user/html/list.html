@@ -1,15 +1,16 @@
-<table class="list" align="center" style="width: 500px;">
+<table class="list" align="center" style="width: 600px;">
 	<col width="40%"/>
-	<col width="60%"/>
+	<col width="50%"/>
+	<col width="10%"/>
 	<thead>
 		<tr>
-			<td colspan="2">Группы и пользователи</td>
+			<td colspan="3">Группы и пользователи</td>
 		</tr>
 	</thead>
 	<tbody>
 		<?php foreach ($group as $g_val): ?>
 			<tr url="#user/group_edit?id=<?php echo $g_val['ID']; ?>">
-				<td colspan="2" style="text-align: left; padding-left: 20px;">
+				<td colspan="3" style="text-align: left; padding-left: 20px;">
 					<?php echo $g_val['Name']; ?>
 				</td>
 			</tr>
@@ -21,6 +22,9 @@
 						</td>
 						<td>
 							<?php echo $u_val['Name']; ?>
+						</td>
+						<td>
+							<a href="#user/user_passwd?id=<?php echo $u_val['ID']; ?>" class="icon_password"></a>
 						</td>
 					</tr>
 				<?php endif; ?>

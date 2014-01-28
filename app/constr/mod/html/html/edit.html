@@ -13,6 +13,18 @@
 			</td>
 		</tr>
 		<tr>
+			<td>По умолчанию</td>
+			<td>
+				<?php if(P::get("html_default") === $html['Identified']): ?>
+					<input type="hidden" name="Default" value="1"/>
+				<?php else: ?>
+					<input type="hidden" name="Default" value="0"/>
+				<?php endif; ?>
+				
+				<input type="checkbox" name="Default" value="1"<?php if(P::get("html_default") === $html['Identified']): ?> checked disabled<?php endif; ?>/>
+			</td>
+		</tr>
+		<tr>
 			<td>
 				<div class="knopka submit">
 					<div class="icon_edit"></div>
@@ -31,3 +43,53 @@
 
 <!-- Кнопка удалить -->
 <div class="icon_delete delete" url="#html/delete_post?id=<?php echo $html['ID']; ?>" mess="Вы действительно хотите удалить шаблон «<?php echo $html['Identified']; ?> (<?php echo $html['Name']; ?>)» ?" style="position: absolute; top: 15px; right: 12px; cursor: pointer;"></div>
+
+<!-- Привязки -->
+<h2>Привязки</h2>
+<table class="list" align="center" style="width: 700px;">
+	<colgroup>
+		<col width="30%"/>
+		<col width="30%"/>
+		<col width="30%"/>
+		<col width="10%"/>
+	</colgroup>
+	<thead>
+		<tr>
+			<td>Модуль</td>
+			<td>Инк</td>
+			<td>Параметр</td>
+			<td>Уд.</td>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($html_inc as $val): ?>
+		<tr>
+			<td><?php echo $val['Module_Name']; ?></td>
+			<td><?php echo $val['Inc_Name']; ?></td>
+			<td>
+				<input style="min-width: 100px;" type="text" value="<!--zn_<?php echo $val['Module_Identified']; ?>_<?php echo $val['Inc_Identified']; ?>-->"/>
+			</td>
+			<td>
+				<div style="cursor: pointer;" class="inc_delete icon_delete" html_id="<?php echo $html['ID']; ?>" inc_id="<?php echo $val['Inc_ID']; ?>"></div>
+			</td>
+		</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+
+<?php if(count($html_inc_allow) !== 0): ?>
+	<div style="margin: 20px auto; width: 500px;">
+		<form action="#html/inc_add_post">
+			<input type="hidden" name="html_id" value="<?php echo $html['ID']; ?>"/>
+			<select name="inc_id">
+				<?php foreach ($html_inc_allow as $val): ?>
+				<option value="<?php echo $val['Inc_ID']; ?>"><?php echo $val['Module_Name']; ?> / <?php echo $val['Inc_Name']; ?></option>
+				<?php endforeach; ?>
+			</select>
+			<div class="knopka submit">
+				<div class="icon_add"></div>
+				Добавить
+			</div>
+		</form>
+	</div>
+<?php endif; ?>

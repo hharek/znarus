@@ -7,9 +7,14 @@
 		<link rel="stylesheet" href="css/basic.css" />
 		<link rel="stylesheet" href="css/struct.css" />
 		<link rel="stylesheet" href="css/index.css" />
+		<link rel="stylesheet" href="css/okno.css" />
 		<link rel="stylesheet" href="css/std.css" />
+		<script src="js/translit.js"></script>
 		<script src="js/jquery-2.0.3.min_1.js"></script>
+		<script src="js/jquery.cookie.js"></script>
+		<script src="js/zn.js"></script>
 		<script src="js/default.js"></script>
+		<script src="js/okno.js"></script>
 		<style id="zn_exe_css"></style>
 	</head>
 	<body>
@@ -25,12 +30,12 @@
 			<!-- Кнопки -->
 			<div class="zn_button">
 				<div class="top">
-					<a href="/" class="icon_home"></a>
-					<a id="zn_exit" href="#exit" class="icon_exit"></a>
+					<a href="/" class="icon_home" title="На главную"></a>
+					<a id="zn_exit" href="#exit" class="icon_exit" title="Выход"></a>
 				</div>
 				<div class="bottom">
-					<a href="#task" class="icon_task">3</a>
-					<a href="#notice" class="icon_notification">2</a>
+					<a href="#task" class="icon_task"><!--3--></a>
+					<a href="#notice" class="icon_notification"><!--2--></a>
 				</div>
 			</div>
 			
@@ -38,7 +43,7 @@
 			<div class="zn_mess" id="zn_mess">
 				<div class="icon icon_active"></div>
 				<div class="close">x</div>
-				<div class="text" id="zn_mess_text">Модуль «articles (Статьи)» отредактирован.</div>
+				<div class="text" id="zn_mess_text"></div>
 			</div>
 			
 			<div class="center">
@@ -68,11 +73,11 @@
 				
 					<div class="menu">
 						<div class="icon icon_bookmark"></div>
-						<div class="title">Закладки</div>
+						<div class="title"><!--Закладки--></div>
 						<!--
 						<div class="podmenu">
 							<a href="#1">Статьи / Добавить</a>
-							<a href="#2">Глоссарий / Чопик ыафыва ыфва ываываыаы</a>
+							<a href="#2">Глоссарий / Чопик </a>
 							<a href="#3">Каталог / Категория 1 / Товар 1 / И что то ещё</a>	
 						</div>
 						-->
@@ -80,7 +85,7 @@
 					
 					<div class="menu">
 						<div class="icon icon_notice"></div>
-						<div class="title">Заметки</div>
+						<div class="title"><!--Заметки--></div>
 						<!--
 						<div class="podmenu">
 							
@@ -94,28 +99,31 @@
 						<div class="icon icon_settings"></div>
 						<div class="title">Настройки</div>
 						<div class="podmenu">
-							<a href="#1">Сменить пароль</a>
+							<a href="#zn_user/passwd">Сменить пароль</a>
 						</div>
 					</div>
 					
 					<div class="menu">
 						<div class="icon icon_help"></div>
-						<div class="title">Справка</div>
+						<div class="title"><!--Справка--></div>
+						<!--
 						<div class="podmenu">
 							<a href="#1">Помощь</a>
 							<a href="#2">О CMS</a>
 							<a href="#3">Версия</a>
 						</div>
+						-->
 					</div>
 					
 				</div>
 				
-				<!-- Путь -->
-				<div id="zn_path" class="zn_path"></div>
+				<!-- Админки по текущему модулю -->
+				<div id="zn_admin" class="zn_admin"></div>
 				
 			</div>
 			
-			
+			<!-- Путь -->
+			<div id="zn_path" class="zn_path"></div>
 			
 		</div>
 		
@@ -130,23 +138,7 @@
 		<!-- Перекрытие -->
 		<div id="zn_overlay" class="zn_overlay"></div>
 		
-		<!-- Окно с предупреждением -->
-		<div id="zn_okno_delete" class="zn_okno_delete">
-			<form>
-				<input type="hidden" name="do_post" value="1"/>
-				<div id="zn_okno_delete_str" class="str">Вы точно хотите этого?</div>
-				<div class="down">
-					<div class="std_button delete">
-						<div class="icon_delete"></div>
-						Удалить
-					</div>
-					<div class="std_button back">
-						<div class="icon_back"></div>
-						Отмена
-					</div>
-				</div>
-			</form>
-		</div>
+		<?php require "okno.html"; ?>
 		
 	</body>
 </html>

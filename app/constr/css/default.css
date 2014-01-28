@@ -59,8 +59,13 @@ DIV.clear
 
 #path
 {
-	float: left;
-	margin: 9px 0px 0px 0px;
+	position: absolute;
+	left: 74px;
+	top: 50px;
+	
+	
+/*	float: left;
+	margin: 9px 0px 0px 0px;*/
 }
 
 #mess_ok

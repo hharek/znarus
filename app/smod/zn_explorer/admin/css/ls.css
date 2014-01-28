@@ -1,0 +1,95 @@
+.explorer
+{
+	width: 600px;
+	margin: 0px auto;
+	border: 1px solid #ccc;
+}
+
+/* Панель */
+.explorer_panel
+{
+	border-bottom: 1px solid #ccc;
+	height: 40px;
+}
+
+.explorer_panel .check_all
+{
+	width: 24px;
+	height: 24px;
+}
+
+.explorer_panel .check_all input
+{
+	margin: 10px 0px 0px 4px;
+}
+
+.explorer_panel div
+{
+	display: block;
+	float: left;
+	cursor: pointer;
+	margin: 8px 0px 0px 12px;
+}
+
+/* Путь */
+.explorer_path
+{
+	border-bottom: 1px solid #ccc;
+	height: 24px;
+	padding: 4px 0px 0px 10px;
+}
+
+/* Файлы и папки */
+.explorer_file
+{
+	min-height: 400px;
+}
+
+.explorer_file .file
+{
+	padding: 5px 0px;
+	cursor: pointer;
+}
+
+.explorer_file .file:hover
+{
+	background: #f6e0a4;
+}
+
+.explorer_file .active
+{
+	background: #f6e0a4;
+}
+
+.explorer_file .file .icon_folder
+{
+	float: left;
+}
+
+.explorer_file .file .check
+{
+	width: 24px;
+	float: left;
+	margin: 2px 0px 0px 10px;
+}
+
+.explorer_file .file .name
+{
+	margin: 0px 0px 0px 64px;
+}
+
+/* Загрузить */
+.explorer_upload
+{
+	padding: 0px 24px 10px 24px;
+}
+
+.explorer_upload input
+{
+	width: 405px;
+}
+
+.explorer_upload .std_button
+{
+	margin: 0px 0px 0px 0px;
+}

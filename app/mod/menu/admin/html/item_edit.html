@@ -1,0 +1,68 @@
+<?php
+/**
+ * Показать пункты меню
+ * 
+ * @param array $item
+ * @param int $level
+ */
+function parent_html($item, $level, $current)
+{
+?>
+
+<?php foreach ($item as $val): ?>
+	
+	<option value="<?php echo $val['ID']; ?>"<?php if($val['ID'] == $current): ?> selected="selected"<?php endif; ?>>
+		<?php echo str_repeat("&nbsp;", $level * 4) . $val['Name']; ?>
+	</option>
+	
+	<?php parent_html($val['Child'], $level + 1, $current); ?>
+	
+<?php endforeach; ?>
+
+<?php
+}
+?>
+
+
+<form action="#menu/item_edit_post?id=<?php echo $item['ID']; ?>">
+	<table class="std_form">
+		<tr>
+			<td>Наименование</td>
+			<td>
+				<input type="text" name="Name" value="<?php echo htmlspecialchars($item['Name']); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td>Адрес</td>
+			<td>
+				<input type="text" name="Url" value="<?php echo htmlspecialchars($item['Url']); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td>Корень</td>
+			<td>
+				<select name="Parent">
+					<option value="0"></option>
+					<?php parent_html($item_all, 0, $item['Parent']); ?>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="std_button submit">
+					<div class="icon_edit"></div>
+					Редактировать
+				</div>
+			</td>
+			<td>
+				<a class="std_button" href="#menu/item?menu_id=<?php echo $menu['ID']; ?>">
+					<div class="icon_back"></div>
+					Назад
+				</a>
+				<div class="icon_delete delete" url="#menu/item_delete_post?id=<?php echo $item['ID']; ?>">
+					Вы действительно хотите удалить пункт меню «<?php echo $item['Name']; ?>»?
+				</div>
+			</td>
+		</tr>
+	</table>
+</form>

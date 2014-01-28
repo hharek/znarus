@@ -60,7 +60,7 @@ else
 	Reg::file_app()->set_path(Reg::ftp_path_app());
 }
 
-Reg::_unset("ftp_host","ftp_user","ftp_pass","ftp_path_www","ftp_path_app","ftp_port","ftp_ssl");
+//Reg::_unset("ftp_host","ftp_user","ftp_pass","ftp_path_www","ftp_path_app","ftp_port","ftp_ssl");
 
 /*** -------------------------- Класс для работы с базой -------------------- ***/
 Reg::db(new ZN_Pgsql(Reg::db_host(), Reg::db_user(), Reg::db_pass(), Reg::db_name(), Reg::db_schema_public(), Reg::db_port(), Reg::db_persistent(), Reg::db_ssl()), true);
@@ -68,7 +68,7 @@ Reg::db(new ZN_Pgsql(Reg::db_host(), Reg::db_user(), Reg::db_pass(), Reg::db_nam
 Reg::db_core(clone Reg::db(), true);
 Reg::db_core()->set_schema(Reg::db_schema_core());
 
-Reg::_unset("db_host","db_user","db_pass","db_name","db_persistent","db_ssl");
+//Reg::_unset("db_host","db_user","db_pass","db_name","db_persistent","db_ssl");
 
 /*** ------------------------------ Авторизация ----------------------------- ***/
 /* Процесс авторизации */
@@ -114,6 +114,14 @@ if(mb_substr(Reg::url_admin_path(), 0, 5) == "/ajax")
 if(mb_substr(Reg::url_admin_path(), 0, 5) == "/menu")
 {
 	require Reg::path_admin()."/menu.php";
+	exit();
+}
+
+/*** -------------------------Страница не найдена ----------------------- ***/
+if(Reg::url_admin_path() !== "/")
+{
+	header("Content-type: text/plain");
+	echo "Страница не найдена";
 	exit();
 }
 

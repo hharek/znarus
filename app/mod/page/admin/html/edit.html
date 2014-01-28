@@ -1,0 +1,117 @@
+<?php
+/**
+ * Показать все страницы
+ * 
+ * @param type $page
+ * @param type $level
+ */
+function parent_html($page, $level, $current)
+{
+?>
+
+<?php foreach ($page as $val): ?>
+	
+	<option value="<?php echo $val['ID']; ?>"<?php if($val['ID'] == $current): ?> selected="selected"<?php endif; ?>>
+		<?php echo str_repeat("&nbsp;", $level * 4) . $val['Name']; ?>
+	</option>
+	
+	<?php parent_html($val['Child'], $level + 1, $current); ?>
+	
+<?php endforeach; ?>
+
+<?php
+}
+?>
+
+<form action="#page/edit_post?id=<?php echo $page['ID']; ?>">
+	<table class="std_form" align="center">
+		<tr>
+			<td>Наименование</td>
+			<td>
+				<input type="text" name="Name" id="Name" value="<?php echo htmlspecialchars($page['Name']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Урл</td>
+			<td>
+				<input type="text" name="Url" id="Url" value="<?php echo htmlspecialchars($page['Url']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Содержание</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<textarea style="width: 100%; height: 450px;" name="Content"><?php echo htmlspecialchars($page['Content']); ?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td>Корень</td>
+			<td>
+				<select name="Parent">
+					<option value="0"></option>
+					<?php parent_html($page_all, 0, $page['Parent']); ?>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>Другое</td>
+			<td>
+				<input type="checkbox" id="show_other"/>
+			</td>
+		</tr>
+		<tr id="tr_html" style="display:none;">
+			<td>Шаблон</td>
+			<td>
+				<select name="Html_Identified">
+					<option value=""></option>
+					<?php foreach ($html as $val): ?>
+						<option value="<?php echo $val['Identified']; ?>"<?php if($page['Html_Identified'] == $val['Identified']): ?> selected="selected"<?php endif; ?>>
+							<?php echo $val['Name']; ?>
+						</option>
+					<?php endforeach; ?>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="std_button submit">
+					<div class="icon_edit"></div>
+					Редактировать
+				</div>
+			</td>
+			<td>
+				<a class="std_button" href="#page/list">
+					<div class="icon_back"></div>
+					Назад
+				</a>
+				<div class="icon_delete delete" 
+					 url="#page/delete_post?id=<?php echo $page['ID']; ?>"
+				>Вы действительно хотите удалить страницу «<?php echo $page['Name']; ?>» ?</div>
+			</td>
+		</tr>
+	</table>
+</form>
+	
+<script>
+/* Отображить другое */
+$("#show_other").click(function()
+{
+	if($(this).is(":checked") === true)
+	{$("#tr_html").show();}
+	else
+	{$("#tr_html").hide();}
+});
+
+/* Транслит */
+$("#Name").change(function()
+{
+	$("#Url").val(translit_rus($(this).val()));
+});
+
+$("#Name").keypress(function()
+{
+	$("#Url").val(translit_rus($(this).val()));
+});
+</script>

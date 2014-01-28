@@ -1,3 +1,8 @@
+/* Хэш параметры */
+var hash = "";
+var hash_url = "";
+var hash_hash = "";
+
 /* --------------------------- Меню ---------------------------*/
 $(function()
 {
@@ -54,144 +59,13 @@ $(function()
 			$(this).find(".admin").hide();
 		}	
 	);
-});
-
-/*--------------------- Окно с подтверждением и удалением ---------------------- */
-var Okno =
-{
-	/* Окно с предупреждением об удалении */
-	Delete:
-	{
-		/**
-		 * Показать
-		 * 
-		 * @param {String} mess
-		 * @param {Object} url
-		 * @returns {Boolean}
-		 */
-		show: function(mess, url)
-		{
-			$("#zn_okno_delete_str").text(mess);
-			
-			$("#zn_overlay").show();
-			$("#zn_okno_delete").show();
-			
-			$("#zn_okno_delete form").off("submit");
-			$("#zn_okno_delete form").submit(function()
-			{
-				zn(url.url, $(this).serializeArray());
-				Okno.Delete.hide();
-				return false;
-			});
-			
-			return true;
-		},
 		
-		/**
-		 * Скрыть
-		 * 
-		 * @returns {Boolean}
-		 */
-		hide: function()
-		{
-			$("#zn_okno_delete_str").text("");
-			
-			$("#zn_overlay").hide();
-			$("#zn_okno_delete").hide();
-			
-			return true;
-		}
-	}
-};
-
-$(function()
-{
-	/* Вешаем на кнопку "Отмена" скрыть окно */
-	$("#zn_okno_delete .down .back").click(function()
+	/* Сообщение */
+	$("#zn_mess .close").click(function()
 	{
-		Okno.Delete.hide();
-	});
-	
-	/* Вешаем на кнопку "Удалить" submit формы */
-	$("#zn_okno_delete .down .delete").click(function()
-	{
-		$("#zn_okno_delete form").submit();
+		$("#zn_mess").hide();
 	});
 });
-
-/* ------------------------- Jquery Cookie ------------------------ */
-/*!
- * jQuery Cookie Plugin v1.3
- * https://github.com/carhartl/jquery-cookie
- *
- * Copyright 2011, Klaus Hartl
- * Dual licensed under the MIT or GPL Version 2 licenses.
- * http://www.opensource.org/licenses/mit-license.php
- * http://www.opensource.org/licenses/GPL-2.0
- */
-(function ($, document, undefined) {
-
-	var pluses = /\+/g;
-
-	function raw(s) {
-		return s;
-	}
-
-	function decoded(s) {
-		return decodeURIComponent(s.replace(pluses, ' '));
-	}
-
-	var config = $.cookie = function (key, value, options) {
-
-		// write
-		if (value !== undefined) {
-			options = $.extend({}, config.defaults, options);
-
-			if (value === null) {
-				options.expires = -1;
-			}
-
-			if (typeof options.expires === 'number') {
-				var days = options.expires, t = options.expires = new Date();
-				t.setDate(t.getDate() + days);
-			}
-
-			value = config.json ? JSON.stringify(value) : String(value);
-
-			return (document.cookie = [
-				encodeURIComponent(key), '=', config.raw ? value : encodeURIComponent(value),
-				options.expires ? '; expires=' + options.expires.toUTCString() : '', // use expires attribute, max-age is not supported by IE
-				options.path    ? '; path=' + options.path : '',
-				options.domain  ? '; domain=' + options.domain : '',
-				options.secure  ? '; secure' : ''
-			].join(''));
-		}
-
-		// read
-		var decode = config.raw ? raw : decoded;
-		var cookies = document.cookie.split('; ');
-		for (var i = 0, l = cookies.length; i < l; i++) {
-			var parts = cookies[i].split('=');
-			if (decode(parts.shift()) === key) {
-				var cookie = decode(parts.join('='));
-				return config.json ? JSON.parse(cookie) : cookie;
-			}
-		}
-
-		return null;
-	};
-
-	config.defaults = {};
-
-	$.removeCookie = function (key, options) {
-		if ($.cookie(key) !== null) {
-			$.cookie(key, null, options);
-			return true;
-		}
-		return false;
-	};
-
-})(jQuery, document);
 
 /* ---------------------------- Хэш ------------------------------ */
 /**
@@ -202,7 +76,7 @@ $(function()
 function hash_parse(url)
 {
 	var obj = {};
-	var reg = /^#([a-z_]+)\/([a-z_]+)(\??[^#]*)(#?.*)/;
+	var reg = /^#([0-9a-z_]+)\/([0-9a-z_]+)(\??[^#]*)(#?.*)/;
 	
 	if(!reg.test(url))
 	{return false;}
@@ -217,11 +91,6 @@ function hash_parse(url)
 	return obj;
 }
 
-/* Хэш параметры */
-var hash = "";
-var hash_url = "";
-var hash_hash = "";
-
 /* Разбор хэша */
 $(function()
 {
@@ -235,7 +104,8 @@ $(function()
 		if(hash !== window.location.hash)
 		{
 			var url = hash_parse(window.location.hash);
-			if(url !== false && hash_url !== url.mod + "/" + url.act + url.get)
+			// && hash_url !== url.mod + "/" + url.act + url.get
+			if(url !== false)
 			{
 				hash_url = url.mod + "/" + url.act + url.get;
 				hash_hash = url.after;
@@ -247,180 +117,6 @@ $(function()
 		}
 	}, 100);
 });
-
-/*----------------------------- Функция zn() ----------------------------*/
-/**
- * Основная функция аякс запросов
- * 
- * @param {String} url
- * @param {Object} post
- * @returns {Boolean}
- */
-function zn(url, post)
-{
-	/* Лог */
-	console.log("zn(«" + url + "»);");
-	
-	if(typeof(post) === "object" && $.isEmptyObject === false)
-	{
-		console.log("POST данные:");
-		console.log(post);
-	}
-	
-	try
-	{
-		/* URL */
-		if(typeof(url) === "undefined")
-		{throw new Error("url не задан.");}
-		
-		if(typeof(url) !== "string")
-		{throw new Error("url не является строкой.");}
-		
-		if(hash_parse(url) === false)
-		{throw new Error("url задан неверно.");}
-		
-		url = hash_parse(url);
-		
-		/* POST */
-		if(typeof(post) === "undefined")
-		{post = {};}
-		
-		if(typeof(post) !== "object")
-		{throw new Error("post данные заданы неверно.");}
-		
-		/* Метод */
-		var method = "GET";
-		if($.isEmptyObject(post) === false)
-		{
-			method = "POST";
-		}
-		
-		/* Токен */
-		var token = "";
-		if(url.get !== "")
-		{
-			token = "&token=" + $.cookie("token");
-		}
-		else
-		{
-			token = "?token=" + $.cookie("token");
-		}
-	}
-	catch(e)
-	{
-		alert(e.message);
-		return false;
-	}
-		
-	/* Запрос */
-	$.ajax
-	({
-		url: "ajax/" + url.mod + "/" + url.act + url.get + token,
-		type: method,
-		dataType: "json",
-		data: post,
-		beforeSend: function()
-		{
-			$("#zn_overlay").show();
-			$("#zn_load").show();
-		},
-		complete: function(jqXHR, textStatus)
-		{
-			$("#zn_load").hide();
-			$("#zn_overlay").hide();
-		},
-		success: function(data, textStatus, jqXHR)
-		{
-			/* Исключения */
-			if(data.exception !== "")
-			{
-				alert(data.exception);
-				return false;
-			}
-
-			/* Заголовок */
-			if(data.title !== "")
-			{
-				document.title = data.title;
-			}
-
-			/* Путь */		
-			if(data.path.length !== 0)
-			{
-				var html = "";
-				for(var i = 0; i < data.path.length; i++)
-				{
-					html += '<a class="path" href="' + data.path[i].url + '">' + data.path[i].name + '</a>';
-					if(data.path.length-1 !== i)
-					{
-						html += '<hr class="join"/>';
-					}
-				}
-				$("#zn_path").html(html);
-			}
-
-			/* Вывод */
-			if(data.exe !== "")
-			{
-				$("#zn_exe_css").html(data.css);
-				$("#zn_exe").html(data.exe);
-			}
-
-			/* Стандартная обработка данных */
-			after();
-
-			/* JS */
-			if(data.js !== "")
-			{
-				$("#zn_exe_js").remove();
-				$("head").append(data.js);
-			}
-
-			/* JS error form */
-			$("table.std_form input,textarea").css("border-color", "");
-			$(".error_mess").remove();
-
-			for(var key in data.form_error)
-			{
-				$("table.std_form [name='" + key + "']").css("border-color","#d90000");
-				$("table.std_form [name='" + key + "']").after("<div class=\"error_mess\">" + data.form_error[key] + "</div>");
-			}
-
-			/* Сообщение об успешном выполнении */
-			if(data.mess_ok !== "")
-			{
-				$("#zn_mess_text").text(data.mess_ok);
-				$("#zn_mess").show();
-				setTimeout(function()
-				{
-					$("#zn_mess").hide();
-				}, 5000);
-			}
-
-			/* Редирект */
-			if(data.redirect !== "")
-			{
-				setTimeout(function()
-				{
-					window.location.hash = data.redirect;
-				}, 1000);
-			}
-
-			/* Сменить урл */
-			if(data.exe !== "")
-			{
-				hash = window.location.hash = "#" + url.mod + "/" + url.act + url.get + hash_hash;
-			}
-
-		},
-		error: function(jqXHR, textStatus, errorThrown)
-		{
-			alert(textStatus);
-		}
-	});
-	
-	return true;
-}
 
 /*-------------- Функция выполняемая после удачной загрузки аякс -------------------*/
 /**
@@ -466,7 +162,9 @@ function after()
 			$(form).off("submit");
 			$(form).submit(function()
 			{
-				zn(url.url, $(form).serializeArray());
+//				zn(url.url, $(form).serializeArray());
+				zn(url.url, new FormData(form));
+				
 				return false;
 			});
 		}
@@ -478,16 +176,17 @@ function after()
 		if
 		(
 			$(this).attr("url") !== undefined && 
-			$(this).attr("mess") !== undefined &&
+			$.trim($(this).text()) !== "" &&
 			hash_parse($(this).attr("url")) !== false
 		)
 		{
 			var url = hash_parse($(this).attr("url"));
-			var mess = $(this).attr("mess");
+			var mess = $(this).text();
+			$(this).text("");
 			
 			$(this).click(function()
 			{
-				Okno.Delete.show(mess, url);
+				Okno.Confirm.show(mess, url.url, "delete");
 			});
 		}
 	});
@@ -511,6 +210,12 @@ function after()
 	$(".std_list").find("tbody").find(".up:first").hide();
 	$(".std_list").find("tbody").find(".down:last").hide();
 	
+	/* Класс token */
+	$("a.token").each(function()
+	{
+		$(this).attr("href", $(this).attr("href") + "?token=" + $.cookie("token"));
+	});
+		
 	return true;
 }
 

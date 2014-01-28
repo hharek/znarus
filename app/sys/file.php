@@ -746,7 +746,7 @@ class ZN_File
 
 		/* Выдать */
 		$func_args = func_get_args();
-		if (mb_strlen($func_args[2]) < 1)
+		if (!isset($func_args[2]) or mb_strlen($func_args[2]) < 1)
 		{
 			header("Content-Type: application/octet-stream");
 			header("Content-Disposition: attachment; filename=\"{$file_name}\"");

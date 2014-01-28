@@ -45,15 +45,17 @@ class ZN_Html
 	 * @param int $id
 	 * @param string $name
 	 * @param string $identified
+	 * @param bool
 	 * @return array
 	 */
-	public static function edit($id, $name, $identified)
+	public static function edit($id, $name, $identified, $default)
 	{
 		/* Проверка */
 		self::is_id($id);
 		
 		Err::check_field($name, "string", false, "Name", "Наименование");
 		Err::check_field($identified, "identified", false, "Identified", "Идентификатор");
+		Err::check_field($default, "bool", false, "Default", "По умолчанию");
 		
 		Err::exception();
 		
@@ -74,6 +76,10 @@ class ZN_Html
 		];
 		Reg::db_core()->update("html", $data, array("ID" => $id));
 		
+		/* Назначить шаблоном по умолчанию */
+		if((bool)$default === true)
+		{P::set("html_default", $identified);}
+		
 		/* Данные изменённого */
 		return self::select_line_by_id($id);
 	}
@@ -88,6 +94,13 @@ class ZN_Html
 	{
 		/* Проверка */
 		$html = self::select_line_by_id($id);
+		
+		/* Нельзя удалить шаблон по умолчанию */
+		if(P::get("html_default") === $html['Identified'])
+		{throw new Exception_Constr("Нельзя удалить шаблон по умолчанию.");}
+		
+		/* Удалить привязки к html */
+		Reg::db_core()->delete("html_inc", array("Html_ID" => $id));
 		
 		/* Файл */
 		Reg::file_app()->rm("html/{$html['Identified']}.html");
@@ -121,6 +134,63 @@ SQL;
 		$count = Reg::db_core()->query_one($query, $id, "html");
 		if($count < 1)
 		{throw new Exception_Constr("Шаблона с номером «{$id}» не существует.");}
+	}
+	
+	/**
+	 * Проверка по идентификатору
+	 * 
+	 * @param string $identified
+	 */
+	public static function is_identified($identified)
+	{
+		if(!Chf::identified($identified))
+		{throw new Exception_Constr("Идентификатор у шаблона задан неверно. ".Chf::error());}
+		
+		$query = 
+<<<SQL
+SELECT 
+	COUNT(*) as count
+FROM 
+	"html"
+WHERE 
+	"Identified" = $1
+SQL;
+		$count = Reg::db_core()->query_one($query, $identified, "html");
+		if($count < 1)
+		{throw new Exception_Constr("Шаблона с идентификтором «{$identified}» не существует.");}
+	}
+	
+	/**
+	 * Подключить инк к шаблону
+	 * 
+	 * @param int $html_id
+	 * @param int $inc_id
+	 */
+	public static function inc_add($html_id, $inc_id)
+	{
+		ZN_Html::is_id($html_id);
+		ZN_Inc::is_id($inc_id);
+		
+		$data = 
+		[
+			"Html_ID" => $html_id,
+			"Inc_ID" => $inc_id
+		];
+		Reg::db_core()->insert("html_inc", $data);
+	}
+	
+	/**
+	 * Отключить инк от шаблона
+	 * 
+	 * @param int $html_id
+	 * @param int $inc_id
+	 */
+	public static function inc_delete($html_id, $inc_id)
+	{
+		ZN_Html::is_id($html_id);
+		ZN_Inc::is_id($inc_id);
+		
+		Reg::db_core()->delete("html_inc", ["Html_ID" => $html_id, "Inc_ID" => $inc_id]);
 	}
 	
 	/**

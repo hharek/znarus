@@ -9,7 +9,15 @@
 			<ul>
 				<?php foreach ($m_val['admin'] as $a_val): ?>
 					<li>
-						<a href="#<?php echo $m_val['Identified']; ?>/<?php echo $a_val['Identified']; ?>"><?php echo $a_val['Name']; ?></a>
+						<?php if($a_val['Window'] === "0"): ?>
+							<a href="#<?php echo $m_val['Identified']; ?>/<?php echo $a_val['Identified']; ?>">
+								<?php echo $a_val['Name']; ?>
+							</a>
+						<?php elseif($a_val['Window'] === "1"): ?>
+							<a class="token" href="ajax/<?php echo $m_val['Identified']; ?>/<?php echo $a_val['Identified']; ?>">
+								<?php echo $a_val['Name']; ?>
+							</a>
+						<?php endif; ?>
 					</li>
 				<?php endforeach; ?>
 			</ul>

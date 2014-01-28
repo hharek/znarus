@@ -185,3 +185,11 @@
 	height: 24px;
 	display: inline-block;
 }
+
+.icon_eye
+{
+	background: url("../img/icon.png") no-repeat -72px -96px;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+}

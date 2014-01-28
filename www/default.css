@@ -1,0 +1,36 @@
+/* Базовые */
+*
+{
+	font-family: "Trebuchet MS";
+	font-size: 16px;
+}
+
+div.clear
+{
+	clear:both;
+}
+
+h1
+{
+	font-size: 20px;
+}
+
+/* Меню */
+.menu_top > a
+{
+	border: 1px solid #ccc;
+	border-radius: 10px;
+	float: left;
+	margin: 0px 20px 0px 0px;
+	width: 160px;
+	height: 20px;
+	text-align: center;
+	color: #000;
+	text-decoration: none;
+	background: #fff;
+}
+
+.menu_top > a.active
+{
+	background: #f6e39f;
+}

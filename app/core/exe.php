@@ -38,7 +38,7 @@ class ZN_Exe
 		if(!Reg::file_app()->is_dir("{$module['Type']}/{$module['Identified']}/exe/html"))
 		{Reg::file_app()->mkdir("{$module['Type']}/{$module['Identified']}/exe/html");}
 		
-		Reg::file_app()->put("{$module['Type']}/{$module['Identified']}/exe/act/{$identified}.php", "");
+		Reg::file_app()->put("{$module['Type']}/{$module['Identified']}/exe/act/{$identified}.php", "<?php\n?>");
 		Reg::file_app()->put("{$module['Type']}/{$module['Identified']}/exe/html/{$identified}.html", "");
 		
 		/* SQL */

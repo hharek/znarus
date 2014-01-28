@@ -5,9 +5,8 @@ $module = ZN_Module::edit
 	$_POST['Name'], 
 	$_POST['Identified'], 
 	$_POST['Desc'], 
-	$_POST['Version'], 
-	$_POST['Url'], 
-	$_POST['Html_ID'], 
+	$_POST['Version'],
+	$_POST['Pages_Isset'],
 	$_POST['Active']
 );
 

@@ -1147,7 +1147,7 @@ SQL;
 		
 		$this->_check_query($query);
 		
-		if (!empty($params))
+		if (!is_null($params))
 		{
 			if(!is_scalar($params) and !is_array($params))
 			{
@@ -1164,7 +1164,7 @@ SQL;
 			$params = array();
 		}
 		
-		if (!empty($tables))
+		if (!is_null($tables))
 		{
 			if (!is_array($tables) and !is_string($tables))
 			{

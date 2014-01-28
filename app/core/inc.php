@@ -35,7 +35,13 @@ class ZN_Inc
 		if(!Reg::file_app()->is_dir("{$module['Type']}/{$module['Identified']}/inc/act"))
 		{Reg::file_app()->mkdir("{$module['Type']}/{$module['Identified']}/inc/act");}
 		
-		Reg::file_app()->put("{$module['Type']}/{$module['Identified']}/inc/act/{$identified}.php", "");
+		Reg::file_app()->put("{$module['Type']}/{$module['Identified']}/inc/act/{$identified}.php", "<?php\n?>");
+		
+		if(!Reg::file_app()->is_dir("{$module['Type']}/{$module['Identified']}/inc/html"))
+		{Reg::file_app()->mkdir("{$module['Type']}/{$module['Identified']}/inc/html");}
+		
+		Reg::file_app()->put("{$module['Type']}/{$module['Identified']}/inc/html/{$identified}.html", "");
+		
 		
 		/* SQL */
 		$data = 
@@ -84,14 +90,12 @@ class ZN_Inc
 			"{$module['Type']}/{$module['Identified']}/inc/act/{$identified}.php"
 		);
 		
-		if(Reg::file_app()->is_file("{$module['Type']}/{$module['Identified']}/inc/html/{$inc['Identified']}.html"))
-		{
-			Reg::file_app()->mv
-			(
-				"{$module['Type']}/{$module['Identified']}/inc/html/{$inc['Identified']}.html",
-				"{$module['Type']}/{$module['Identified']}/inc/html/{$identified}.html"
-			);
-		}
+		Reg::file_app()->mv
+		(
+			"{$module['Type']}/{$module['Identified']}/inc/html/{$inc['Identified']}.html",
+			"{$module['Type']}/{$module['Identified']}/inc/html/{$identified}.html"
+		);
+		
 		
 		/* SQL */
 		$data =
@@ -117,6 +121,9 @@ class ZN_Inc
 		/* Проверка */
 		$inc = self::select_line_by_id($id);
 		$module = ZN_Module::select_line_by_id($inc['Module_ID']);
+		
+		/* Удалить привязки к html */
+		Reg::db_core()->delete("html_inc", array("Inc_ID" => $id));
 		
 		/* Файлы */
 		Reg::file_app()->rm("{$module['Type']}/{$module['Identified']}/inc/act/{$inc['Identified']}.php");

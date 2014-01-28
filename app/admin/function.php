@@ -55,4 +55,12 @@ function redirect($url)
 	
 	Reg::redirect($url);
 }
+
+/**
+ * Перезагрузить страницу
+ */
+function reload()
+{
+	Reg::reload(true);
+}
 ?>

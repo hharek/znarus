@@ -30,6 +30,8 @@
 							<?php else: ?>
 								<?php echo $a_val['Name']; ?>
 							<?php endif; ?>
+								
+							<?php if($a_val['Allow_All'] === "1"): ?>(+)<?php endif; ?>
 						</td>
 						<?php foreach ($a_val['group_priv'] as $gp_val): ?>
 							<td>

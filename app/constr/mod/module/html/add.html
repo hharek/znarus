@@ -34,29 +34,19 @@
 			</td>
 		</tr>
 		<tr>
-			<td>URL</td>
+			<td>Наличие страниц</td>
 			<td>
-				<input type="text" name="Url" value=""/>
-			</td>
-		</tr>
-		<tr>
-			<td>Шаблон</td>
-			<td>
-				<select name="Html_ID">
-					<option value="0">Нет</option>
-					<?php foreach ($html as $val): ?>
-						<option value="<?php echo $val['ID']; ?>"><?php echo $val['Identified']; ?> (<?php echo $val['Name']; ?>)</option>
-					<?php endforeach; ?>
-				</select>
+				<input type="hidden" name="Pages_Isset" value="0"/>
+				<input type="checkbox" name="Pages_Isset" value="1" checked="checked"/>
 			</td>
 		</tr>
 		<tr>
 			<td>Активность</td>
 			<td>
 				<input type="hidden" name="Active" value="0"/>
-				<input type="checkbox" name="Active" value="1"/>
+				<input type="checkbox" name="Active" value="1" checked="checked"/>
 			</td>
-		</tr>	
+		</tr>
 		<tr>
 			<td>
 				<div class="knopka submit">

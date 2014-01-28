@@ -1,5 +1,5 @@
 /* Меню */
-.zn_menu .menu
+.zn_menu > .menu
 {
 	width: 180px;
 	height: 28px;
@@ -11,21 +11,21 @@
 	position: relative;
 }
 
-.zn_menu .menu .icon
+.zn_menu > .menu > .icon
 {
 	width: 24px;
 	margin: 2px;
 	float: left;
 }
 
-.zn_menu .menu .title
+.zn_menu > .menu > .title
 {
 	height: 24px;
 	margin: 4px 2px 2px 35px;
 	overflow:  hidden;
 }
 
-.zn_menu .menu .podmenu
+.zn_menu > .menu > .podmenu
 {
 	min-width: 180px;
 	position: absolute;
@@ -41,19 +41,19 @@
 	display: none;
 }
 
-.zn_menu .menu .podmenu a
+.zn_menu > .menu > .podmenu > a
 {
 	display: block;
 	color: #000;
 	padding: 3px 3px 0px 5px;
 }
 
-.zn_menu .menu .podmenu a:hover
+.zn_menu > .menu > .podmenu > a:hover
 {
 	background-color: #fff;
 }
 
-.zn_menu .menu .module
+.zn_menu > .menu > .module
 {
 	width: 180px;
 	position: absolute;
@@ -67,22 +67,22 @@
 	display: none;
 }
 
-.zn_menu .menu .module .mod
+.zn_menu > .menu > .module > .mod
 {
 	position: relative;
 }
 
-.zn_menu .menu .module .mod .name
+.zn_menu > .menu > .module > .mod > .name
 {
 	padding: 3px 3px 0px 5px;
 }
 
-.zn_menu .menu .module .mod .name:hover
+.zn_menu > .menu > .module > .mod > .name:hover
 {
 	background-color: #fff;
 }
 
-.zn_menu .menu .module .mod .admin
+.zn_menu > .menu > .module > .mod > .admin
 {
 	width: 180px;
 	position: absolute;
@@ -95,22 +95,22 @@
 	display: none;
 }
 
-.zn_menu .menu .module .mod .admin a
+.zn_menu > .menu > .module > .mod > .admin a
 {
 	display: block;
 	color: black;
 	padding: 3px 3px 0px 5px;
 }
 
-.zn_menu .menu .module .mod .admin a:hover
+.zn_menu > .menu > .module > .mod > .admin a:hover
 {
 	background-color: #fff;
 }
 
 /* Путь */
-.zn_path .path
+.zn_path > .path
 {
-	width: 120px;
+	min-width: 120px;
 	height: 19px;
 	float: left;
 	background-color: #f6e8b6;
@@ -123,7 +123,7 @@
 	color: #000;
 }
 
-.zn_path .join
+.zn_path > .join
 {
 	width: 10px;
 	border: 1px solid #ccc;
@@ -132,52 +132,91 @@
 	margin: 12px 0px 0px 0px;
 }
 
-.zn_path .path:last-child
+.zn_path > .path:last-child
 {
 	font-weight: bold;
 	background-color: #f6e39f;
 }
 
+/* Админки */
+.zn_admin > .module, .zn_admin > .admin
+{
+	float: left;
+	border: 1px solid #ccc;
+	border-radius: 7px;
+	overflow: hidden;
+	white-space: nowrap;
+	color: #000;
+}
+
+.zn_admin > .module
+{
+	background-color: #dde783;
+	text-align: left;
+	min-width: 150px;
+	height: 26px;
+	margin: 0px 0px 0px 0px;
+	padding: 6px 5px 0px 0px;
+}
+
+.zn_admin > .module > .icon
+{
+	float: left;
+	margin: -2px 5px 2px 2px;
+	width: 24px;
+}
+
+.zn_admin > .admin
+{
+	background-color: #fbe69e;
+	text-align: center;
+	min-width: 120px;
+	height: 17px;
+	margin: 11px 0px 0px 10px;
+	padding: 2px 5px;
+	font-size: 14px;
+}
+
 /* Сообщение */
-.zn_mess .icon
+.zn_mess > .icon
 {
 	float: left;
 	margin: 2px 0px 0px 0px;
 }
 
-.zn_mess .close
+.zn_mess > .close
 {
 	float: right;
 	cursor: pointer;
 	color: #ccc;
 }
 
-.zn_mess .text
+.zn_mess > .text
 {
 	margin: 3px 20px 0px 30px;
 }
 
 /* Кнопки */
-.zn_button .icon_home
+.zn_button > .icon_home
 {
 	float: left;
 	margin: 0px 3px 5px 3px;
 }
 
-.zn_button .icon_exit
+.zn_button > .icon_exit
 {
 	float: right;
 	margin: 0px 3px 5px 3px;
 }
 
-.zn_button .icon_task
+.zn_button > .icon_task
 {
 	float: left;
 	margin: 0px 3px 5px 3px;
 	text-align: center;
 }
 
-.zn_button .icon_notification
+.zn_button > .icon_notification
 {
 	float: right;
 	margin: 0px 3px 5px 3px;
@@ -211,55 +250,28 @@
 	display: none;
 }
 
-.zn_okno_delete
-{
-	width: 340px;
-	height: 150px;
-	
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	margin-left: -200px;
-	margin-top: -100px;
-	
-	border: 1px solid #000;
-	border-radius: 20px;
-	background-color: #fff;
-	z-index: 11;
-	
-	display: none;
-}
-
-.zn_okno_delete .str
-{
-	width: 308px;
-	min-height: 64px;
-	
-	margin: 14px auto;
-	text-align: center;
-}
-
-.zn_okno_delete .down
-{
-	width: 316px;
-	margin: 30px auto;
-}
-
-.zn_okno_delete .down .delete
-{
-	float: left;
-	margin: 0px;
-}
-
-.zn_okno_delete .down .back
-{
-	float: right;
-	margin: 0px;
-}
-
 /* Сообщение об ошибке в форме */
 .error_mess
 {
 	color: #d90000;
 	font-size: 13px;
+}
+
+/* Иконка удаления */
+.zn_exe .delete
+{
+	cursor: pointer;
+	margin: 0px 0px -8px 20px;
+}
+
+/* Исключение админское */
+.zn_exe .exception_admin
+{
+	width: 500px;
+	margin: 30px auto 0px auto;
+	border: 1px solid #ccc;
+	border-radius: 10px;
+	padding: 10px 20px 5px 20px;
+	text-align: center;
+	background: #ffe7ae;
 }

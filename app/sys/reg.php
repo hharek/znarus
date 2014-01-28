@@ -28,7 +28,7 @@ class Reg
      */
     public static function __callStatic($func, $args)
     {
-        /* Проверка */
+		/* Проверка */
         $func = (string) $func;
         self::_check_name($func);
 

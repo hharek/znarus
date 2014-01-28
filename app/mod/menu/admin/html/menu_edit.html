@@ -1,0 +1,27 @@
+<form action="#menu/menu_edit_post?id=<?php echo $menu['ID']; ?>">
+	<table class="std_form">
+		<tr>
+			<td>Наименование</td>
+			<td>
+				<input type="text" name="Name" value="<?php echo htmlspecialchars($menu['Name']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="std_button submit">
+					<div class="icon_edit"></div>
+					Редактировать
+				</div>
+			</td>
+			<td>
+				<a class="std_button" href="#menu/menu">
+					<div class="icon_back"></div>
+					Назад
+				</a>
+				<div class="icon_delete delete" url="#menu/menu_delete_post?id=<?php echo $menu['ID']; ?>">
+					Вы действительно хотите удалить меню «<?php echo $menu['Name']; ?>»?
+				</div>
+			</td>
+		</tr>
+	</table>
+</form>

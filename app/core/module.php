@@ -12,12 +12,11 @@ class ZN_Module
 	 * @param text $desc
 	 * @param string $version
 	 * @param enum $type (mod|smod)
-	 * @param string $url
-	 * @param int $html_id
+	 * @param bool $pages_isset
 	 * @param bool $active
 	 * @return array
 	 */
-	public static function add($name, $identified, $desc, $version, $type, $url, $html_id, $active)
+	public static function add($name, $identified, $desc, $version, $type, $pages_isset, $active)
 	{
 		/* Проверка */
 		Err::check_field($name, "string", false, "Name", "Наименование");
@@ -28,13 +27,7 @@ class ZN_Module
 		if(!in_array($type, array("mod","smod")))
 		{Err::add("Поле «Тип» задано неверно. ".Chf::error(), "Type");}
 		
-		Err::check_field($url, "url", true, "Url", "Урл");
-		
-		if(!empty($html_id))
-		{ZN_Html::is_id($html_id);}
-		else
-		{$html_id = null;}
-		
+		Err::check_field($pages_isset, "bool", false, "Pages_Isset", "Наличие страниц");
 		Err::check_field($active, "bool", false, "Active", "Активен");
 		
 		Err::exception();
@@ -62,8 +55,7 @@ class ZN_Module
 			"Desc" => $desc, 
 			"Version" => $version, 
 			"Type" => $type, 
-			"Url" => $url, 
-			"Html_ID" => $html_id, 
+			"Pages_Isset" => $pages_isset,
 			"Active" => $active
 		];
 		$id = Reg::db_core()->insert("module", $data, "ID");
@@ -80,12 +72,11 @@ class ZN_Module
 	 * @param string $identified
 	 * @param text $desc
 	 * @param string $version
-	 * @param string $url
-	 * @param int $html_id
+	 * @param bool $pages_isset
 	 * @param bool $active
 	 * @return array
 	 */
-	public static function edit($id, $name, $identified, $desc, $version, $url, $html_id, $active)
+	public static function edit($id, $name, $identified, $desc, $version, $pages_isset, $active)
 	{
 		/* Проверка */
 		self::is_id($id);
@@ -94,13 +85,7 @@ class ZN_Module
 		Err::check_field($identified, "identified", false, "Identified", "Идентификатор");
 		Err::check_field($desc, "text", true, "Desc", "Описание");
 		Err::check_field($version, "string", false, "Version", "Версия");
-		Err::check_field($url, "url", true, "Url", "Урл");
-		
-		if(!empty($html_id))
-		{ZN_Html::is_id($html_id);}
-		else
-		{$html_id = null;}
-		
+		Err::check_field($pages_isset, "bool", false, "Pages_Isset", "Наличие страниц");
 		Err::check_field($active, "bool", false, "Active", "Активен");
 		
 		Err::exception();
@@ -134,8 +119,7 @@ class ZN_Module
 			"Identified" => $identified, 
 			"Desc" => $desc, 
 			"Version" => $version, 
-			"Url" => $url, 
-			"Html_ID" => $html_id, 
+			"Pages_Isset" => $pages_isset,
 			"Active" => $active
 		];
 		Reg::db_core()->update("module", $data, array("ID" => $id));
@@ -174,6 +158,10 @@ class ZN_Module
 		$inc = ZN_Inc::select_list_by_module_id($id);
 		foreach ($inc as $val)
 		{ZN_Inc::delete($val['ID']);}
+		
+		$proc = ZN_Proc::select_list_by_module_id($id);
+		foreach ($proc as $val)
+		{ZN_Proc::delete($val['ID']);}
 		
 		$text = ZN_Text::select_list_by_module_id($id);
 		foreach ($text as $val)
@@ -215,6 +203,30 @@ SQL;
 	}
 	
 	/**
+	 * Проверка по идентификатору
+	 * 
+	 * @param type $identified
+	 */
+	public static function is_identified($identified)
+	{
+		if(!Chf::identified($identified))
+		{throw new Exception_Constr("Идентификатор у модуля задан неверно. ".Chf::error());}
+		
+		$query = 
+<<<SQL
+SELECT 
+	COUNT(*) as count
+FROM 
+	"module"
+WHERE 
+	"Identified" = $1
+SQL;
+		$count = Reg::db_core()->query_one($query, $identified, "module");
+		if($count < 1)
+		{throw new Exception_Constr("Модуля с идентификатором «{$identified}» не существует.");}
+	}
+	
+	/**
 	 * Выборка строки по ID
 	 * 
 	 * @param int $id
@@ -233,8 +245,7 @@ SELECT
 	"Desc", 
 	"Version", 
 	"Type", 
-	"Url", 
-	"Html_ID", 
+	"Pages_Isset"::int,
 	"Active"::int
 FROM 
 	"module"
@@ -273,9 +284,8 @@ SELECT
 	"Identified", 
 	"Desc", 
 	"Version", 
-	"Type", 
-	"Url", 
-	"Html_ID", 
+	"Type",
+	"Pages_Isset"::int,
 	"Active"::int
 FROM 
 	"module"

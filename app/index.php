@@ -4,8 +4,6 @@ require dirname(__FILE__)."/sys/reg.php";
 require dirname(__FILE__)."/conf/conf.php";
 require dirname(__FILE__)."/conf/options.php";
 
-
-
 /* Общее */
 if(Reg::error_reporting())
 {error_reporting(-1);}
@@ -16,10 +14,13 @@ mb_internal_encoding("UTF-8");
 
 /* Разбор урла */
 Reg::url(urldecode($_SERVER['REQUEST_URI']));
-Reg::url_path(parse_url(Reg::url(), PHP_URL_PATH));
-Reg::url_path_ar(explode("/", mb_substr(Reg::url_path(), 1)));
+Reg::url_path(parse_url("http://{$_SERVER['SERVER_NAME']}" . Reg::url(), PHP_URL_PATH));
+if(Reg::url_path() !== "/")
+{Reg::url_path_ar(explode("/", mb_substr(Reg::url_path(), 1)));}
+else
+{Reg::url_path_ar(array());}
 
-/* Не слэша на конце */
+/* Нет слэша на конце */
 if(in_array(Reg::url(), array("/" . Reg::url_constr(), "/" . Reg::url_admin())))
 {
 	header("Location: " . Reg::url() . "/");
@@ -49,6 +50,6 @@ elseif (Reg::url_path() == "/test")
 else
 {
 	Reg::location("front");
-	require Reg::path_app()."/front.php";
+	require Reg::path_app()."/front/index.php";
 }
 ?>

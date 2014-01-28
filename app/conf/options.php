@@ -1,6 +1,6 @@
 <?php
 /* Версия */
-Reg::version("4.2.1", true);
+Reg::cms_version("0.3", true);
 
 /* Отображение ошибок */
 Reg::error_reporting(true);
@@ -33,6 +33,7 @@ Reg::error_403("/error/403", true);
 /* Наименование путей */
 Reg::url_constr("конструктор", true);	/* Для конструктора */
 Reg::url_admin("админка", true);		/* Для админки */
+Reg::url_end("");						/* Окончание урла */
 
 /* Время хранения сессии в секундах */
 Reg::session_time_constr(60 * 60 * 24 * 2);				/* Для конструктора */

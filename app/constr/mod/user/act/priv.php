@@ -25,7 +25,8 @@ SELECT
 	"ID", 
 	"Name",
 	"Module_ID",
-	"Visible"::int
+	"Visible"::int,
+	"Allow_All"::int
 FROM 
 	"admin" 
 ORDER BY 

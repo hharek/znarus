@@ -1,1 +1,209 @@
-<p>Сведения о системе</p>
+<!-- Система -->
+<table class="std_list" align="center" style="width: 800px;">
+	<col width="40%"/>
+	<col width="60%"/>
+	<thead>
+		<tr>
+			<td colspan="2"><strong>Система</strong></td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Операционная система</td>
+			<td>
+				<?php echo $os['uname']; ?>
+			</td>
+		</tr>
+		<tr>
+			<td>IP адрес</td>
+			<td>
+				<?php echo $os['server_name']; ?> (<?php echo $os['server_ip']; ?>)
+			</td>
+		</tr>
+		<tr>
+			<td>Веб-сервер</td>
+			<td>
+				<?php echo $os['server_software']; ?> 
+			</td>
+		</tr>
+		<tr>
+			<td>Размер сайта</td>
+			<td>
+				<?php echo $os['file_size_mb']; ?> Мб
+			</td>
+		</tr>
+		<tr>
+			<td>Браузер</td>
+			<td>
+				<?php echo $os['user_agent']; ?> 
+			</td>
+		</tr>
+	</tbody>
+</table>
+<center>
+	<a href="ajax/zn_service/server" class="token">
+		<div class="std_button">
+			<div class="icon_help"/>
+			Массив $_SERVER
+		</div>
+	</a>
+</center>
+<br/>
+
+<!-- PHP -->
+<table class="std_list" align="center" style="width: 800px;">
+	<col width="40%"/>
+	<col width="60%"/>
+	<thead>
+		<tr>
+			<td colspan="2"><strong>PHP</strong></td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Версия</td>
+			<td>
+				<?php echo $php['version']; ?>
+			</td>
+		</tr>
+		<tr>
+			<td style="vertical-align: top;">Модули</td>
+			<td>
+				<ul style="padding-left: 16px;">
+					<?php foreach ($php['modules'] as $val): ?>
+						<li>
+							<?php echo $val; ?>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td>Пользователь</td>
+			<td>
+				<?php echo $php['user']; ?>
+			</td>
+		</tr>
+		<tr>
+			<td>Разрешённый объем памяти</td>
+			<td>
+				<?php echo $php['memory_limit']; ?> Мб
+			</td>
+		</tr>
+		<tr>
+			<td>Папка TEMP</td>
+			<td>
+				<?php echo $php['tmp_path']; ?>
+			</td>
+		</tr>
+		<tr>
+			<td>Максимальный размер файла для загрузки</td>
+			<td>
+				<?php echo $php['upload_max']; ?> Мб
+			</td>
+		</tr>
+	</tbody>
+</table>
+<center>
+	<a href="ajax/zn_service/phpinfo" class="token">
+		<div class="std_button">
+			<div class="icon_help"/>
+			phpinfo
+		</div>
+	</a>
+</center>
+<br/>
+
+<!-- Веб сервер -->
+<table class="std_list" align="center" style="width: 800px;">
+	<col width="40%"/>
+	<col width="60%"/>
+	<thead>
+		<tr>
+			<td colspan="2"><strong>Веб-сервер</strong></td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Наименование</td>
+			<td>
+				<?php echo $web_server['name']; ?>
+			</td>
+		</tr>
+		<tr>
+			<td>Тип интерфейса с PHP</td>
+			<td>
+				<?php echo $web_server['sapi']; ?>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<br/>
+
+<!-- PostgreSQL -->
+<table class="std_list" align="center" style="width: 800px;">
+	<col width="40%"/>
+	<col width="60%"/>
+	<thead>
+		<tr>
+			<td colspan="2"><strong>PostgreSQL</strong></td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Адрес</td>
+			<td>
+				<?php echo $pgsql['host']; ?>
+			</td>
+		</tr>
+		<tr>
+			<td>Пользователь</td>
+			<td>
+				<?php echo $pgsql['user']; ?>
+			</td>
+		</tr>
+		<tr>
+			<td>Имя БД</td>
+			<td>
+				<?php echo $pgsql['db_name']; ?>
+			</td>
+		</tr>
+		<tr>
+			<td>Схема core</td>
+			<td>
+				<?php echo $pgsql['schema_core']; ?>
+			</td>
+		</tr>
+		<tr>
+			<td>Схема public</td>
+			<td>
+				<?php echo $pgsql['schema_public']; ?>
+			</td>
+		</tr>
+		
+		<tr>
+			<td>Версия</td>
+			<td>
+				<?php echo $pgsql['version']; ?>
+			</td>
+		</tr>
+		<tr>
+			<td>Кодировка сервера</td>
+			<td>
+				<?php echo $pgsql['server_encoding']; ?>
+			</td>
+		</tr>
+		<tr>
+			<td>Кодировка клиента</td>
+			<td>
+				<?php echo $pgsql['client_encoding']; ?>
+			</td>
+		</tr>
+		<tr>
+			<td>Размер БД</td>
+			<td>
+				<?php echo $pgsql['size_mb']; ?> Мб
+			</td>
+		</tr>
+	</tbody>
+</table>

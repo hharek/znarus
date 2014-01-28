@@ -1,6 +1,9 @@
 <?php
 title("Модули");
-path(["Список модулей [#zn_sevice/module]"]);
+path
+([
+	"Модули [#zn_service/module]"
+]);
 
 $user = ZN_User_Action::data();
 
@@ -21,7 +24,8 @@ FROM
 WHERE 
 	"up"."Group_ID" = $1 AND 
 	"up"."Admin_ID" = "a"."ID" AND
-	"a"."Module_ID" = "m"."ID"
+	"a"."Module_ID" = "m"."ID" AND
+	"a"."Visible" = true
 ORDER BY 
 	"m"."Identified" ASC
 SQL;
@@ -33,13 +37,15 @@ SELECT
 	"a"."ID",
 	"a"."Name",
 	"a"."Identified",
-	"a"."Module_ID"
+	"a"."Module_ID",
+	"a"."Window"::int
 FROM 
 	"user_priv" as "up", 
 	"admin" as "a"
 WHERE 
 	"up"."Group_ID" = $1 AND 
-	"up"."Admin_ID" = "a"."ID"
+	"up"."Admin_ID" = "a"."ID" AND
+	"a"."Visible" = true
 ORDER BY 
 	"a"."Sort" ASC
 SQL;
@@ -55,9 +61,12 @@ SELECT
 	"ID", 
 	"Name", 
 	"Identified", 
-	"Module_ID"
+	"Module_ID",
+	"Window"::int
 FROM 
 	"admin"
+WHERE 
+	"Visible" = true
 ORDER BY 
 	"Sort" ASC
 SQL;
@@ -74,6 +83,11 @@ foreach ($module as $m_key => $m_val)
 			$module[$m_key]['admin'][] = $a_val;
 			unset($admin[$a_key]);
 		}
+	}
+	
+	if(empty($module[$m_key]['admin']))
+	{
+		unset($module[$m_key]);
 	}
 }
 ?>

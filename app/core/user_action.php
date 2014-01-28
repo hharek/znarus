@@ -262,6 +262,7 @@ SELECT
 	"u"."ID", 
 	"u"."Name", 
 	"u"."Email",
+	"u"."Password",
 	"g"."ID" as "Group_ID",
 	"g"."Name" as "Group_Name"
 FROM 
@@ -318,12 +319,19 @@ SQL;
 		
 		/* Совпадение паролей */
 		if($old === $new)
-		{Err::add("Старый и новый пароль совпадают.", "Password_New");}
+		{
+			Err::add("Старый и новый пароль совпадают.", "Password_Old");
+			Err::add("Старый и новый пароль совпадают.", "Password_New");
+		}
 		
 		Err::exception();
 		
 		/* Проверка старого пароля */
 		$user = self::data();
+		
+		if($user['Name'] === "root")
+		{throw new Exception_Admin("Чтобы сменить пароль у root-а, воспользуйтесь конфигурационным файлом.");}
+		
 		if($user['Password'] !== ZN_User::password_hash($old))
 		{
 			Err::add("Старый пароль указан неверно.", "Password_Old");

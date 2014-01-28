@@ -6,12 +6,17 @@ try
 {
 	header("Content-type: text/plain");
 	
-
-	ZN_Admin::delete(2);
-	ZN_Admin::delete(3);
-	ZN_Admin::delete(4);
-	ZN_Admin::delete(5);
-	ZN_Admin::delete(6);
+	require_once Reg::path_app() . "/mod/menu/class/menu.php";
+	require_once Reg::path_app() . "/mod/menu/class/menu_item.php";
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 }

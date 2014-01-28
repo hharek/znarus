@@ -1,0 +1,68 @@
+/* Общее */
+.priv 
+{
+	border-collapse: collapse;
+	clear: both;
+	margin: 0px auto;
+}
+
+.priv TD
+{
+	border: 1px solid #ccc;
+	padding: 3px 10px;
+}
+
+/* Группы */
+.priv THEAD TD
+{
+	vertical-align: top;
+	text-align: center;
+	background-color: #fff;
+	line-height: 1;
+}
+
+/* Тело */
+.priv TBODY TR.priv_body
+{
+	background-color: #ffffff;
+}
+
+.priv TBODY TR.priv_body:nth-child(even)
+{
+	background-color: #eff0ec;
+}
+
+.priv TBODY TR.priv_body:hover
+{
+	background-color: #f9fac5;
+}
+
+.priv TBODY TR.priv_body TD
+{
+	text-align: center;
+}
+
+.priv TBODY TR.priv_body TD:nth-child(1)
+{
+	padding-left: 30px;
+}
+
+.priv TBODY TR.priv_body TD:nth-child(1)
+{
+	width: 300px;
+	text-align: left;
+}
+
+/* Заголовок */
+.priv TBODY TR.priv_title TD
+{
+	font-style: italic;
+	background-color: #e2eeb4;
+}
+
+.priv TBODY TR.priv_title TD:nth-child(1)
+{
+	width: 320px;
+	text-align: left;
+	cursor: pointer;
+}

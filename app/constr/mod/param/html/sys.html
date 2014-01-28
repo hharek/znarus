@@ -1,0 +1,44 @@
+<h2 style="text-align: center">Системные параметры</h2>
+
+<table class="list" align="center">
+	<colgroup>
+		<col width="20%">
+		<col width="20%">
+		<col width="10%">
+		<col width="50%">
+	</colgroup>
+	<thead>
+		<tr>
+			<td>Идентификатор</td>
+			<td>Наименование</td>
+			<td>Тип</td>
+			<td>Значение</td>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($param as $val): ?>
+		<tr url="#param/sys_edit?id=<?php echo $val['ID']; ?>">
+			<td>
+				<?php echo $val['Identified']; ?>
+			</td>
+			<td>
+				<?php echo $val['Name']; ?>
+			</td>
+			<td>
+				<?php echo $val['Type']; ?>
+			</td>
+			<td>
+				<?php echo $val['Value']; ?>
+			</td>
+		</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+
+<br/>
+<center>
+	<a class="knopka" href="#param/sys_add">
+		<div class="icon_add"></div>
+		Добавить
+	</a>
+</center>

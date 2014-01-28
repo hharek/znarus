@@ -25,7 +25,11 @@ class ZN_Param
 		
 		Err::check_field($value, $type, true, "Value", "Значение");
 		
-		ZN_Module::is_id($module_id);
+		$module_id = (int)$module_id;
+		if(!empty($module_id))
+		{ZN_Module::is_id($module_id);}
+		else
+		{$module_id = null;}
 		
 		Err::exception();
 		

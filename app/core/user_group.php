@@ -94,7 +94,7 @@ class ZN_User_Group
 	public static function is_id($id)
 	{
 		if(!Chf::uint($id))
-		{throw new Exception_Constr("Номер у группы задан неверно. ".Chf::error());}
+		{throw new Exception_Admin("Номер у группы задан неверно. ".Chf::error());}
 		
 		$query = 
 <<<SQL
@@ -107,7 +107,7 @@ WHERE
 SQL;
 		$count = Reg::db_core()->query_one($query, $id, "user_group");
 		if($count < 1)
-		{throw new Exception_Constr("Группы с номером «{$id}» не существует.");}
+		{throw new Exception_Admin("Группы с номером «{$id}» не существует.");}
 	}
 	
 	/**

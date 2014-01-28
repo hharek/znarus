@@ -1,0 +1,34 @@
+<h2 style="text-align: center">Системные тексты</h2>
+
+<table class="list" align="center" style="width: 500px;">
+	<colgroup>
+		<col width="50%">
+		<col width="50%">
+	</colgroup>
+	<thead>
+		<tr>
+			<td>Идентификатор</td>
+			<td>Наименование</td>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($text as $val): ?>
+		<tr url="#text/sys_edit?id=<?php echo $val['ID']; ?>">
+			<td>
+				<?php echo $val['Identified']; ?>
+			</td>
+			<td>
+				<?php echo $val['Name']; ?>
+			</td>
+		</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+
+<br/>
+<center>
+	<a class="knopka" href="#text/sys_add">
+		<div class="icon_add"></div>
+		Добавить
+	</a>
+</center>

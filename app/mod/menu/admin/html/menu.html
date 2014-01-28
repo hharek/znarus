@@ -1,0 +1,22 @@
+<table class="std_list" align="center" style="width: 500px;">
+	<thead>
+		<tr>
+			<td>Меню</td>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($menu as $val): ?>
+			<tr url="#menu/menu_edit?id=<?php echo $val['ID']; ?>">
+				<td style="text-align: left; padding-left: 20px; ">
+					<?php echo $val['Name']; ?>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+<center>
+	<a class="std_button" href="#menu/menu_add">
+		<div class="icon_add"></div>
+		Добавить
+	</a>
+</center>

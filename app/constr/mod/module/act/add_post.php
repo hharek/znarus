@@ -6,8 +6,7 @@ $module = ZN_Module::add
 	$_POST['Desc'],
 	$_POST['Version'],
 	$_POST['Type'],
-	$_POST['Url'],
-	$_POST['Html_ID'],
+	$_POST['Pages_Isset'],
 	$_POST['Active']
 );
 

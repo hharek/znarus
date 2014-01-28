@@ -57,6 +57,7 @@ class Chf
 			"timestamp",
 			"uint",
 			"url",
+			"url_part",
 			"path"
 		);
 		
@@ -414,10 +415,10 @@ class Chf
 	 */
 	private static function _string($str)
 	{
-		$result = strpbrk($str, "\n\r\t\v\f\$\\");
+		$result = strpbrk($str, "\n\r\t\v\f");
 		if ($result !== false)
 		{
-			throw new Exception("Пробельные символы.");
+			throw new Exception("Недопустимые символы.");
 		}
 
 		$result = strpbrk($str, "><");
@@ -497,9 +498,25 @@ class Chf
 	 * @param string $str
 	 * @return bool 
 	 */
+	private static function _url_part($str)
+	{
+		if (!preg_match("#^[a-zа-я0-9\_\-\.]+$#isu", $str))
+		{
+			throw new Exception("Недопустимые символы.");
+		}
+
+		return true;
+	}
+	
+	/**
+	 * Урл
+	 * 
+	 * @param string $str
+	 * @return bool 
+	 */
 	private static function _url($str)
 	{
-		if (!preg_match("#^[a-zа-я0-9\_]+$#isu", $str))
+		if (!preg_match("#^[a-zа-я0-9\_\-\.\/]+$#isu", $str))
 		{
 			throw new Exception("Недопустимые символы.");
 		}

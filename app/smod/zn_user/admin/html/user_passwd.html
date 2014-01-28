@@ -1,0 +1,31 @@
+<form action="#zn_user/user_passwd_post?id=<?php echo $_GET['id']; ?>">
+	<table class="std_form">
+		<tr>
+			<td>Пользователь</td>
+			<td>
+				<?php echo $user['Email']; ?> (<?php echo $user['Name']; ?>)
+			</td>
+		</tr>
+		<tr>
+			<td>Новый пароль</td>
+			<td>
+				<input type="password" name="Password" value="" style="min-width: 200px;"/>
+				<div id="icon_eye" class="icon_eye" style="position: absolute; cursor: pointer;"></div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="std_button submit">
+					<div class="icon_edit"></div>
+					Изменить
+				</div>
+			</td>
+			<td>
+				<a class="std_button" href="#zn_user/user">
+					<div class="icon_back"></div>
+					Назад
+				</a>
+			</td>
+		</tr>
+	</table>
+</form>
