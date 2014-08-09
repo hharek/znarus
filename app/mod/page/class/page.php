@@ -17,16 +17,18 @@ class Page
 	 * @param string $name
 	 * @param string $url
 	 * @param string $content
+	 * @param string $tags
 	 * @param int $parent
 	 * @param string $html_identified
 	 * @return array
 	 */
-	public static function add($name, $url, $content, $parent, $html_identified)
+	public static function add($name, $url, $content, $tags, $parent, $html_identified)
 	{
 		/* Проверка */
 		Err::check_field($name, "string", false, "Name", "Наименование");
 		Err::check_field($url, "url_part", false, "Url", "Урл");
 		Err::check_field($content, "html", true, "Content", "Содержимое");
+		Err::check_field($tags, "tags", true, "Tags", "Теги");
 		
 		$parent = (int)$parent;
 		if(!empty($parent))
@@ -54,6 +56,7 @@ class Page
 			"Name" => $name,
 			"Url" => $url,
 			"Content" => $content,
+			"Tags" => mb_strtolower($tags),
 			"Parent" => $parent,
 			"Html_Identified" => $html_identified
 		];
@@ -70,11 +73,12 @@ class Page
 	 * @param string $name
 	 * @param string $url
 	 * @param string $content
+	 * @param string $tags
 	 * @param int $parent
 	 * @param string $html_identified
 	 * @return array
 	 */
-	public static function edit($id, $name, $url, $content, $parent, $html_identified)
+	public static function edit($id, $name, $url, $content, $tags, $parent, $html_identified)
 	{
 		/* Проверка */
 		self::is_id($id);
@@ -82,6 +86,7 @@ class Page
 		Err::check_field($name, "string", false, "Name", "Наименование");
 		Err::check_field($url, "url_part", false, "Url", "Урл");
 		Err::check_field($content, "html", true, "Content", "Содержимое");
+		Err::check_field($tags, "tags", true, "Tags", "Теги");
 		
 		$parent = (int)$parent;
 		if(!empty($parent))
@@ -108,8 +113,10 @@ class Page
 			"Name" => $name,
 			"Url" => $url,
 			"Content" => $content,
+			"Tags" => mb_strtolower($tags),
 			"Parent" => $parent,
-			"Html_Identified" => $html_identified
+			"Html_Identified" => $html_identified,
+			"Last_Modified" => "now()"
 		];
 		Reg::db()->update("page", $data, array("ID" => $id));
 		
@@ -182,8 +189,10 @@ SELECT
 	"Name",
 	"Url",
 	"Content",
+	"Tags",
 	COALESCE("Parent", 0) as "Parent",
-	"Html_Identified"
+	"Html_Identified",
+	"Last_Modified"
 FROM 
 	"page"
 WHERE 

@@ -1,37 +1,21 @@
 <?php
-/* Режим работы с файлами (sys|ftp) */
-Reg::file_manager("sys", true);
+/* Домен */
+Reg::domain("example.com", true);
 
-/* Данные для подключения по FTP, если Reg::file_manager("ftp") */
-Reg::ftp_host("localhost");
-Reg::ftp_user("ftp_user");
-Reg::ftp_pass("ftp_password");
-Reg::ftp_path_app("/app");
-Reg::ftp_path_www("/www");
+/* Путь к статическим файлам */
+Reg::path_www("/home/example/www", true);
 
 /* Данные для поключиния к PostgreSQL */
 Reg::db_host("127.0.0.1");
-Reg::db_user("db_user");
-Reg::db_pass("db_password");
-Reg::db_name("znarus");
+Reg::db_user("example");
+Reg::db_pass("password");
+Reg::db_name("example");
 Reg::db_schema_core("core");
 Reg::db_schema_public("public");
 
-/* Кэширование для PostgreSQL */
-Reg::db_cache(false);						/* Использовать ли кэширование */
-Reg::db_cache_salt("Секретная фраза");		/* Соль для кэша */
-Reg::db_cache_type("memcache");				/* Тип кэширования (file|memcache) */
-
-/* Тип кэширования Reg::db_cache_type("file") */
-Reg::db_cache_dir("");	
-
-/* Тип кэширования Reg::db_cache_type("memcache") */
-Reg::db_cache_memcache_host("localhost");
-Reg::db_cache_memcache_port("11211");
-
 /* Имя и пароль для root пользователя */
 Reg::root_name("root");						/* Имя root пользователя */
-Reg::root_password("password");				/* Пароль для root пользователя */
+Reg::root_password("root");					/* Пароль для root пользователя */
 
 /* Соль */
 Reg::salt_constr("Секретная фраза");		/* Соль для сессий в кострукторе */

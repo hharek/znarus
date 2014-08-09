@@ -1,8 +1,8 @@
 <?php
 /* Первоначальные данные */
-Reg::meta_title(P::get("zn_seo", "title_default"));
-Reg::meta_keywords(P::get("zn_seo", "keywords_default"));
-Reg::meta_description(P::get("zn_seo", "description_default"));
+Reg::meta_title("");
+Reg::meta_keywords("");
+Reg::meta_description("");
 
 /* Является ли адресом для продвижения */
 $query = 

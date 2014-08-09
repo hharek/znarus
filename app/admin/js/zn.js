@@ -142,6 +142,9 @@ function zn(url, post)
 			/* Вывод */
 			if(data.exe !== "")
 			{
+				/* Обработка данных до загрузки HTML-а */
+				before_html();
+				
 				$("#zn_exe_css").html(data.css);
 				$("#zn_exe").html(data.exe);	
 			}

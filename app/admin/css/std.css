@@ -13,6 +13,11 @@
 	border-radius: 4px;
 }
 
+.std_form input[type="file"]
+{
+	min-width: 350px;	
+}
+
 .std_form textarea
 {
 	min-width: 350px;
@@ -129,4 +134,3 @@ table.std_list tbody tr .up,.down
 	float: left;
 	margin: 0px 5px 0px 0px;
 }
-

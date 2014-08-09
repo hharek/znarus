@@ -36,6 +36,8 @@
 .auth input
 {
 	min-width: 100px;
+	border: 1px solid #a19d9a;
+	border-radius: 4px;
 }
 
 .auth .std_button

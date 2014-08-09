@@ -1,21 +1,21 @@
 <form action="#zn_seo/settings_post">
 	<table class="std_form">
 		<tr>
-			<td>Тег title по умолчанию</td>
+			<td>Тег title для главной страницы</td>
 			<td>
-				<input type="text" name="Title" value="<?php echo htmlspecialchars(P::get("zn_seo", "title_default")); ?>" />
+				<input type="text" name="Title" value="<?php echo htmlspecialchars(P::get("zn_seo", "home_title")); ?>" />
 			</td>
 		</tr>
 		<tr>
-			<td>Тег meta keywords по умолчанию</td>
+			<td>Тег meta description для главной страницы</td>
 			<td>
-				<input type="text" name="Keywords" value="<?php echo htmlspecialchars(P::get("zn_seo", "keywords_default")); ?>" />
+				<input type="text" name="Description" value="<?php echo htmlspecialchars(P::get("zn_seo", "home_description")); ?>" />
 			</td>
 		</tr>
 		<tr>
-			<td>Тег meta description по умолчанию</td>
+			<td>Тег meta keywords для главной страницы</td>
 			<td>
-				<input type="text" name="Description" value="<?php echo htmlspecialchars(P::get("zn_seo", "description_default")); ?>" />
+				<input type="text" name="Keywords" value="<?php echo htmlspecialchars(P::get("zn_seo", "home_keywords")); ?>" />
 			</td>
 		</tr>
 	</table>

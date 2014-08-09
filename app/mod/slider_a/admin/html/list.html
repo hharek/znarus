@@ -1,0 +1,42 @@
+<table class="std_list" style="width: 700px;" align="center">
+	<col width="80%"/>
+	<col width="10%"/>
+	<col width="10%"/>
+	<thead>
+		<tr>
+			<td>Наименование</td>
+			<td>Просм.</td>
+			<td>Сорт.</td>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($slider as $key=>$val): ?>
+			<tr>
+				<td url="#slider_a/edit?id=<?php echo $val['ID']; ?>" style="text-align: left; padding-left: 10px;">
+					<?php echo $val['Name']; ?>
+				</td>
+				<td>
+					<a href="/<?php echo P::get("slider_a", "path"); ?>/<?php echo $val['File']; ?>" class="icon_view" target="_blank">
+						
+					</a>
+				</td>
+				<td>
+					<?php if($key !== 0): ?>
+						<div onclick="zn('#slider_a/sort_up_post', { id: <?php echo $val['ID']; ?>});" class="icon_up" style="cursor: pointer;"></div>
+					<?php endif; ?>
+
+					<?php if(count($slider) != $key + 1): ?>
+						<div onclick="zn('#slider_a/sort_down_post', { id: <?php echo $val['ID']; ?>});" class="icon_down" style="cursor: pointer;"></div>
+					<?php endif; ?>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+<br/>
+<center>
+	<a class="std_button" href="#slider_a/add">
+		<div class="icon_add"></div>
+		Добавить
+	</a>
+</center>

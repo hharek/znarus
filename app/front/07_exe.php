@@ -14,11 +14,14 @@ try
 	{
 		/* Классы */
 		$path = Reg::path_app() . "/" . Reg::module_type() . "/" . Reg::module() . "/class";
-		$files = scandir($path);
-		foreach ($files as $val)
+		if(is_dir($path))
 		{
-			if (is_file($path . "/" . $val) and mb_substr($val, -4) === ".php")
-			{require_once $path . "/" . $val;}
+			$files = scandir($path);
+			foreach ($files as $val)
+			{
+				if (is_file($path . "/" . $val) and mb_substr($val, -4) === ".php")
+				{require_once $path . "/" . $val;}
+			}
 		}
 		
 		/* Сам код */

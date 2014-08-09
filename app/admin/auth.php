@@ -40,7 +40,7 @@ try
 	$status = true;
 }
 catch (Exception $e)
-{
+{	
 //	$error = $e->getMessage() . " Код: " . $e->getCode();
 	$error = $e->getMessage();
 }

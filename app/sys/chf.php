@@ -58,7 +58,8 @@ class Chf
 			"uint",
 			"url",
 			"url_part",
-			"path"
+			"path",
+			"tags"
 		);
 		
 		if(!in_array($func, $type_ar))
@@ -177,7 +178,7 @@ class Chf
 	 */
 	private static function _date($str)
 	{
-		if (!preg_match("#^([\d]{2})\.([\d]{2})\.([\d]{4})$#isu", $str, $sovpal))
+		if (!preg_match("#^([\d]{2})\.([\d]{2})\.([\d]{4})$#isuD", $str, $sovpal))
 		{
 			throw new Exception("Недопустимые символы.");
 		}
@@ -246,7 +247,7 @@ class Chf
 	{
 		self::check($str);
 
-		if (!preg_match("#^[a-zA-Z0-9_\-\.]+@[a-zA-Z0-9\-\.]+\.[a-z]{2,}$#isu", $str))
+		if (!preg_match("#^[a-zA-Z0-9_\-\.]+@[a-zA-Z0-9\-\.]+\.[a-z]{2,}$#isuD", $str))
 		{
 			throw new Exception("Допускается строка в формате [a-z]@[a-z].[a-z].");
 		}
@@ -262,7 +263,7 @@ class Chf
 	 */
 	private static function _file($str)
 	{
-		if (!preg_match("#^[a-z0-9_-]+\.[a-z0-9]+$#isu", $str))
+		if (!preg_match("#^[a-z0-9_-]+\.[a-z0-9]+$#isuD", $str))
 		{
 			throw new Exception("Неодпустимые символы.");
 		}
@@ -335,7 +336,7 @@ class Chf
 	 */
 	private static function _image($str)
 	{
-		if (!preg_match("#^[a-z0-9_\-.]+\.(gif|jpg|png)+$#isu", $str))
+		if (!preg_match("#^[a-z0-9_\-.]+\.(gif|jpg|png)+$#isuD", $str))
 		{
 			throw new Exception("Допускаются символы a-z,0-9,\"_\", \".\" в наименовании и расширение gif, jpg, png.");
 		}
@@ -367,7 +368,7 @@ class Chf
 	 */
 	private static function _md5($str)
 	{
-		if (!preg_match("#^[a-z0-9]+$#isu", $str))
+		if (!preg_match("#^[a-z0-9]+$#isuD", $str))
 		{
 			throw new Exception("Допускаются символы a-z,0-9.");
 		}
@@ -500,7 +501,7 @@ class Chf
 	 */
 	private static function _url_part($str)
 	{
-		if (!preg_match("#^[a-zа-я0-9\_\-\.]+$#isu", $str))
+		if (!preg_match("#^[a-zа-яё0-9\_\-\.]+$#isuD", $str))
 		{
 			throw new Exception("Недопустимые символы.");
 		}
@@ -516,7 +517,7 @@ class Chf
 	 */
 	private static function _url($str)
 	{
-		if (!preg_match("#^[a-zа-я0-9\_\-\.\/]+$#isu", $str))
+		if (!preg_match("#^[a-zа-яё0-9\_\-\.\/\#]+$#isuD", $str))
 		{
 			throw new Exception("Недопустимые символы.");
 		}
@@ -574,6 +575,37 @@ class Chf
 				throw new Exception("Путь \"" . func_get_arg(0) . "\" задан неверно. Не задано имя файла.");
 			}
 		}
+	}
+	
+	/**
+	 * Строка с тегами через запятую
+	 * 
+	 * @param string $str
+	 * @return bool 
+	 */
+	private static function _tags($str)
+	{
+		if (!preg_match("#^[a-zа-яё0-9\-\, ]+$#isuD", $str))
+		{
+			throw new Exception("Недопустимые символы.");
+		}
+		
+		$ar = explode(",", $str);
+		if(empty($ar))
+		{
+			throw new Exception("Не указано ни одного тега");
+		}
+		
+		foreach ($ar as $val)
+		{
+			$val = trim($val);
+			if(empty($val))
+			{
+				throw new Exception("Пустой тег или лишняя зяпятая");
+			}
+		}
+
+		return true;
 	}
 }
 

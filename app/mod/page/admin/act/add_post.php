@@ -3,7 +3,8 @@ $page = Page::add
 (
 	$_POST['Name'], 
 	$_POST['Url'],
-	$_POST['Content'], 
+	$_POST['Content'],
+	$_POST['Tags'],
 	$_POST['Parent'], 
 	$_POST['Html_Identified']
 );

@@ -23,6 +23,9 @@ function parent_html($page, $level, $current)
 }
 ?>
 
+
+<?php packjs_tinymce4("Content"); ?>
+
 <form action="#page/add_post">
 	<table class="std_form" align="center">
 		<tr>
@@ -32,18 +35,20 @@ function parent_html($page, $level, $current)
 			</td>
 		</tr>
 		<tr>
-			<td>Урл</td>
+			<td>Адрес</td>
 			<td>
 				<input type="text" name="Url" id="Url"/>
 			</td>
 		</tr>
 		<tr>
-			<td>Содержание</td>
-			<td>&nbsp;</td>
-		</tr>
-		<tr>
 			<td colspan="2">
 				<textarea style="width: 100%; height: 450px;" name="Content"></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td>Теги</td>
+			<td>
+				<textarea name="Tags"></textarea>
 			</td>
 		</tr>
 		<tr>

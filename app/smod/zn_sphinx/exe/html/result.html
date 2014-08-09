@@ -1,0 +1,45 @@
+<form class="enter_form sph" method="get" action="">
+	<div style="width: 600px; margin: 0px auto;">
+		<label style="margin-top: 4px;">Найти</label>
+		<input type="text" name="word" value="<?php echo $word; ?>"/>
+		<input name="" type="submit" class="search_btn" value=""/>
+	</div>
+	<br/>
+	<?php if(!empty($word)): ?>
+		<?php if(empty($result)): ?>
+			<!-- Ничего не найдено -->
+			<p style="text-align: center;">По слову «<strong><?php echo $word; ?></strong>» ничего не найдено.</p>
+		<?php else: ?>
+			<!-- Результат поиска -->
+			<ol start="<?php echo ($page-1) * P::get("zn_sphinx", "count_to_page") + 1; ?>">
+				<?php foreach ($result as $val): ?>
+					<li style="margin: 10px 0px 0px 0px;">
+						<a href="<?php echo $val['url']; ?>" target="_blank">
+							<?php echo $val['name']; ?>
+						</a>
+						<div>
+							<?php echo $val['content']; ?>
+						</div>
+					</li>
+				<?php endforeach; ?>
+				
+			</ol>
+			<?php if($page_all > 1): ?>
+				<!-- Страницы -->
+				<div>
+					<div>
+						<?php for($i = 1; $i <= $page_all; $i++): ?>
+							<?php if($i !== $page): ?>
+								<a href="?word=<?php echo $word; ?>&page=<?php echo $i; ?>"><?php echo $i; ?></a>
+							<?php else: ?>
+								<span><?php echo $i; ?></span>
+							<?php endif; ?>
+							
+						<?php endfor; ?>
+					</div>
+				</div>
+			<?php endif ?>
+		<?php endif; ?>
+	<?php endif; ?>
+	
+</form>

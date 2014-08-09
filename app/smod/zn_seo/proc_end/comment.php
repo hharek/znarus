@@ -1,4 +1,9 @@
 <?php
+if(Reg::meta_title() === "" and Reg::title() !== "")
+{
+	Reg::meta_title(Reg::title());
+}
+
 $search = 
 [
 	"<!--zn_meta_title-->",

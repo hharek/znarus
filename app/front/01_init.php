@@ -35,4 +35,7 @@ Reg::db_core(clone Reg::db(), true);
 Reg::db_core()->set_schema(Reg::db_schema_core());
 
 Reg::_unset("db_host","db_user","db_pass","db_name","db_persistent","db_ssl");
+
+/* Старт сессии */
+session_start();
 ?>

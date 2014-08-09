@@ -1,0 +1,30 @@
+<?php if(!empty($data)) { sitemap_html($data); } ?>
+
+<?php
+/**
+ * Распечатать html по массиву
+ * 
+ * @param array $data
+ */
+function sitemap_html($data)
+{
+?>
+
+<ul class="sitemap">
+	<?php foreach ($data as $val): ?>
+		<li>
+			<a href="<?php echo $val['url']; ?>">
+				<?php echo $val['name']; ?>
+			</a>
+		</li>
+		
+		<?php if(!empty($val['child'])): ?>
+			<?php sitemap_html($val['child']); ?>
+		<?php endif; ?>
+		
+	<?php endforeach; ?>
+</ul>
+
+<?php
+}
+?>

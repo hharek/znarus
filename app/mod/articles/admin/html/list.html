@@ -1,0 +1,49 @@
+<!-- Года -->
+<select name="year" id="year" style="width: 150px; float: right;">
+	<?php foreach ($year as $val): ?>
+	<option<?php if($val == $current_year): ?> selected="selected"<?php endif; ?>><?php echo $val; ?></option>
+	<?php endforeach; ?>
+</select>
+
+<script>
+$("#year").change(function()
+{
+	window.location = "#articles/list?year=" + $(this).val();
+});	
+</script>
+
+<!-- Статьи -->
+<table class="std_list" style="width: 800px;" align="center">
+	<col width="70%" />
+	<col width="15%" />
+	<col width="15%" />
+	<thead>
+		<tr>
+			<td>Заголовок</td>
+			<td>Дата</td>
+			<td>Просм.</td>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($articles as $val): ?>
+		<tr>
+			<td style="text-align: left; padding-left: 10px;" url="#articles/edit?id=<?php echo $val['ID']; ?>">
+				<?php echo $val['Title']; ?>
+			</td>
+			<td url="#articles/edit?id=<?php echo $val['ID']; ?>">
+				<?php echo date("d.m.Y", strtotime($val['Date'])); ?>
+			</td>
+			<td>
+				<a href="/статьи/<?php echo $val['Url']; ?>" class="icon_view"></a>
+			</td>
+		</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+<br/>
+<center>
+<a class="std_button" href="#articles/add">
+	<div class="icon_add"></div>
+	Добавить
+</a>
+</center>

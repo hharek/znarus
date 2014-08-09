@@ -102,6 +102,7 @@ SQL;
 	{
 		/* Полезные функции */
 		require Reg::path_admin() . "/function.php";
+		require Reg::path_admin() . "/packjs/function.php";
 		
 		try 
 		{	

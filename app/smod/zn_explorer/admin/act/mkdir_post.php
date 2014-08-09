@@ -3,7 +3,7 @@
 if(empty($_POST['name']))
 {throw new Exception_Admin("Имя папки не задано.");}
 
-if(!Chf::file($_POST['name']))
+if(!Chf::string($_POST['name']))
 {throw new Exception_Admin("В имени папки присутствуют недопустимые символы");}
 
 /* Путь */

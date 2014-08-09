@@ -104,8 +104,8 @@ $(function()
 		if(hash !== window.location.hash)
 		{
 			var url = hash_parse(window.location.hash);
-			// && hash_url !== url.mod + "/" + url.act + url.get
-			if(url !== false)
+//			if(url !== false)
+			if(url !== false && hash_url !== url.mod + "/" + url.act + url.get)
 			{
 				hash_url = url.mod + "/" + url.act + url.get;
 				hash_hash = url.after;
@@ -118,10 +118,20 @@ $(function()
 	}, 100);
 });
 
+/*-------------- Функция выполняемая до загрузки html -------------------*/
+/**
+ * Функция выполняемая до загрузки html
+ */
+function before_html()
+{
+	/* TinyMCE */
+	if(typeof tinymce === "object")
+	{tinymce.remove();}
+}
+
 /*-------------- Функция выполняемая после удачной загрузки аякс -------------------*/
 /**
- * Функция выполняемая после загрузки аякс
- * @returns Boolean
+ * Функция выполняемая после загрузки ajax
  */
 function after()
 {
@@ -162,7 +172,14 @@ function after()
 			$(form).off("submit");
 			$(form).submit(function()
 			{
-//				zn(url.url, $(form).serializeArray());
+				/* Перед отправкой поместить данные из tinyMce в textarea */
+				if(typeof tinymce === "object")
+				{tinymce.triggerSave();}
+				
+				/* Перед отправкой поместить данные из CodeMirror в textarea */
+				if(typeof cm === "object")
+				{cm.save();}
+
 				zn(url.url, new FormData(form));
 				
 				return false;
@@ -215,8 +232,37 @@ function after()
 	{
 		$(this).attr("href", $(this).attr("href") + "?token=" + $.cookie("token"));
 	});
-		
+	
+	/* Вкладки */
+	$(".tab_button").click(function()
+	{
+		tab_show($(this).attr("tab"));
+	});
+	
+	if(hash_hash.substr(0, 5) === "#tab_")
+	{
+		tab_show(hash_hash.substr(5));
+	}
+	
 	return true;
+}
+
+/**
+ * Показать вкладку
+ * 
+ * @param {String} name
+ */
+function tab_show(name)
+{
+	$(".tab").hide();
+	$(".tab_button.active").removeClass("active");
+
+	$("#tab_" + name).show();
+	$(".tab_button[tab=" + name + "]").addClass("active");
+	
+	hash_hash = "#tab_" + name;
+	hash = window.location.hash = "#" + hash_url + hash_hash;
+	
 }
 
 /*---------------------------- Сортировка -------------------------- */

@@ -1,6 +1,6 @@
 <?php
-if(!Chf::file($_POST['name']))
-{throw new Exception_Admin("В имени файла присутствуют недопустимые символы");}
+if(!Chf::string($_POST['name']))
+{throw new Exception_Admin("В имени файла присутствуют недопустимые символы. {$_POST['name']}");}
 
 /* Путь */
 $path = "";

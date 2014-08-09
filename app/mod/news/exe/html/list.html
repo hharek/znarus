@@ -1,0 +1,16 @@
+<?php foreach ($news as $val): ?>
+<div class="news">
+	<div class="title">
+		<a href="/новости/<?php echo $val['Url']; ?>">
+			<?php echo $val['Title']; ?>
+		</a>
+	</div>
+	<div class="date">
+		<?php echo $val['Date']; ?>
+	</div>
+	<div class="clear"></div>
+	<div class="anons">
+		<?php echo $val['Anons']; ?>
+	</div>
+</div>
+<?php endforeach; ?>

@@ -1,0 +1,46 @@
+<form method="post" action="">
+	<input type="hidden" name="secret_key" value="<?php echo md5($_SESSION['feedback_secret_key']); ?>"/>
+	<table class="feedback">
+		<tr>
+			<td>Представьтесь, пожалуйста</td>
+			<td>
+				<input type="text" name="Name" value="<?php echo htmlspecialchars($fdata['Name']); ?>"<?php if(!empty(Err::get()['Name'])): ?> class="error_input"<?php endif; ?>/>
+				<?php if(!empty(Err::get()['Name'])): ?>
+				<div class="error_text"><?php echo Err::get()['Name']; ?></div>
+				<?php endif; ?>
+			</td>
+		</tr>
+		<tr>
+			<td>E-mail</td>
+			<td>
+				<input type="text" name="Email" value="<?php echo htmlspecialchars($fdata['Email']); ?>"<?php if(!empty(Err::get()['Email'])): ?> class="error_input"<?php endif; ?>/>
+				<?php if(!empty(Err::get()['Email'])): ?>
+				<div class="error_text"><?php echo Err::get()['Email']; ?></div>
+				<?php endif; ?>
+			</td>
+		</tr>
+		<tr>
+			<td>Телефон</td>
+			<td>
+				<input type="text" name="Telefon" value="<?php echo htmlspecialchars($fdata['Telefon']); ?>"<?php if(!empty(Err::get()['Telefon'])): ?> class="error_input"<?php endif; ?>/>
+				<?php if(!empty(Err::get()['Telefon'])): ?>
+				<div class="error_text"><?php echo Err::get()['Telefon']; ?></div>
+				<?php endif; ?>
+			</td>
+		</tr>
+		<tr>
+			<td>Сообщение</td>
+			<td>
+				<textarea name="Message" <?php if(!empty(Err::get()['Telefon'])): ?> class="error_input"<?php endif; ?>><?php echo htmlspecialchars($fdata['Telefon']); ?></textarea>
+				<?php if(!empty(Err::get()['Message'])): ?>
+				<div class="error_text"><?php echo Err::get()['Message']; ?></div>
+				<?php endif; ?>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<input type="submit" value="Отправить"/>
+			</td>
+		</tr>
+	</table>
+</form>

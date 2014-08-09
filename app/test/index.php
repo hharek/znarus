@@ -4,20 +4,9 @@ require dirname(__FILE__)."/init.php";
 
 try 
 {
-	header("Content-type: text/plain");
-	
-	require_once Reg::path_app() . "/mod/menu/class/menu.php";
-	require_once Reg::path_app() . "/mod/menu/class/menu_item.php";
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	session_start();
+
+	echo "Тест";
 	
 }
 catch (Exception $e)

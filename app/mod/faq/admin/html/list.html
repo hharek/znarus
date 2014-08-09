@@ -1,0 +1,40 @@
+<table align="center" class="std_list">
+	<col width="40%" />
+	<col width="40%" />
+	<col width="10%" />
+	<thead>
+		<tr>
+			<td>Вопрос</td>
+			<td>Ответ</td>
+			<td>Сорт.</td>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($faq as $key=>$val): ?>
+			<tr>
+				<td url="#faq/edit?id=<?php echo $val['ID']; ?>" style="text-align: left; padding-left: 10px; vertical-align: top;">
+					<?php echo $val['Question']; ?>
+				</td>
+				<td url="#faq/edit?id=<?php echo $val['ID']; ?>" style="text-align: left; padding-left: 10px;">
+					<?php echo $val['Answer']; ?>
+				</td>
+				<td>
+					<?php if($key !== 0): ?>
+						<div onclick="zn('#faq/sort_up_post', { id: <?php echo $val['ID']; ?>});" class="icon_up" style="cursor: pointer;"></div>
+					<?php endif; ?>
+
+					<?php if(count($faq) != $key + 1): ?>
+						<div onclick="zn('#faq/sort_down_post', { id: <?php echo $val['ID']; ?>});" class="icon_down" style="cursor: pointer;"></div>
+					<?php endif; ?>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+<br/>
+<center>
+	<a href="#faq/add" class="std_button">
+		<div class="icon_add"></div>
+		Добавить
+	</a>
+</center>

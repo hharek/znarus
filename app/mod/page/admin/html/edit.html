@@ -23,6 +23,8 @@ function parent_html($page, $level, $current)
 }
 ?>
 
+<?php packjs_tinymce4("Content"); ?>
+
 <form action="#page/edit_post?id=<?php echo $page['ID']; ?>">
 	<table class="std_form" align="center">
 		<tr>
@@ -32,18 +34,20 @@ function parent_html($page, $level, $current)
 			</td>
 		</tr>
 		<tr>
-			<td>Урл</td>
+			<td>Адрес</td>
 			<td>
 				<input type="text" name="Url" id="Url" value="<?php echo htmlspecialchars($page['Url']); ?>"/>
 			</td>
 		</tr>
 		<tr>
-			<td>Содержание</td>
-			<td>&nbsp;</td>
-		</tr>
-		<tr>
 			<td colspan="2">
 				<textarea style="width: 100%; height: 450px;" name="Content"><?php echo htmlspecialchars($page['Content']); ?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td>Теги</td>
+			<td>
+				<textarea name="Tags"><?php echo htmlspecialchars($page['Tags']); ?></textarea>
 			</td>
 		</tr>
 		<tr>
@@ -78,7 +82,7 @@ function parent_html($page, $level, $current)
 			<td>
 				<div class="std_button submit">
 					<div class="icon_edit"></div>
-					Редактировать
+					Сохранить
 				</div>
 			</td>
 			<td>
@@ -93,7 +97,9 @@ function parent_html($page, $level, $current)
 		</tr>
 	</table>
 </form>
-	
+
+
+
 <script>
 /* Отображить другое */
 $("#show_other").click(function()

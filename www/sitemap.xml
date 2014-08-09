@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>http://example.com/</loc>
+  </url>
+  <url>
+    <loc>http://example.com/статьи</loc>
+  </url>
+  <url>
+    <loc>http://example.com/статьи/статья-2</loc>
+  </url>
+  <url>
+    <loc>http://example.com/статьи/статья-1</loc>
+  </url>
+  <url>
+    <loc>http://example.com/вопрос-ответ</loc>
+  </url>
+  <url>
+    <loc>http://example.com/обратная-связь</loc>
+  </url>
+  <url>
+    <loc>http://example.com/новости</loc>
+  </url>
+  <url>
+    <loc>http://example.com/новости/новость-2</loc>
+  </url>
+  <url>
+    <loc>http://example.com/новости/новость-1</loc>
+  </url>
+  <url>
+    <loc>http://example.com/поиск</loc>
+  </url>
+</urlset>

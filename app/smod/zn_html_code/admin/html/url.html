@@ -1,0 +1,79 @@
+<!-- Урл -->
+<script>
+$("#html_code_button").click(function()
+{
+	window.location = "#zn_html_code/url?url=" + $("#html_code_url").val();
+});
+
+$("#html_code_form").submit(function()
+{
+	window.location = "#zn_html_code/url?url=" + $("#html_code_url").val();
+	return false;
+});
+</script>
+
+<table class="std_form" align="center">
+	<tr>
+		<td colspan="2" style="text-align: center;">
+			<form id="html_code_form">
+				http://<?php echo Reg::domain(); ?>
+				<input type="text" id="html_code_url" name="url" value="<?php echo $url; ?>"/>
+				<div id="html_code_button" class="icon_view" style="margin: 0px 0px -7px 0px; cursor: pointer;"></div>
+				<input type="submit" value="" style="display: none;"/>
+			</form>
+		</td>
+	</tr>
+</table>
+
+<!-- Шаблон -->
+<table class="std_list" align="center" style="width: 700px;">
+	<col width="40%"/>
+	<col width="60%"/>
+	<thead>
+		<tr>
+			<td colspan="2">Шаблон</td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr url="#zn_html_code/html_content?id=<?php echo $html['ID']; ?>&from=url&url=<?php echo $url; ?>">
+			<td style="text-align: left; padding-left: 20px;">
+				<?php echo $html['Identified']; ?>.html
+			</td>
+			<td style="text-align: left; padding-left: 20px;">
+				<?php echo $html['Name']; ?>
+			</td>
+		</tr>
+		<?php foreach ($inc as $val): ?>
+			<tr url="#zn_html_code/inc_content?id=<?php echo $val['ID']; ?>&from=url&url=<?php echo $url; ?>">
+				<td style="text-align: left; padding-left: 50px;">
+					- <?php echo $val['Module_Identified']; ?>_<?php echo $val['Identified']; ?>
+				</td>
+				<td style="text-align: left; padding-left: 50px;">
+					- <?php echo $val['Module_Name']; ?> / <?php echo $val['Name']; ?>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+
+<!-- Exe -->
+<table class="std_list" align="center" style="width: 700px; margin: 20px auto 0px auto;">
+	<col width="40%"/>
+	<col width="60%"/>
+	<thead>
+		<tr>
+			<td colspan="2">Исполнитель</td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr url="#zn_html_code/exe_content?id=<?php echo $exe['ID']; ?>&from=url&url=<?php echo $url; ?>">
+			<td style="text-align: left; padding-left: 20px;">
+				<?php echo $exe['Module_Identified']; ?> / <?php echo $exe['Identified']; ?>.html
+			</td>
+			<td style="text-align: left; padding-left: 20px;">
+				 <?php echo $exe['Module_Name']; ?> / <?php echo $exe['Name']; ?>
+			</td>
+		</tr>
+	</tbody>
+</table>
+

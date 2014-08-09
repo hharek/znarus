@@ -180,7 +180,7 @@ SQL;
 			
 			if(count($other) < 2)
 			{
-				throw new Exception_Admin("Необходимо хотя бы два исполнителя.");
+				throw new Exception_Admin("Необходимо хотя бы два пункта меню.");
 			}
 
 			foreach ($other as $key=>$val)

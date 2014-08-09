@@ -1,28 +1,31 @@
 <?php
 /*** -------------------------- Статические файлы -------------------------- ***/
 $static_file = Reg::path_admin() . Reg::url_admin_path();
-if (in_array(mb_substr(Reg::url(), -4), array(".css", ".jpg", ".png", ".gif")))
+$static_ext = "";
+$static_ext_pos = strrpos(Reg::url_admin_path(), ".");
+if($static_ext_pos !== false)
 {
-	$static_ext = mb_substr(Reg::url(), -3);
-}
-elseif (mb_substr(Reg::url(), -3) == ".js")
-{
-	$static_ext = "js";
+	$static_ext = mb_substr(Reg::url_admin_path(), $static_ext_pos);
 }
 
-if (!empty($static_ext) and is_file($static_file))
+if
+(
+	!empty($static_ext) and
+	$static_ext !== ".php" and
+	is_file(Reg::path_admin() . Reg::url_admin_path())
+)
 {
 	/* Позволить кэшировать статические файлы */
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", filemtime($static_file))." GMT");
 	
-	/* Заголовок Content-Type */
+	/* Заголовок */
 	switch ($static_ext)
 	{
-		case "css"	: header("Content-Type: text/css; charset=utf-8"); break;
-		case "jpg"	: header("Content-Type: image/jpeg"); break;
-		case "png"	: header("Content-Type: image/png"); break;
-		case "gif"	: header("Content-Type: image/gif"); break;
-		case "js"	: header("Content-Type: application/x-javascript; charset=utf-8"); break;
+		case ".css"	: header("Content-Type: text/css; charset=utf-8"); break;
+		case ".jpg"	: header("Content-Type: image/jpeg"); break;
+		case ".png"	: header("Content-Type: image/png"); break;
+		case ".gif"	: header("Content-Type: image/gif"); break;
+		case ".js"	: header("Content-Type: application/x-javascript; charset=utf-8"); break;
 	}
 	
 	/* Заголовок Content-Length */
@@ -30,7 +33,12 @@ if (!empty($static_ext) and is_file($static_file))
 	
 	/* Вывод */
 	readfile($static_file);
-	
+	exit();
+}
+/* Другие файлы php */
+elseif($static_ext === ".php")
+{
+	require $static_file;
 	exit();
 }
 

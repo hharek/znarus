@@ -275,3 +275,26 @@
 	text-align: center;
 	background: #ffe7ae;
 }
+
+/* Вкладки */
+.tab_button
+{
+	margin-left: 100px;
+}
+
+.tab_button:nth-child(1)
+{
+	margin-left: 0px;
+}
+
+.tab_button.active
+{
+	cursor: none;
+	background: #f0f0f0;
+	border: 1px solid black;
+}
+
+.tab
+{
+	display: none;
+}
