@@ -1,9 +1,0 @@
-<?php
-/**
- * {Name}
- */
-class {Identified}
-{
-	
-}
-?>
