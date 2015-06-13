@@ -1,4 +1,7 @@
 <?php
+/* Исключения срабатываемые при ошибке в форме */
+class Exception_Form extends Exception {}
+
 /**
  * Класс для работы с ошибками при заполнении формы
  */
@@ -9,45 +12,58 @@ class Err
 	 * 
 	 * @var array
 	 */
-	private static $error = array();
-	
+	private static $error = [];
+
 	/**
 	 * Добавить
 	 * 
 	 * @param string $error
 	 * @param string $name
-	 * @return bool
 	 */
 	public static function add($error, $name)
 	{
-		self::$error[$name] = $error;
-		
-		return true;
+		if (!isset(self::$error[$name]))
+		{
+			self::$error[$name] = $error;
+		}
 	}
-	
+
 	/**
 	 * Получить список ошибок
 	 * 
-	 * @return bool
+	 * @param string $name
+	 * @return string
 	 */
-	public static function get()
+	public static function get($name = null)
 	{
-		return self::$error;
+		if ($name === null)
+		{
+			return self::$error;
+		}
+		elseif ($name !== null)
+		{
+			if (isset(self::$error[$name]))
+			{
+				return self::$error[$name];
+			}
+			else
+			{
+				return;
+			}
+		}
 	}
-	
+
 	/**
 	 * Исключение для ошибок
-	 * 
-	 * @return bool
 	 */
-	public static function exception($error="")
+	public static function exception()
 	{
-		if(count(self::$error)!=0)
-		{throw new Exception_Form($error);}
-		
-		return true;
+		if (count(self::$error) !== 0)
+		{
+			throw new Exception_Form();
+		}
 	}
-	
+
 	/**
 	 * Проверить поле
 	 * 
@@ -56,27 +72,24 @@ class Err
 	 * @param bool $empty_allow
 	 * @param string $identified
 	 * @param string $name
-	 * @return boolean
 	 */
-	public static function check_field($value, $type, $empty_allow, $identified, $name)
+	public static function check_field(&$value, $type, $empty_allow, $identified, $name)
 	{
-		$value = (string)$value;
-		if(mb_strlen($value) == 0 )
+		$value = trim((string) $value);
+		if ($value === "")
 		{
-			if(!$empty_allow)
+			if (!$empty_allow)
 			{
 				self::add("Поле «{$name}» не заполнено.", $identified);
 			}
 		}
 		else
 		{
-			if(!Chf::$type($value))
+			if (!Chf::$type($value))
 			{
-				self::add("Поле «{$name}» задано неверно. ".Chf::error(), $identified);
+				self::add("Поле «{$name}» задано неверно. " . Chf::error(), $identified);
 			}
 		}
-		
-		return true;
 	}
 }
 ?>

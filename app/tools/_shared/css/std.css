@@ -1,0 +1,152 @@
+/* Элементы формы */
+.std_form
+{
+	input, textarea, select
+	{
+		padding: 4px 6px;
+		font-family: "Trebuchet MS";
+		font-size: 16px;
+		min-width: 350px;
+		border: 1px solid #a19d9a;
+		border-radius: 4px;
+		box-shadow: 0px 0px 6px #ccc;
+		
+		&:hover, &:focus
+		{
+			box-shadow: 0px 0px 6px #ffa500;
+		}
+	}
+	
+	input[type="file"]
+	{
+		border: 0px;
+		padding: 0px;
+		box-shadow: none;
+	}
+	
+	input[type="radio"], input[type="checkbox"]
+	{
+		min-width: 0px;
+		vertical-align: middle;
+		margin-top: -2px;
+	}
+	
+	textarea
+	{
+		min-height: 100px;
+	}
+
+	select
+	{
+		min-width: 200px;
+		background-color: #fff;
+	}
+
+	input.sort
+	{
+		min-width: 35px;
+		width: 35px;
+		text-align: right;
+	}
+}
+
+/* Таблица для формы */
+table.std_form
+{
+	width: 90%;
+	margin: 0px auto;
+
+	td
+	{
+		padding: 6px 10px;
+
+		&:nth-child(odd)
+		{
+			text-align: right;
+			width: 40%;
+		}
+
+		&:nth-child(even)
+		{
+			text-align: left;
+			width: 60%;
+		}
+	}
+}
+
+/* Список */
+table.std_list
+{
+	width: 90%;
+	margin: 0px auto;
+	clear: both;
+	border-collapse: collapse;
+
+	thead
+	{
+		td
+		{
+			text-align: center;
+			border: solid 1px #c0c0c0;
+			background-color: #e2eeb4;
+		}
+	}
+
+	tbody
+	{
+		tr
+		{
+			background-color: #ffffff;
+
+			&:nth-child(even)
+			{
+				background-color: #eff0ec;
+			}
+
+			&:hover
+			{
+				background-color: #f9fac5;
+			}
+
+			.up, .down
+			{
+				cursor: pointer;
+			}
+		}
+
+		td
+		{
+			text-align: center;
+			border: solid 1px #ccc;
+			vertical-align: middle;
+		}
+	}
+}
+
+/* Кнопки */
+.std_button
+{
+	border: 1px solid #c0c0c0;
+	border-radius: 10px;
+	display: inline-block;
+	background-color: #e3e3e3;
+	min-width: 120px;
+	height: 22px;
+	cursor: pointer;
+	padding: 4px 10px 4px 6px;
+	margin-left: 10px;
+	margin: 5px 10px 5px 0px;
+	color: #000;
+	text-align: center;
+
+	&:hover
+	{
+		background-color: #f0f0f0;
+	}
+
+	div
+	{
+		float: left;
+		margin: 0px 5px 0px 0px;
+	}
+}

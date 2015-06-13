@@ -1,0 +1,30 @@
+<form>
+	<table class="std_form" align="center">
+		<tr>
+			<td colspan="2" style="text-align: center;">
+				<input type="text" name="Title" value="<?php echo htmlspecialchars(P::get("_service","home_title")); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<textarea style="width: 100%; height: 450px;" name="Content"><?php echo htmlspecialchars(T::get("_service", "home_content")); ?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td>Тэги</td>
+			<td>
+				<textarea name="Tags"><?php echo P::get("_service", "home_tags"); ?></textarea>
+			</td>
+		</tr>
+	</table>
+	<div class="center">
+		<div class="std_button submit">
+			<div class="icon_edit"></div>
+			Сохранить
+		</div>
+		<a class="std_button" href="#_service/other_page">
+			<div class="icon_back"></div>
+			Назад
+		</a>
+	</div>
+</form>

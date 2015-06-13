@@ -1,0 +1,31 @@
+<?php foreach ($module as $m_val): ?>
+	<div class="module">
+		<div class="title"><?php echo $m_val['Name']; ?></div>
+		<div class="m_center">
+			<div class="image">
+				<img src="mod_icon/<?php echo $m_val['Identified']; ?>.png" width="32" height="32"/>
+			</div>
+			<div class="admin">
+				<ul>
+					<?php foreach ($m_val['Admin'] as $a_val): ?>
+						<li>
+							<?php if($a_val['Window'] === "0"): ?>
+								<a href="#<?php echo $m_val['Identified']; ?>/<?php echo $a_val['Identified']; ?>">
+									<?php echo $a_val['Name']; ?>
+								</a>
+							<?php elseif($a_val['Window'] === "1"): ?>
+								<a class="token" href="ajax/<?php echo $m_val['Identified']; ?>/<?php echo $a_val['Identified']; ?>">
+									<?php echo $a_val['Name']; ?>
+								</a>
+							<?php endif; ?>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+			</div>
+		</div>
+	</div>
+<?php endforeach; ?>
+
+
+
+

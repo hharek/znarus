@@ -1,0 +1,68 @@
+<?php 
+$_module = _User_Group_Priv::get_admin_visible_and_allow(G::user()['Group_ID']);
+$_task_to = _Task::get_count_to_create(G::user()['ID']);
+$_task_from = _Task::get_count_from_create(G::user()['ID']);
+?>
+
+<div id="_menu" class="_menu">
+
+	<div class="_item">
+		<div class="_icon icon_install"></div>
+		<div class="_title">Модули</div>
+		<div class="_module">
+			<?php foreach ($_module as $_m_val): ?>
+				<div class="_mod">
+					<div class="_name"><?php echo $_m_val['Name']; ?></div>
+					<div class="_admin">
+						<?php foreach ($_m_val['Admin'] as $_a_val): ?>
+							<a href="#<?php echo $_m_val['Identified']; ?>/<?php echo $_a_val['Identified']; ?>" class="_adm">
+								<?php echo $_a_val['Name']; ?>
+							</a>
+						<?php endforeach; ?>
+					</div>
+				</div>
+			<?php endforeach; ?>
+		</div>
+	</div>
+
+	<div class="_item">
+		<div class="_icon icon_task"></div>
+		<div class="_title">Задачи <?php if ($_task_to !== 0): ?>(<?php echo $_task_to; ?>)<?php endif; ?></div>
+		<div class="_podmenu">
+			<a href="#_task/to">Задания <?php if ($_task_to !== 0): ?>(<?php echo $_task_to; ?>)<?php endif; ?></a>
+			<a href="#_task/from">Поручения <?php if ($_task_from !== 0): ?>(<?php echo $_task_from; ?>)<?php endif; ?></a>
+		</div>
+	</div>
+
+	<div class="_item">
+		<div class="_icon icon_bookmark"></div>
+		<div class="_title"><!--Закладки--></div>
+		<!--
+		<div class="podmenu">
+			<a href="#1">Статьи / Добавить</a>
+			<a href="#2">Глоссарий / Чопик </a>
+			<a href="#3">Каталог / Категория 1 / Товар 1 / И что то ещё</a>	
+		</div>
+		-->
+	</div>
+
+	<div class="_item">
+		<div class="_icon icon_settings"></div>
+		<div class="_title">Настройки</div>
+		<div class="_podmenu">
+			<a href="#_user/passwd">Сменить пароль</a>
+		</div>
+	</div>
+
+	<div class="_item">
+		<div class="_icon icon_help"></div>
+		<div class="_title"><!--Справка--></div>
+		<!--
+		<div class="podmenu">
+			<a href="#1">Помощь</a>
+			<a href="#2">О CMS</a>
+		</div>
+		-->
+	</div>
+
+</div>

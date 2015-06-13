@@ -1,5 +1,5 @@
 <?php
-if(Reg::url_path() === "/вопрос-ответ")
+if(G::url_path() === "/вопрос-ответ")
 {
 	return "list";
 }

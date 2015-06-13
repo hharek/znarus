@@ -1,0 +1,14 @@
+<form>
+	<input type="hidden" name="dump" value="1"/>
+	<p style="text-align: center;">Вы действительно хотите создать установочный файл для «<?php echo $packjs['Identified']; ?>» ?</p>
+	<center>
+		<a href="exe/packjs/dump?id=<?php echo $packjs['ID']; ?>&ok=1" class="std_button token">
+			<div class="icon_install"></div>
+			Создать
+		</a>
+		<a href="#packjs/edit?id=<?php echo $packjs['ID']; ?>" class="std_button">
+			<div class="icon_back"></div>
+			Отмена
+		</a>
+	</center>
+</form>

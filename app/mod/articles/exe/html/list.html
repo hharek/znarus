@@ -1,16 +1,12 @@
 <?php foreach ($articles as $val): ?>
 <div class="articles">
-	<div class="date">
-		<?php echo $val['Date']; ?>
-	</div>
 	<div class="title">
-		<a href="/статьи/<?php echo $val['Url']; ?>">
-			<?php echo $val['Title']; ?>
-		</a>
+		<a href="/статьи/<?php echo $val['Url']; ?>"><?php echo $val['Title']; ?></a>
 	</div>
+	<div class="date"><?php echo date("d.m.Y", strtotime($val['Date'])); ?></div>
 	<div class="clear"></div>
 	<div class="anons">
-		<?php echo $val['Anons']; ?>
+		<a href="/статьи/<?php echo $val['Url']; ?>"><?php echo $val['Anons']; ?></a>
 	</div>
 </div>
 <?php endforeach; ?>

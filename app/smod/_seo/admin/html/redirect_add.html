@@ -1,0 +1,33 @@
+<form>
+	<table class="std_form">
+		<tr>
+			<td>Источник - http://<?php echo DOMAIN; ?></td>
+			<td>
+				<input type="text" name="From"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Назначение</td>
+			<td>
+				<input type="text" name="To"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Делать переход на другой урл</td>
+			<td>
+				<input type="hidden" name="Location" value="0"/>
+				<input type="checkbox" name="Location" value="1" checked="checked"/>
+			</td>
+		</tr>
+	</table>
+	<div class="center">
+		<div class="std_button submit">
+			<div class="icon_add"></div>
+			Добавить
+		</div>
+		<a class="std_button" href="#_seo/redirect">
+			<div class="icon_back"></div>
+			Назад
+		</a>
+	</div>
+</form>

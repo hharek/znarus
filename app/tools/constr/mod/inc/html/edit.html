@@ -1,0 +1,45 @@
+<form>
+	<table class="std_form">
+		<tr>
+			<td>Идентификатор</td>
+			<td>
+				<input type="text" name="Identified" value="<?php echo htmlspecialchars($inc['Identified']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Наименование</td>
+			<td>
+				<input type="text" name="Name" value="<?php echo htmlspecialchars($inc['Name']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Активность</td>
+			<td>
+				<input type="hidden" name="Active" value="0"/>
+				<input type="checkbox" name="Active" value="1"<?php if($inc['Active'] === "1"): ?> checked="checked"<?php endif; ?>/>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="std_button submit">
+					<div class="icon_edit"></div>
+					Редактировать
+				</div>
+			</td>
+			<td>
+				<a class="std_button" href="#module/edit?id=<?php echo $module['ID']; ?>#tab_structure_inc">
+					<div class="icon_back"></div>
+					Назад
+				</a>
+				<div 
+					class="icon_basket delete" 
+					url="#inc/delete?id=<?php echo $inc['ID']; ?>" 
+					mess="Вы действительно хотите удалить inc «<?php echo $inc['Identified']; ?> (<?php echo $inc['Name']; ?>)» ?" 
+					style="margin: 0 0 -8px 0"
+				></div>
+			</td>
+		</tr>
+	</table>
+</form>
+
+

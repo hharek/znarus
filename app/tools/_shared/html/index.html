@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<!-- 
+- top
+	- logo
+	- button
+	- center
+		- menu
+		- admin
+	- path
+- panel
+	- title
+	- version
+	- autosave
+- content
+- loader
+- overlay
+- mess_ok
+- okno
+-->
+	<head>
+		<meta charset="utf-8" />
+		<?php if (G::location() === "constr"): ?>
+			<title>Конструктор</title>
+		<?php elseif (G::location() === "admin"): ?>
+			<title>Админка</title>
+		<?php endif; ?>
+		<link rel="stylesheet" href="index.css" />
+		
+		<script>
+/* Общие настройки */
+var _settings = 
+{
+	/* Хэш по умолчанию */
+	<?php if (G::location() === "constr"): ?>
+		hash_default: "<?php echo CONSTR_HASH_DEFAULT; ?>",
+	<?php elseif (G::location() === "admin"): ?>
+		hash_default: "<?php echo ADMIN_HASH_DEFAULT; ?>",
+	<?php endif; ?>
+		
+	/* CSS-для редактора */
+	css_default: "<?php echo P::get("css_default");?>"
+};
+
+
+		</script>
+		
+		<script src="index.js"></script>
+		<!--
+		<script src="js/translit.js"></script>
+		<script src="js/jquery-2.1.3.min.js"></script>
+		<script src="js/jquery.cookie.js"></script>
+		<script src="js/default.js"></script>
+		<script src="js/menu.js"></script>
+		<script src="js/okno.js"></script>
+		<script src="js/hash.js"></script>
+		<script src="js/exe.js"></script>
+		<script src="js/error.js"></script>
+		<script src="js/success.js"></script>
+		<script src="js/path.js"></script>
+		<script src="js/tab.js"></script>
+		<script src="js/sort.js"></script>
+		<script src="js/version.js"></script>
+		<script src="js/draft.js"></script>
+		<script src="js/autosave.js"></script>
+		<script src="js/packjs.js"></script>
+		-->
+	</head>
+	<body>
+		<div class="_top">
+			
+			<!-- Логотип -->
+			<div class="_logo" id="_logo">
+				<?php if (G::location() === "constr"): ?>
+					<a href="<?php echo CONSTR_HASH_DEFAULT; ?>">
+						<img src="img/logo_constr.png" width="58" height="64" title="Пользователь: root" />
+					</a>
+				<?php elseif (G::location() === "admin"): ?>
+					<a href="<?php echo ADMIN_HASH_DEFAULT; ?>">
+						<img src="img/logo_admin.png" width="58" height="64" title="Пользователь: root" />
+					</a>
+				<?php endif; ?>
+			</div>
+			
+			<!-- Кнопки -->
+			<div class="_buttons">
+				<a id="_exit" href="#exit" class="icon_exit" title="Выход"></a>
+				<a href="/" class="icon_home" title="На главную"></a>
+			</div>
+			
+			<div class="_center">
+				
+				<!-- Меню -->
+				<?php if (G::location() === "constr"): ?>
+					<?php require "part/menu_constr.html"; ?>
+				<?php elseif (G::location() === "admin"): ?>
+					<?php require "part/menu_admin.html"; ?>
+				<?php endif; ?>
+				
+				<!-- Админки -->
+				<?php if (G::location() === "admin"): ?>
+					<div class="_admin" id="_admin">
+						<div class="_module">
+							<div class="_icon">
+								<img/>
+							</div>
+							<span></span>
+						</div>
+					</div>
+				<?php endif; ?>
+				
+			</div>
+			
+		</div>
+		
+		<!-- Путь -->
+		<div id="_path" class="_path"></div>
+		
+		<div class="_panel">
+			
+			<!-- Заголовок -->
+			<div id="_title" class="_title">
+				<div></div>
+			</div>
+			
+			<!-- Версии файлов -->
+			<div id="_version" class="_version" title="Версии данных">
+				<div class="_load">
+					<img src="img/loader_small.gif">
+				</div>
+				<div class="icon_version"></div>
+				<div class="_list">
+					<div class="_active">2014-09-17 17:47:54</div>
+					<div>2014-09-16 10:04:12</div>
+					<div>2014-09-10 09:16:00</div>
+				</div>
+			</div>
+			
+			<!-- Автосохранение -->
+			<div id="_autosave" class="_autosave">
+				<div class="icon_autosave"></div>
+			</div>
+			
+		</div>
+		
+		<!-- Основной вывод -->
+		<div id="_content" class="_content"></div>
+		
+		<!-- Загрузка -->
+		<div id="_loader" class="_loader">
+			<img src="img/loader.gif" width="220" height="19"/>
+		</div>
+		
+		<!-- Перекрытие -->
+		<div id="_overlay" class="_overlay"></div>
+		
+		<!-- Сообщение об удачном выполнении -->
+		<div id="_mess_ok" class="_mess_ok">
+			<div class="_primary">
+				<div class="_icon icon_active"></div>
+				<div class="_close">x</div>
+				<div class="_text"></div>
+			</div>
+		</div>
+		
+		<!-- Стандартные окна (alert, confirm, prompt) -->
+		<?php require "part/okno.html"; ?>
+		
+	</body>
+</html>

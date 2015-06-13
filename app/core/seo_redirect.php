@@ -2,70 +2,107 @@
 /**
  * Адреса для переадресации
  */
-class ZN_Seo_Redirect
+class _Seo_Redirect
 {
+	/**
+	 * Проверка по ID
+	 * 
+	 * @param int $id
+	 * @return array
+	 */
+	public static function is($id)
+	{
+		if (!Chf::uint($id))
+		{
+			throw new Exception("Номер у переадресации задан неверно. " . Chf::error());
+		}
+
+		$query = 
+<<<SQL
+SELECT 
+	true
+FROM 
+	"seo_redirect"
+WHERE 
+	"ID" = $1
+SQL;
+		$rec = G::db_core()->query($query, $id)->single();
+		if ($rec === null)
+		{
+			throw new Exception("Переадресации с номером «{$id}» не существует.");
+		}
+	}
+	
 	/**
 	 * Добавить
 	 * 
 	 * @param string $from
 	 * @param string $to
+	 * @param bool $location
 	 * @return array
 	 */
-	public static function add($from, $to)
+	public static function add($from, $to, $location)
 	{
 		/* Проверка */
-		Err::check_field($from, "url", false, "From", "Источник");
-		Err::check_field($to, "url", false, "To", "Назначение");
-		Err::exception();
-		
+		self::_check($from, $to, $location);
+
 		/* Уникальность */
 		self::_unqiue($from);
-		Err::exception();
-		
+
 		/* Добавить */
 		$data = 
 		[
 			"From" => $from,
-			"To" => $to
+			"To" => $to,
+			"Location" => $location
 		];
-		$id = Reg::db_core()->insert("seo_redirect", $data, "ID");
+		$id = G::db_core()->insert("seo_redirect", $data, "ID");
 		
+		/* Удалить кэш */
+		G::cache_db_core()->delete_tag("seo_redirect");
+		_Cache_Front::delete(["url_path" => $from]);
+		_Cache_Front::delete(["url_path" => $to]);
+
 		/* Данные добавленного */
-		return self::select_line_by_id($id);
+		return self::get($id);
 	}
-	
+
 	/**
 	 * Редактировать
 	 * 
 	 * @param int $id
 	 * @param string $from
 	 * @param string $to
+	 * @param bool $location
 	 * @return array
 	 */
-	public static function edit($id, $from, $to)
+	public static function edit($id, $from, $to, $location)
 	{
 		/* Проверка */
-		self::is_id($id);
-		Err::check_field($from, "url", false, "From", "Источник");
-		Err::check_field($to, "url", false, "To", "Назначение");
-		Err::exception();
-		
+		self::is($id);
+		self::_check($from, $to, $location);
+
 		/* Уникальность */
 		self::_unqiue($from, $id);
-		Err::exception();
-		
+
 		/* Редактировать */
-		$data =
+		$data = 
 		[
 			"From" => $from,
-			"To" => $to
+			"To" => $to,
+			"Location" => $location
 		];
-		Reg::db_core()->update("seo_redirect", $data, array("ID" => $id));
+		G::db_core()->update("seo_redirect", $data, ["ID" => $id]);
 		
+		/* Удалить кэш */
+		G::cache_db_core()->delete_tag("seo_redirect");
+		_Cache_Front::delete(["url_path" => $from]);
+		_Cache_Front::delete(["url_path" => $to]);
+
 		/* Данные редактируемого */
-		return self::select_line_by_id($id);
+		return self::get($id);
 	}
-	
+
 	/**
 	 * Удалить
 	 * 
@@ -74,86 +111,67 @@ class ZN_Seo_Redirect
 	 */
 	public static function delete($id)
 	{
-		$redirect = self::select_line_by_id($id);
+		$old = self::get($id);
+
+		G::db_core()->delete("seo_redirect", ["ID" => $id]);
 		
-		Reg::db_core()->delete("seo_redirect", array("ID" => $id));
-		
-		return $redirect;
+		/* Удалить кэш */
+		G::cache_db_core()->delete_tag("seo_redirect");
+		_Cache_Front::delete(["url_path" => $old['From']]);
+		_Cache_Front::delete(["url_path" => $old['To']]);
+
+		return $old;
 	}
-	
-	/**
-	 * Проверка по ID
-	 * 
-	 * @param int $id
-	 * @return array
-	 */
-	public static function is_id($id)
-	{
-		if(!Chf::uint($id))
-		{throw new Exception_Admin("Номер у переадресации задан неверно. ".Chf::error());}
-		
-		$query = 
-<<<SQL
-SELECT 
-	COUNT(*) as count
-FROM 
-	"seo_redirect"
-WHERE 
-	"ID" = $1
-SQL;
-		$count = Reg::db_core()->query_one($query, $id, "seo_redirect");
-		if($count < 1)
-		{throw new Exception_Admin("Переадресации с номером «{$id}» не существует.");}
-		
-		return array();
-	}
-	
+
 	/**
 	 * Выборка строки по ID
 	 * 
 	 * @param int $id
 	 * @return array
 	 */
-	public static function select_line_by_id($id)
+	public static function get($id)
 	{
-		self::is_id($id);
-		
+		self::is($id);
+
 		$query = 
 <<<SQL
 SELECT
 	"ID",
 	"From",
-	"To"
+	"To",
+	"Location"::int
 FROM 
 	"seo_redirect"
 WHERE 
 	"ID" = $1
 SQL;
-		$redirect = Reg::db_core()->query_line($query, $id, "seo_redirect");
-		
-		return $redirect;
+		return G::db_core()->query($query, $id)->row();
 	}
-	
+
 	/**
 	 * Выборка всех по источнику
 	 * 
 	 * @param string $from
 	 * @return array
 	 */
-	public static function select_list_by_from($from = "")
+	public static function get_by_from($from = "")
 	{
-		if(!empty($from))
+		/* Проверка */
+		$from = trim((string)$from);
+		if ($from !== "" and !Chf::url($from))
 		{
-			if(!Chf::url($from))
-			{throw new Exception_Admin("Источник задан неверно. " . Chf::error());}
+			throw new Exception("Источник указан неверно.");
 		}
+		$from = mb_strtolower($from);
 		
-		$query =
+		/* Выборка */
+		$query = 
 <<<SQL
 SELECT
 	"ID",
 	"From",
-	"To"
+	"To",
+	"Location"::int
 FROM 
 	"seo_redirect"
 WHERE 
@@ -161,33 +179,80 @@ WHERE
 ORDER BY
 	"From" ASC
 SQL;
-		$redirect = Reg::db_core()->query_assoc($query, "%".$from."%", "seo_redirect");
+		return G::db_core()->query($query, "%" . $from . "%")->assoc();
+	}
+	
+	/**
+	 * Все редиректы
+	 * 
+	 * @return array
+	 */
+	public static function get_all()
+	{
+		$redirect = G::cache_db_core()->get("seo_redirect_all");
+		if ($redirect === null)
+		{
+			$redirect = G::db_core()->seo_redirect_all()->assoc();
+			G::cache_db_core()->set("seo_redirect_all", $redirect, "seo_redirect");
+		}
 		
 		return $redirect;
 	}
-	
+
+	/**
+	 * Проверка полей
+	 * 
+	 * @param string $from
+	 * @param string $to
+	 * @param bool $location
+	 */
+	private static function _check(&$from, &$to, $location)
+	{
+		Err::check_field($from, "url", false, "From", "Источник");
+		$from = mb_strtolower($from);
+		if ($from === "/")
+		{
+			Err::add("Нельзя сделать переадресацию с главной страницы.", "From");
+		}
+		
+		Err::check_field($to, "url", false, "To", "Назначение");
+		$to = mb_strtolower($to);
+		
+		if ($from === $to)
+		{
+			Err::add("Назначение и Источник совпадают.", "To");
+		}
+		
+		Err::check_field($location, "bool", false, "Location", "Делать переход на другой урл");
+		
+		Err::exception();
+	}
+
 	/**
 	 * Уникальность
 	 * 
 	 * @param string $from
 	 * @param int $id
 	 */
-	private static function _unqiue($from, $id=null)
+	private static function _unqiue($from, $id = null)
 	{
 		$query = 
 <<<SQL
 SELECT 
-	COUNT(*) as count
+	true
 FROM 
 	"seo_redirect"
 WHERE 
-	"From" = $1
+	"From" = $1 AND
+	"ID" != $2
 SQL;
-		if(!is_null($id))
-		{$query .= " AND \"ID\" != '{$id}'";}
-		$count = Reg::db_core()->query_one($query, $from, "seo_redirect");
-		if($count > 0)
-		{Err::add("Источник «{$from}» уже существует.", "From");}
+		$rec = G::db_core()->query($query, [$from, (int)$id])->single();
+		if ($rec !== null)
+		{
+			Err::add("Источник «{$from}» уже существует.", "From");
+		}
+		
+		Err::exception();
 	}
 }
 ?>

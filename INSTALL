@@ -1,0 +1,31 @@
+- Копируем файлы
+# cd /home/example
+# git clone https://github.com/hharek/znarus .
+# rm .git dez
+# mkdir var
+
+- Устанавливаем базу данных
+# psql -U example example < sql/dump.sql
+
+- Правим конфигурационный файл
+# nano app/conf/conf.php
+
+- Устанавливаем основные пакеты JavaScript
+	- Переходим в «Конструктор» http://example.com/const/ 
+		- Наименование урла храниться в app/conf/options.php (const URL_CONSTR)
+		- Имя в const ROOT_NAME (app/conf/options.php) пароль в const ROOT_PASSWORD (app/conf/conf.php)
+	- Меню «Пакеты JavaScript» / «Установить»
+	- Устанавливаем (Файлы находятся в папке «packjs»)
+		- tinymce
+		- codemirror
+		- jquery_ui
+		- datepick
+		- datepicker
+
+- Создаём оператора
+	- Переходим в «Админку» http://example.com/admin/ 
+		- Наименование урла храниться в app/conf/options.php (const URL_CONSTR)
+		- Имя в const ROOT_NAME (app/conf/options.php) пароль в const ROOT_PASSWORD (app/conf/conf.php)
+	- «Пользователи» / «Управление» / «Добавить пользователя»
+
+- Пользуемся

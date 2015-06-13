@@ -1,0 +1,15 @@
+<body>
+	<p>Вам поступило задание с сайта «<?php echo DOMAIN; ?>».</p>
+	<p>Дата создания: <?php echo date("d.m.Y - H:i:s", strtotime($task['Date_Create'])); ?></p>
+	<p>Заказчик: <?php echo !empty($task['From_Name']) ? $task['From_Name'] : ROOT_NAME_FULL; ?></p>
+	<p>Наименование: <?php echo htmlspecialchars($task['Name']); ?></p>
+	<p>Описание: <?php echo htmlspecialchars($task['Content']); ?></p>
+	<?php if(!empty($task['Date_Require'])): ?>
+		<p>Выполнить до: <?php echo date("d.m.Y - H:i", strtotime($task['Date_Require']));?></p>
+	<?php endif; ?>
+	<p>
+		<a href="http://<?php echo DOMAIN; ?>/<?php echo URL_ADMIN; ?>/#zn_task/to_view?id=<?php echo $task['ID']; ?>">
+			Подробнее
+		</a>
+	</p>
+</body>

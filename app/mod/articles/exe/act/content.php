@@ -1,14 +1,16 @@
 <?php
-$articles = Articles::select_line_by_id(Reg::articles_id());
+/* Статья */
+$articles = Articles::get(G::articles_id());
 
-Reg::title($articles['Title']);
-Reg::meta_title($articles['Title']. ". Статьи");
-Reg::meta_description(ZN_Seo::meta_description_prepare($articles['Anons']));
-Reg::meta_keywords($articles['Tags']);
-
-Reg::path
+/* Мета */
+title($articles['Title']);
+meta_title($articles['Title']. ". Статьи");
+meta_description($articles['Anons']);
+tags($articles['Tags']);
+path
 ([
-	"Статьи [/статьи]",
+	"Полезные статьи [/статьи]",
 	"{$articles['Title']} [/статьи/{$articles['Url']}]"
 ]);
+last_modified($articles['Last_Modified']);
 ?>

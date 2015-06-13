@@ -6,10 +6,10 @@
  * @author		Sergeev Denis <hharek@yandex.ru>
  * @copyright	2011 Sergeev Denis
  * @license		https://github.com/hharek/zn_pgsql/wiki/MIT-License MIT License
- * @version		0.2.1
+ * @version		1.0
  * @link		https://github.com/hharek/zn_pgsql/
  */
-class ZN_Pgsql
+class _PgSQL
 {
 	/**
 	 * Дескриптор подключения
@@ -89,60 +89,25 @@ class ZN_Pgsql
 	private $_connection_allow = true;
 	
 	/**
-	 * Использовать кэширование
+	 * Объект ZN_PgSQL_Result
 	 * 
-	 * @var bool
+	 * @var object
 	 */
-	private $_cache = false;
-
+	private $_result;
+	
 	/**
-	 * Соль для кэша
+	 * Вести отчёт
+	 * 
+	 * @var bool 
+	 */
+	private $_log = false;
+	
+	/**
+	 * Файл отчёта
 	 * 
 	 * @var string
 	 */
-	private $_cache_salt;
-	
-	/**
-	 * Тип кэша (file|memcache)
-	 * 
-	 * @var string
-	 */
-	private $_cache_type;
-	
-	/**
-	 * Префикс для наименование кэша запросов
-	 * 
-	 * @var string
-	 */
-	private $_cache_prefix_query = "query_";
-	
-	/**
-	 * Префикс для наименование кэша таблиц
-	 * 
-	 * @var string
-	 */
-	private $_cache_prefix_table = "table_";
-	
-	/**
-	 * Префикс для наименования кэша содержащего все таблицы
-	 * 
-	 * @var string 
-	 */
-	private $_cache_prefix_table_all = "table_all_";
-	
-	/**
-	 * Папка с кэшом
-	 * 
-	 * @var string
-	 */
-	private $_cache_dir;
-	
-	/**
-	 * Объект memcache
-	 * 
-	 * @var Memcache
-	 */
-	private $_memcache_obj;
+	private $_log_file;
 
 	/**
 	 * Конструктор
@@ -155,42 +120,51 @@ class ZN_Pgsql
 	 * @param int $port
 	 * @param bool $persistent
 	 * @param string $ssl (disable|prefer|require)
-	 * @return bool
 	 */
-	public function __construct($host, $user, $pass, $db_name, $schema="public", $port=5432, $persistent=false, $ssl="disable")
+	public function __construct
+	(
+		$host, 
+		$user, 
+		$pass, 
+		$db_name, 
+		$schema = "public", 
+		$port = 5432, 
+		$persistent = false, 
+		$ssl = "disable"
+	)
 	{
 		/* Проверка */
 		if (empty($host))
 		{
-			throw new Exception("Хост не задан.", 11);
+			throw new Exception("Хост не задан.");
 		}
 
 		if (empty($user))
 		{
-			throw new Exception("Пользователь не задан.", 12);
+			throw new Exception("Пользователь не задан.");
 		}
 
 		if (empty($db_name))
 		{
-			throw new Exception("Наименование базы не задано.", 13);
+			throw new Exception("Наименование базы не задано.");
 		}
 
 		if (empty($schema))
 		{
-			throw new Exception("Схема задана неверно.", 14);
+			throw new Exception("Схема задана неверно.");
 		}
 
 		$port = (int) $port;
 		if ($port == 0)
 		{
-			throw new Exception("Порт задан неверно.", 15);
+			throw new Exception("Порт задан неверно.");
 		}
 
 		$persistent = (bool) $persistent;
 
-		if (!in_array($ssl, array('disable', 'prefer', 'require')))
+		if (!in_array($ssl, ["disable", "prefer", "require"]))
 		{
-			throw new Exception("Тип подключения по SSL задан неверно. Допустимые значения disable, prefer, require.", 16);
+			throw new Exception("Тип подключения по SSL задан неверно. Допустимые значения disable, prefer, require.");
 		}
 
 		/* Назначить */
@@ -208,26 +182,48 @@ class ZN_Pgsql
 		
 		/* При клонировании сохранять обозначение текущей схемы */
 		$this->_schema_current = &$this->_schema_current;
-		
-		return true;
 	}
 
 	/**
 	 * Деструктор
-	 * 
-	 * @return bool
 	 */
 	public function __destruct()
 	{
 		$this->close();
+	}
+	
+	/**
+	 * Исполнение функций
+	 * 
+	 * @param string $func
+	 * @param array $args
+	 * @return ZN_PgSQL_Result
+	 */
+	public function __call($func, $args)
+	{
+		/* Создать запрос для функции */
+		$args_number_str = "";
+		if (!empty($args))
+		{
+			$args_number_ar = array();
+			for($i = 1; $i <= count($args); $i++)
+			{
+				$args_number_ar[] = $i;
+			}
+			$args_number_str = "$". implode(", $", $args_number_ar);
+		}
+		
+		$query = 
+<<<SQL
+SELECT * FROM {$func}({$args_number_str});
+SQL;
 
-		return true;
+		/* Выполнить запрос */
+		return $this->query($query, $args);
 	}
 
 	/**
 	 * Соединение
-	 * 
-	 * @return bool
 	 */
 	public function connect()
 	{
@@ -247,17 +243,17 @@ class ZN_Pgsql
 			if (!$this->_db_conn)
 			{
 				$error = error_get_last();
-				throw new Exception("Не удалось установить соединение. " . $error['message'], 21);
+				throw new Exception("Не удалось установить соединение. " . $error['message']);
 			}
 		}
 		
 		if ($this->_schema != $this->_schema_current)
 		{
 			$query = "SET \"search_path\" TO '" . $this->escape($this->_schema) . "'";
-			$result = @pg_query($this->_db_conn, $query);
+			$result = pg_query($this->_db_conn, $query);
 			if ($result === false)
 			{
-				throw new Exception("Схема указана неверно. ".pg_last_error($this->_db_conn), 22);
+				throw new Exception("Схема указана неверно. ".pg_last_error($this->_db_conn));
 			}
 			pg_free_result($result);
 
@@ -265,53 +261,41 @@ class ZN_Pgsql
 		}
 		
 		$this->_connection_allow = true;
-
-		return true;
 	}
 
 	/**
 	 * Закрыть соединение
-	 * 
-	 * @return bool
 	 */
 	public function close()
 	{
 		if ($this->is_connect())
 		{
-			@pg_close($this->_db_conn);
+			pg_close($this->_db_conn);
 		}
 		
 		$this->_connection_allow = false;
-
-		return true;
 	}
 
 	/**
 	 * Пересоединение
-	 * 
-	 * @return bool
 	 */
 	public function reconnect()
 	{
-		if(!$this->_connection_allow)
+		if (!$this->_connection_allow)
 		{
-			throw new Exception("Невозможно открыть соединение.", 31);
+			throw new Exception("Невозможно открыть соединение.");
 		}
 		
 		$this->connect();
 
 		if (!pg_connection_reset($this->_db_conn))
 		{
-			throw new Exception("Пересоединение не удалось.", 32);
+			throw new Exception("Пересоединение не удалось.");
 		}
-
-		return true;
 	}
 
 	/**
 	 * Проверить соединение
-	 * 
-	 * @return bool
 	 */
 	public function is_connect()
 	{
@@ -334,495 +318,105 @@ class ZN_Pgsql
 	}
 
 	/**
-	 * Назначить схему
+	 * Показать текущую схему или назначить новую
 	 * 
-	 * @param string $schema 
-	 * @return bool
+	 * @param string $schema
+	 * @return string | null
 	 */
-	public function set_schema($schema)
+	public function schema($schema = null)
 	{
-		$schema = (string) $schema;
-		$schema = trim($schema);
-
-		if (empty($schema))
+		/* Показать схему */
+		if ($schema === null)
 		{
-			throw new Exception("Схема не задана.", 41);
+			return $this->_schema;
 		}
-		
-		$this->_schema = $schema;
-
-		return true;
-	}
-	
-	/**
-	 * Текущая схема
-	 * 
-	 * @return string
-	 */
-	public function get_schema()
-	{
-		return $this->_schema;
-	}
-
-	/**
-	 * Активация кэширования
-	 * 
-	 * @param string $type
-	 * @param string $salt
-	 * @param string|object $param
-	 * @return bool
-	 */
-	public function cache_enable($type="", $salt="", $param="")
-	{
-		/* Тип */
-		if(empty($type) and empty($this->_cache_type))
-		{
-			throw new Exception("Не указан тип кэширования", 51);
-		}
-		
-		if(!empty($type))
-		{
-			$this->_cache_type = $type;
-		}
-		
-		if(!in_array($this->_cache_type, array("file","memcache")))
-		{
-			throw new Exception("Тип кэша задан неверно. Можно использовать file или memcache.", 52);
-		}
-		
-		/* Соль для хэша файлов */
-		if(empty($salt))
-		{
-			if(empty($this->_cache_salt))
-			{
-				$this->_cache_salt = md5($_SERVER['SERVER_SOFTWARE'] . " " . php_uname());
-			}
-		}
+		/* Назначить схему */
 		else
 		{
-			$this->_cache_salt = $salt;
-		}
-		
-		$this->_cache_salt = mb_substr($this->_cache_salt, 0, 32);
-		
-		/* Папка для кэша */
-		if($this->_cache_type == "file")
-		{
-			$dir = $param;
-			
-			if(empty($dir) and empty($this->_cache_dir))
-			{
-				throw new Exception("Не указана папка для кэша.", 53);
-			}
-			
-			if(!empty($dir))
-			{
-				if(!is_string($dir))
-				{
-					throw new Exception("Папка указана неверно.", 54);
-				}
-			
-				$dir = trim($dir);
-				$dir = realpath($dir);
-				
-				if (!is_dir($dir))
-				{
-					throw new Exception("Папки \"" . func_get_arg(2) . "\" не существует.", 55);
-				}
-				
-				$check_file = md5(microtime());
-				if(@file_put_contents($dir . "/" . $check_file, "") === false)
-				{
-					throw new Exception("Папка \"" . func_get_arg(2) . "\" недоступна для записи.", 56);
-				}
-				unlink($dir . "/" . $check_file);
-				
-				$this->_cache_dir = $dir;
-			}
-		}
-		/* Объект memcache */
-		elseif($type == "memcache")
-		{
-			$memcache_obj = $param;
-			
-			if(empty($memcache_obj) and empty($this->_memcache_obj))
-			{
-				throw new Exception("Не указан объект Memcache.", 57);
-			}
-			
-			if(!empty($memcache_obj))
-			{
-				if(!is_object($memcache_obj) or get_class($memcache_obj) != "Memcache")
-				{
-					throw new Exception("Объект Memcache указан неверно.", 58);
-				}
-				
-				$this->_memcache_obj = $memcache_obj;
-			}
-		}
-		
-		/* Флаг кэша */
-		$this->_cache = true;
-		
-		return true;
-	}
+			$schema = (string) $schema;
+			$schema = trim($schema);
 
-	/**
-	 * Отключить кэширование
-	 * 
-	 * @return bool
-	 */
-	public function cache_disable()
-	{
-		$this->_cache = false;
+			if (empty($schema))
+			{
+				throw new Exception("Схема не задана.");
+			}
 
-		return true;
+			$this->_schema = $schema;
+		}
 	}
 	
 	/**
-	 * Удалить весь кэш
+	 * Один метод для всех методов query*
 	 * 
-	 * @return bool
+	 * @param string $query
+	 * @param string|array $params
+	 * @return ZN_PgSQL_Result
 	 */
-	public function cache_truncate()
+	public function query($query, $params = null)
 	{
-		/* Все таблицы */
-		$table_all = array();
-		if($this->_cache_type == "file")
-		{
-			if(is_file($this->_cache_dir . "/" . $this->_get_cache_name_table_all()))
-			{
-				$table_all = unserialize(file_get_contents($this->_cache_dir . "/" . $this->_get_cache_name_table_all()));
-			}
-		}
-		elseif($this->_cache_type == "memcache")
-		{
-			$memcache_result = $this->_memcache_obj->get($this->_get_cache_name_table_all());
-			if($memcache_result !== false)
-			{
-				$table_all = unserialize($memcache_result);
-			}
-		}
+		/* Проверка */
+		$this->_check_query($query);
 		
-		foreach ($table_all as $t_val)
+		if (!is_null($params))
 		{
-			/* Запросы по таблице */
-			$query = array();
-			if($this->_cache_type == "file")
+			if (!is_scalar($params) and !is_array($params))
 			{
-				if (is_file($this->_cache_dir . "/" . $this->_cache_prefix_table . $t_val))
-				{
-					$query = unserialize(file_get_contents($this->_cache_dir . "/" . $this->_cache_prefix_table . $t_val));
-				}
-			}
-			elseif($this->_cache_type == "memcache")
-			{
-				$memcache_result = $this->_memcache_obj->get($this->_cache_prefix_table . $t_val);
-				if($memcache_result !== false)
-				{
-					$query = unserialize($memcache_result);
-				}
+				throw new Exception("Параметры для запроса заданы неверно.");
 			}
 			
-			/* Удаление файлов запросов */
-			foreach ($query as $q_val)
+			if (is_scalar($params))
 			{
-				if($this->_cache_type == "file")
-				{
-					@unlink($this->_cache_dir . "/" . $this->_cache_prefix_query . $q_val);
-				}
-				else
-				{
-					$this->_memcache_obj->delete($this->_cache_prefix_query . $q_val);
-				}
+				$params = [$params];
 			}
-			
-			/* Удаление кэша таблиц */
-			if($this->_cache_type == "file")
-			{
-				unlink($this->_cache_dir . "/" . $this->_cache_prefix_table . $t_val);
-			}
-			elseif($this->_cache_type == "memcache")
-			{
-				$this->_memcache_obj->delete($this->_cache_prefix_table . $t_val);
-			}
-		}
-		
-		/* Удаление кэша всех таблиц */
-		if($this->_cache_type == "file")
-		{
-			unlink($this->_cache_dir . "/" . $this->_get_cache_name_table_all());
-		}
-		elseif($this->_cache_type == "memcache")
-		{
-			$this->_memcache_obj->delete($this->_get_cache_name_table_all());
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * Удалить кэш у таблицы
-	 *  
-	 * @return bool
-	 */
-	public function cache_delete()
-	{
-		if($this->_cache === false)
-		{return true;}
-		
-		$tables = func_get_args();
-		
-		if(empty($tables))
-		{
-			throw new Exception("Не указана таблица, у которой нужно удалить кэш.", 61);
-		}
-		
-		foreach ($tables as $t_val)
-		{
-			/* Проверка */
-			if(!is_string($t_val))
-			{
-				throw new Exception("Таблицы заданы неверно.", 62);
-			}
-			
-			/* Кэш таблицы */
-			$cache_name = $this->_get_cache_name_table($t_val);			
-			if($this->_cache_type == "file")
-			{
-				if(!is_file($this->_cache_dir . "/" . $this->_cache_prefix_table . $cache_name))
-				{
-					return true;
-				}
-				else
-				{
-					$mt_query_ar = unserialize(file_get_contents($this->_cache_dir . "/" . $this->_cache_prefix_table . $cache_name));
-				}
-			}
-			elseif($this->_cache_type == "memcache")
-			{
-				$memcache_result = $this->_memcache_obj->get($this->_cache_prefix_table . $cache_name);
-				if($memcache_result === false)
-				{
-					return true;
-				}
-				else
-				{
-					$mt_query_ar = unserialize($memcache_result);
-				}
-			}
-			
-			/* Мои запросы относящиеся к моей таблице */
-			foreach ($mt_query_ar as $mq_val)
-			{
-				/* Таблицы привязанные к моему запросу */
-				if($this->_cache_type == "file")
-				{
-					$d_table_ar = unserialize(file_get_contents($this->_cache_dir . "/" . $this->_cache_prefix_query . $mq_val));
-				}
-				elseif($this->_cache_type == "memcache")
-				{
-					$d_table_ar = unserialize($this->_memcache_obj->get($this->_cache_prefix_query . $mq_val));
-				}
-
-				/* Удалить пометку запроса в файле таблицы */
-				foreach ($d_table_ar['tables'] as $d_val)
-				{
-					$d_table_cache_name = $this->_get_cache_name_table($d_val);
-					
-					if($this->_cache_type == "file")
-					{
-						$d_table_query = unserialize(file_get_contents($this->_cache_dir . "/" . $this->_cache_prefix_table . $d_table_cache_name));
-					}
-					elseif($this->_cache_type == "memcache")
-					{
-						$d_table_query = unserialize($this->_memcache_obj->get($this->_cache_prefix_table . $d_table_cache_name));
-					}
-
-					foreach ($d_table_query as $dq_key => $dq_val)
-					{
-						if ($dq_val == $mq_val)
-						{
-							unset($d_table_query[$dq_key]);
-						}
-					}
-
-					/* Удалить файл таблицы если у него уже нет запросов */
-					if (empty($d_table_query))
-					{
-						$this->_cache_table_delete($d_table_cache_name);
-					}
-					/* Перезаписать файл таблицы */
-					else
-					{
-						if($this->_cache_type == "file")
-						{
-							file_put_contents($this->_cache_dir . "/" . $this->_cache_prefix_table . $d_table_cache_name, serialize($d_table_query));
-						}
-						elseif($this->_cache_type == "memcache")
-						{
-							$this->_memcache_obj->set($this->_cache_prefix_table . $d_table_cache_name, serialize($d_table_query));
-						}
-					}
-				}
-
-				/* Удалить файл запроса */
-				if($this->_cache_type == "file")
-				{
-					unlink($this->_cache_dir . "/" . $this->_cache_prefix_query . $mq_val);
-				}
-				elseif($this->_cache_type == "memcache")
-				{
-					$this->_memcache_obj->delete($this->_cache_prefix_query . $mq_val);
-				}
-			}
-		}
-		
-		return true;
-	}
-
-	/**
-	 * Используется ли кэширование
-	 * 
-	 * @return bool
-	 */
-	public function is_cache()
-	{
-		return $this->_cache;
-	}
-	
-	/**
-	 * Показать тип кэширования
-	 * 
-	 * @return string|bool
-	 */
-	public function get_cache_type()
-	{
-		if($this->_cache)
-		{
-			return $this->_cache_type;
 		}
 		else 
 		{
-			return false;
+			$params = [];
 		}
-	}
-	
-	/**
-	 * Выполнить запрос
-	 * 
-	 * @param string $query
-	 * @param string|array $params
-	 * @param string|array $tables
-	 * @return bool
-	 */
-	public function query($query, $params=null, $tables=null)
-	{
-		return $this->_query("simple", $query, $params, $tables);
-	}
+		
+		/* Запрос */
+		if(!$this->_connection_allow)
+		{
+			throw new Exception("Невозможно открыть соединение.");
+		}
+		
+		$this->connect();
 
-	/**
-	 * Выполнить запрос и вернуть ассоциативный массив
-	 * 
-	 * @param string $query
-	 * @param string|array $params
-	 * @param string|array $tables
-	 * @param string $cache_time
-	 * @return array
-	 */
-	public function query_assoc($query, $params=null, $tables=null, $cache_time="+1 month")
-	{
-		return $this->_query("assoc", $query, $params, $tables, $cache_time);
-	}
+		if(!empty($params))
+		{
+			$result = pg_query_params($this->_db_conn, $query, $params);
+		}
+		else
+		{
+			$result = pg_query_params($this->_db_conn, $query, []);
+		}
+		
+		/* Отчёт */
+		$this->_log($query, $params);
+		
+		/* Ошибка */
+		if ($result === false)
+		{
+			throw new Exception("Ошибка в запросе. ".pg_last_error($this->_db_conn));
+		}
 
-	/**
-	 * Выполнить запрос и вернуть первый столбец в обычный массив
-	 * 
-	 * @param string $query
-	 * @param string|array $params
-	 * @param string|array $tables
-	 * @param string $cache_time
-	 * @return array 
-	 */
-	public function query_column($query, $params=null, $tables=null, $cache_time="+1 month")
-	{
-		return $this->_query("column", $query, $params, $tables, $cache_time);
-	}
-
-	/**
-	 * Выполнить запрос и вернуть первую строку в ассоциативном массиве
-	 * где индекс наименование столбца
-	 * 
-	 * @param string $query
-	 * @param string|array $params
-	 * @param string|array $tables
-	 * @param string $cache_time
-	 * @return array
-	 */
-	public function query_line($query, $params=null, $tables=null, $cache_time="+1 month")
-	{
-		return $this->_query("line", $query, $params, $tables, $cache_time);
-	}
-
-	/**
-	 * Выполнить запрос и вернуть первый столбец в первой строке
-	 * 
-	 * @param string $query
-	 * @param string|array $params
-	 * @param string|array $tables
-	 * @param string $cache_time
-	 * @return string
-	 */
-	public function query_one($query, $params=null, $tables=null, $cache_time="+1 month")
-	{
-		return $this->_query("one", $query, $params, $tables, $cache_time);
-	}
-	
-	/**
-	 * Выполнить запрос и вернуть объект
-	 * 
-	 * @param string $query
-	 * @param string|array $params
-	 * @param string|array $tables
-	 * @param string $cache_time
-	 * @return object
-	 */
-	public function query_object($query, $params=null, $tables=null, $cache_time="+1 month")
-	{
-		return $this->_query("object", $query, $params, $tables, $cache_time);
-	}
-	
-	/**
-	 * Выполнить запрос и вернуть массив объектов
-	 * 
-	 * @param string $query
-	 * @param string|array $params
-	 * @param string|array $tables
-	 * @param string $cache_time
-	 * @return array
-	 */
-	public function query_object_ar($query, $params=null, $tables=null, $cache_time="+1 month")
-	{
-		return $this->_query("object_ar", $query, $params, $tables, $cache_time);
-	}
-
-	/**
-	 * Выполнить запрос и вернуть ресурс результата запроса
-	 * 
-	 * @param string $query
-	 * @param string|array $params
-	 * @return resource
-	 */
-	public function query_result($query, $params=null)
-	{
-		return $this->_query("result", $query, $params);
+		/* Создаём объект для результатов */
+		if(empty($this->_result))
+		{
+			$this->_result = new ZN_PgSQL_Result();
+		}
+		
+		/* Помещаем результат запроса в переменную */
+		$this->_result->_pgsql_result = $result;
+		
+		/* Возвращаем значение */
+		return $this->_result;
 	}
 	
 	/**
 	 * Множественный запрос
 	 * 
 	 * @param string $query
-	 * @return bool
 	 */
 	public function multi_query($query)
 	{
@@ -830,23 +424,21 @@ class ZN_Pgsql
 		$this->_check_query($query, 33554432);
 		
 		/* Запрос */
-		if(!$this->_connection_allow)
+		if (!$this->_connection_allow)
 		{
-			throw new Exception("Невозможно открыть соединение.", 71);
+			throw new Exception("Невозможно открыть соединение.");
 		}
 		
 		$this->connect();
 
-		$result = @pg_query($this->_db_conn, $query);
+		$result = pg_query($this->_db_conn, $query);
 		if ($result === false)
 		{
-			throw new Exception("Ошибка в запросе. ".pg_last_error($this->_db_conn), 72);
+			throw new Exception("Ошибка в запросе. ".pg_last_error($this->_db_conn));
 		}
 		pg_free_result($result);
-		
-		return true;
 	}
-
+	
 	/**
 	 * Экранировать строку
 	 * 
@@ -866,110 +458,34 @@ class ZN_Pgsql
 	}
 
 	/**
-	 * Проверка таблицы на существование
-	 * 
-	 * @param string $table
-	 * @return bool
-	 */
-	public function is_table($table)
-	{
-		$table = trim($table);
-		if (empty($table))
-		{
-			throw new Exception("Не задано имя таблицы.", 81);
-		}
-
-		$query =
-<<<SQL
-SELECT COUNT(*) as count
-FROM "information_schema"."tables"
-WHERE "table_schema" = $1
-AND "table_name" = $2
-SQL;
-		$count = $this->query_one($query, array($this->_schema, $table));
-		if ($count > 0)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	/**
-	 * Проверка на существование столбца
-	 * 
-	 * @param string $table
-	 * @param string $column
-	 * @return bool
-	 */
-	public function is_column($table, $column)
-	{
-		$table = trim($table);
-		if (empty($table))
-		{
-			throw new Exception("Не задано имя таблицы.", 91);
-		}
-
-		$column = trim($column);
-		if (empty($column))
-		{
-			throw new Exception("Не задано имя столбца.", 92);
-		}
-
-		$query =
-<<<SQL
-SELECT COUNT(*) as count
-FROM "information_schema"."columns"
-WHERE "table_schema" = $1
-AND "table_name" = $2
-AND "column_name" = $3
-SQL;
-
-		$count = $this->query_one($query, array($this->_schema, $table, $column));
-		if ($count > 0)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
-	/**
 	 * Запрос INSERT
 	 * 
 	 * @param string $table
 	 * @param array $data
 	 * @param string $return
-	 * @return bool|string
+	 * @return null|string
 	 */
-	public function insert($table, $data, $return="")
+	public function insert($table, $data, $return = null)
 	{
 		/* Проверка */
-		if(!is_string($table))
+		if (!is_string($table))
 		{
-			throw new Exception("Таблица для INSERT задана неверно.", 101);
+			throw new Exception("Таблица для INSERT задана неверно.");
 		}
 		
-		if(!is_array($data))
+		if (!is_array($data))
 		{
-			throw new Exception("Данные для INSERT заданы неверно.", 102);
+			throw new Exception("Данные для INSERT заданы неверно.");
 		}
 		
-		if(!is_string($return))
+		if ($return !== null and !is_string($return))
 		{
-			throw new Exception("Возвращаемые поле задано неверно.", 103);
+			throw new Exception("Возвращаемые поле задано неверно.");
 		}
 		
 		/* Формирование запроса */
-		$stolb = array(); 
-		$param = array(); 
-		$param_int = array();
+		$stolb = []; $param = []; $param_int = [];
 		$i = 1;
-		
 		foreach ($data as $key => $val)
 		{
 			$stolb[] = $key;
@@ -989,17 +505,16 @@ VALUES ({$sql_values})
 SQL;
 		
 		/* Возвращаемые значения */
-		if(!empty($return))
+		if ($return !== null)
 		{
 			$query .= "\nRETURNING \"{$return}\"";
-			$result = $this->query_one($query, $param);
-			$this->cache_delete($table);
+			$result = $this->query($query, $param)->single();
+			
 			return $result;
 		}
 		else
 		{
-			$this->query($query, $param, $table);
-			return true;
+			$this->query($query, $param);
 		}
 	}
 	
@@ -1009,29 +524,28 @@ SQL;
 	 * @param string $table
 	 * @param array $data
 	 * @param array $where
-	 * @return bool
 	 */
 	public function update($table, $data, $where)
 	{
 		/* Проверка */
-		if(!is_string($table))
+		if (!is_string($table))
 		{
-			throw new Exception("Таблица для UPDATE задана неверно.", 111);
+			throw new Exception("Таблица для UPDATE задана неверно.");
 		}
 		
-		if(!is_array($data))
+		if (!is_array($data))
 		{
-			throw new Exception("Данные для UPDATE заданы неверно.", 112);
+			throw new Exception("Данные для UPDATE заданы неверно.");
 		}
 		
-		if(!is_array($where))
+		if (!is_array($where))
 		{
-			throw new Exception("Условия для UPDATE заданы неверно.", 113);
+			throw new Exception("Условия для UPDATE заданы неверно.");
 		}
 		
 		/* Формирование запроса */
 		$sql_values = "";
-		$param = array();
+		$param = [];
 		$i = 1;
 		
 		foreach ($data as $key => $val)
@@ -1070,9 +584,7 @@ SET
 {$sql_values}
 WHERE {$sql_where}
 SQL;
-		$this->query($query, $param, $table);
-		
-		return true;
+		$this->query($query, $param);
 	}
 	
 	/**
@@ -1080,23 +592,22 @@ SQL;
 	 * 
 	 * @param string $table
 	 * @param array $where
-	 * @return bool
 	 */
 	public function delete($table, $where)
 	{
 		/* Проверка */
-		if(!is_string($table))
+		if (!is_string($table))
 		{
-			throw new Exception("Таблица для DELETE задана неверно.", 121);
+			throw new Exception("Таблица для DELETE задана неверно.");
 		}
 		
-		if(!is_array($where))
+		if (!is_array($where))
 		{
-			throw new Exception("Условия для DELETE заданы неверно.", 122);
+			throw new Exception("Условия для DELETE заданы неверно.");
 		}
 		
 		/* Формирование запроса */
-		$param = array();
+		$param = [];
 		$i = 1;
 		$where_first = true;
 		$sql_where = "";
@@ -1122,228 +633,58 @@ DELETE
 FROM "{$table}"
 WHERE {$sql_where}
 SQL;
-		$this->query($query, $param, $table);
-		
-		return true;
+		$this->query($query, $param);
 	}
 
 	/**
-	 * Один метод для всех методов query*
-	 * 
-	 * @param string $type
-	 * @param string $query
-	 * @param string|array $params
-	 * @param string|array $tables
-	 * @param string $cache_time 
-	 * @return mixed
+	 * Включить отчёт
 	 */
-	private function _query($type, $query, $params=null, $tables=null, $cache_time="+1 month")
+	public function log_enable($file = null)
 	{
-		/* Проверка */
-		if(!in_array($type, array("assoc","column","line","one","object","object_ar","simple","result")))
+		if ($file === null and $this->_log_file === null)
 		{
-			throw new Exception("Тип запроса " . func_get_arg(0) . " задан неверно.", 131);
+			throw new Exception("Укажите файл для отчёта.");
 		}
 		
-		$this->_check_query($query);
-		
-		if (!is_null($params))
+		if ($file !== null)
 		{
-			if(!is_scalar($params) and !is_array($params))
+			/* Создать файл отчёта */
+			if (!is_file($file))
 			{
-				throw new Exception("Параметры для запроса заданы неверно.", 132);
+				if (touch($file) === false)
+				{
+					throw new Exception("Невозможно создать файл отчёта.");
+				}
 			}
 			
-			if(is_scalar($params))
+			$file = realpath($file);
+			
+			/* Назначить дату начала отчёта */
+			if (filesize($file) !== 0)
 			{
-				$params = array($params);
+				file_put_contents($file, "\n\n", FILE_APPEND);
 			}
-		}
-		else 
-		{
-			$params = array();
-		}
-		
-		if (!is_null($tables))
-		{
-			if (!is_array($tables) and !is_string($tables))
-			{
-				throw new Exception("Таблицы заданы неверно.", 133);
-			}
-
-			if (is_string($tables))
-			{
-				$tables = array($tables);
-			}
-		}
-		else 
-		{
-			$tables = array();
+			file_put_contents($file, "------------------- " . date("d.m.Y - H:i:s") . " --------------------\n", FILE_APPEND);
+			
+			$this->_log_file = $file;
 		}
 		
-		$cache_time = trim($cache_time);
-		$cache_time = strtotime($cache_time);
-		if($cache_time === false)
-		{
-			throw new Exception("Время хранения кэша \"" . func_get_arg(4) . "\" задано неверно.", 134);
-		}
-		
-		/* Берём данные из кэша */
-		if 
-		(
-			$this->_cache == true and
-			!empty($tables) and 
-			!in_array($type, array("simple","result"))
-		)
-		{
-			/* Кэш из файла */
-			if($this->_cache_type == "file")
-			{
-				$cache_file = $this->_cache_dir . "/" . $this->_cache_prefix_query . $this->_get_cache_name_query($query, $type, $params);
-				if(is_file($cache_file))
-				{
-					$cache_result = unserialize(file_get_contents($cache_file));
-					if(time() <= $cache_result['time'])
-					{
-						return $cache_result['result'];
-					}
-					else
-					{
-						unlink($cache_file);
-					}
-				}
-			}
-			/* Кэш из памяти */
-			elseif($this->_cache_type == "memcache")
-			{
-				$memcache_result_str = $this->_memcache_obj->get($this->_cache_prefix_query . $this->_get_cache_name_query($query, $type, $params));
-				if($memcache_result_str !== false)
-				{
-					$memcache_result = unserialize($memcache_result_str);
-					return $memcache_result['result'];
-				}
-			}
-		}
-
-		/* Запрос */
-		if(!$this->_connection_allow)
-		{
-			throw new Exception("Невозможно открыть соединение.", 135);
-		}
-		
-		$this->connect();
-
-		if(!empty($params))
-		{
-			$result = @pg_query_params($this->_db_conn, $query, $params);
-		}
-		else
-		{
-			$result = @pg_query_params($this->_db_conn, $query, array());
-		}
-		
-		if ($result === false)
-		{
-			throw new Exception("Ошибка в запросе. ".pg_last_error($this->_db_conn), 136);
-		}
-
-		/* Результат запроса */
-		switch ($type)
-		{
-			case "assoc":
-			{
-				$data = array();
-				while ($row = pg_fetch_assoc($result))
-				{
-					$data[] = $row;
-				}
-			}
-			break;
-		
-			case "column":
-			{
-				$data = array();
-				while ($row = pg_fetch_row($result))
-				{
-					$data[] = $row[0];
-				}
-			}
-			break;
-		
-			case "line":
-			{
-				$data = pg_fetch_assoc($result);
-			}
-			break;
-		
-			case "one":
-			{
-				$row = pg_fetch_row($result);
-				if (!isset($row[0]))
-				{
-					$row[0] = null;
-				}
-				$data = $row[0];
-			}
-			break;
-		
-			case "object":
-			{
-				$data = pg_fetch_object($result);
-			}
-			break;
-		
-			case "object_ar":
-			{
-				$data = array();
-				while ($obj = pg_fetch_object($result))
-				{
-					$data[] = $obj;
-				}
-			}
-			break;
-		
-			case "result":
-			{
-				return $result;
-			}
-			break;
-		}
-		
-		/* Освобождаем память занятую ресурсом */
-		pg_free_result($result);
-		
-		/* Кэш */
-		if($this->_cache == true and !empty($tables))
-		{
-			/* Создаём кэш */
-			if(in_array($type, array("assoc","column","line","one","object","object_ar")))
-			{
-				$this->_cache_create($query, $params, $tables, $data, $type, $cache_time);
-			}
-			/* Удаляем кэш */
-			elseif($type == "simple")
-			{
-				foreach ($tables as $val)
-				{
-					$this->cache_delete($val);
-				}
-			}
-		}
-		
-		/* Возвращаем значение */
-		if($type != "simple")
-		{return $data;}
-		else
-		{return true;}
+		$this->_log = true;
 	}
 	
+	/**
+	 * Отключить отчёт
+	 */
+	public function log_disable()
+	{
+		$this->_log = false;
+	}
+
 	/**
 	 * Проверка запроса
 	 * 
 	 * @param string $query
 	 * @param int $max_length
-	 * @return bool
 	 */
 	private function _check_query($query, $max_length = 1048576)
 	{
@@ -1353,7 +694,7 @@ SQL;
 		$query = trim($query);
 		if (empty($query))
 		{
-			throw new Exception("Запрос задан неверно. Пустая строка.", 141);
+			throw new Exception("Запрос задан неверно. Пустая строка.");
 		}
 
 		/* Строка с нулевым символом */
@@ -1362,275 +703,172 @@ SQL;
 		$strlen_after = mb_strlen($query);
 		if ($strlen_before != $strlen_after)
 		{
-			throw new Exception("Запрос задан неверно. Нулевой символ.", 142);
+			throw new Exception("Запрос задан неверно. Нулевой символ.");
 		}
 
 		/* Бинарная строка, либо символы не в UTF-8 */
 		$result = mb_detect_encoding($query, "UTF-8");
 		if ($result === false)
 		{
-			throw new Exception("Запрос задан неверно. Бинарная строка, либо символы не в UTF-8.", 143);
+			throw new Exception("Запрос задан неверно. Бинарная строка, либо символы не в UTF-8.");
 		}
 
 		/* Очень большая строка */
 		if (mb_strlen($query) > $max_length)
 		{
-			throw new Exception("Запрос задан неверно. Очень большая строка.", 144);
+			throw new Exception("Запрос задан неверно. Очень большая строка.");
 		}
-
-		return true;
 	}
+	
 	/**
-	 * Создать кэш запроса
+	 * Записать запрос в отчёт
 	 * 
 	 * @param string $query
-	 * @param array $tables
 	 * @param array $params
-	 * @param mixed $result
-	 * @param string $result_type
-	 * @param int $time
-	 * @return bool
 	 */
-	private function _cache_create($query, $params, $tables, &$result, $result_type, $time)
+	private function _log($query, $params)
 	{
-		/* Проверка */
-		if(!in_array($result_type, array("assoc","column","line","one","object","object_ar")))
+		/* Отчёт отключён */
+		if ($this->_log !== true)
 		{
-			throw new Exception("Тип результата задан неверно.", 151);
+			return;
 		}
 		
-		/* Кэш запроса */
-		$query_data = array();
-		$query_data['tables'] = $tables;
-		$query_data['result'] = $result;
-		$query_data['time'] = $time;
+		/* Подготовить запрос */
+		$search = []; $replace = [];
+		foreach ($params as $key => $val)
+		{
+			$key = $key + 1;
+			$search[] = "$" . $key;
+			$replace[] = "'" . $this->escape($val). "'";
+		}
+		$query = str_replace($search, $replace, $query);
+		$query = $query . "\n--------------------------------------------------------------\n" ;
 		
-		$cache_name_query = $this->_get_cache_name_query($query, $result_type, $params);
-
-		if($this->_cache_type == "file")
-		{
-			file_put_contents($this->_cache_dir . "/" . $this->_cache_prefix_query . $cache_name_query, serialize($query_data));
-		}
-		elseif($this->_cache_type == "memcache")
-		{
-			if($time - time() >= 2592000 or $time - time() <= 0)
-			{
-				$memcache_time = 2592000;
-			}
-			else
-			{
-				$memcache_time = $time - time();
-			}
-			
-			$this->_memcache_obj->set($this->_cache_prefix_query . $cache_name_query, serialize($query_data), false, $memcache_time);
-		}
-
-		/* Кэш для таблиц */
-		foreach ($tables as $val)
-		{
-			$cache_name_table = $this->_get_cache_name_table($val);
-			$this->_cache_table_add($cache_name_table, $cache_name_query);
-		}
-
-		return true;
+		/* Записать запрос */
+		file_put_contents($this->_log_file, $query, FILE_APPEND);
 	}
+}
 
+/**
+ * Класс для работы с результатами запроса
+ */
+class ZN_PgSQL_Result
+{
 	/**
-	 * Получить имя кэша таблицы
+	 * Результат запроса
 	 * 
-	 * @param string $table
-	 * @return string
+	 * @var resource 
 	 */
-	private function _get_cache_name_table($table)
-	{
-		if (empty($table))
-		{
-			throw new Exception("Имя таблиц не задано.", 161);
-		}
-
-		$name = md5($this->_cache_salt . $this->_host . $this->_db_name . $this->_schema . $table);
-		
-		return $name;
-	}
-
-	/**
-	 * Получить имя кэша запроса
-	 * 
-	 * @param string $query
-	 * @param string $result_type
-	 * @param array $params
-	 * @return string
-	 */
-	private function _get_cache_name_query($query, $result_type, $params)
-	{
-		if (empty($query))
-		{
-			throw new Exception("Запрос не задан.", 171);
-		}
-
-		$name = md5($this->_cache_salt . $this->_host . $this->_db_name . $this->_schema . $query . $result_type . serialize($params));
-
-		return $name;
-	}
+	public $_pgsql_result;
 	
 	/**
-	 * Получить имя кэша со всеми таблицами
-	 * 
-	 * @return string 
+	 * Деструктор
 	 */
-	private function _get_cache_name_table_all()
+	public function __destruct()
 	{
-		return $this->_cache_prefix_table_all . md5($this->_cache_salt . $this->_host . $this->_db_name . $this->_schema);
+		if ($this->_pgsql_result !== null)
+		{
+			$this->_free_result();
+		}
 	}
-	
+
 	/**
-	 * Добавить запрос в кэш таблицы
+	 * Вернуть все данные в виде ассоциативный массив
 	 * 
-	 * @param string $cache_name_table
-	 * @param array $cache_name_query
-	 * @return boolean 
+	 * @return array
 	 */
-	private function _cache_table_add($cache_name_table, $cache_name_query)
+	public function assoc()
 	{
-		/* Запросы по таблице */
-		$table_query = array();
-		if($this->_cache_type == "file")
-		{
-			if (is_file($this->_cache_dir . "/" . $this->_cache_prefix_table . $cache_name_table))
-			{
-				$table_query = unserialize(file_get_contents($this->_cache_dir . "/" . $this->_cache_prefix_table . $cache_name_table));
-			}
-		}
-		elseif($this->_cache_type == "memcache")
-		{
-			$memcache_result = $this->_memcache_obj->get($this->_cache_prefix_table . $cache_name_table);
-			if($memcache_result !== false)
-			{
-				$table_query = unserialize($memcache_result);
-			}
-		}
-
-		/* Добавить запрос */
-		if (!in_array($cache_name_query, $table_query))
-		{
-			$table_query[] = $cache_name_query;
-		}
-
-		/* Перезаписать кэш таблицы */
-		if($this->_cache_type == "file")
-		{
-			file_put_contents($this->_cache_dir . "/" . $this->_cache_prefix_table . $cache_name_table, serialize($table_query));
-		}
-		elseif($this->_cache_type == "memcache")
-		{
-			$this->_memcache_obj->set($this->_cache_prefix_table . $cache_name_table, serialize($table_query));
-		}
+		$data = pg_fetch_all($this->_pgsql_result);
+		$this->_free_result();
 		
-		/* Добавить в список всех таблиц */
-		$table_all = array();
-		if($this->_cache_type == "file")
+		if ($data !== false)
 		{
-			if(is_file($this->_cache_dir . "/" . $this->_get_cache_name_table_all()))
-			{
-				$table_all = unserialize(file_get_contents($this->_cache_dir . "/" . $this->_get_cache_name_table_all()));
-			}
+			return $data;
 		}
-		elseif($this->_cache_type == "memcache")
-		{
-			$memcache_result = $this->_memcache_obj->get($this->_get_cache_name_table_all());
-			if($memcache_result !== false)
-			{
-				$table_all = unserialize($memcache_result);
-			}
-		}
-		
-		if(!in_array($cache_name_table, $table_all))
-		{
-			$table_all[] = $cache_name_table;
-		}
-		
-		if($this->_cache_type == "file")
-		{
-			file_put_contents($this->_cache_dir . "/" . $this->_get_cache_name_table_all(), serialize($table_all));
-		}
-		elseif($this->_cache_type == "memcache")
-		{
-			$this->_memcache_obj->set($this->_get_cache_name_table_all(), serialize($table_all));
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * Удалить кэш таблицы
-	 * 
-	 * @param string $cache_name_table
-	 * @return boolean 
-	 */
-	private function _cache_table_delete($cache_name_table)
-	{
-		/* Удалить кэш таблицы */
-		if($this->_cache_type == "file")
-		{
-			unlink($this->_cache_dir . "/" . $this->_cache_prefix_table . $cache_name_table);
-		}
-		elseif($this->_cache_type == "memcache")
-		{
-			$this->_memcache_obj->delete($this->_cache_prefix_table . $cache_name_table);
-		}
-		
-		/* Удалить таблицу из списка всех таблиц memcache */
-		$table_all = array();
-		if($this->_cache_type == "file")
-		{
-			if(is_file($this->_cache_dir . "/" . $this->_get_cache_name_table_all()))
-			{
-				$table_all = unserialize(file_get_contents($this->_cache_dir . "/" . $this->_get_cache_name_table_all()));
-			}
-		}
-		elseif($this->_cache_type == "memcache")
-		{
-			$memcache_result = $this->_memcache_obj->get($this->_get_cache_name_table_all());
-			if($memcache_result !== false)
-			{
-				$table_all = unserialize($memcache_result);
-			}
-		}
-		
-		foreach ($table_all as $key=>$val)
-		{
-			if($val == $cache_name_table)
-			{
-				unset($table_all[$key]);
-			}
-		}
-
-		/* Перезаписать кэш со всеми таблицами */
-		if(!empty($table_all))
-		{
-			if($this->_cache_type == "file")
-			{
-				file_put_contents($this->_cache_dir . "/" . $this->_get_cache_name_table_all(), serialize($table_all));
-			}
-			elseif($this->_cache_type == "memcache")
-			{
-				$this->_memcache_obj->set($this->_get_cache_name_table_all(), serialize($table_all));
-			}
-		}
-		/* Удалить кэш со всеми таблицами, т.к. пустой */
 		else
 		{
-			if($this->_cache_type == "file")
-			{
-				unlink($this->_cache_dir . "/" . $this->_get_cache_name_table_all());
-			}
-			elseif($this->_cache_type == "memcache")
-			{
-				$this->_memcache_obj->delete($this->_get_cache_name_table_all());
-			}
+			return [];
+		}
+	}
+	
+	/**
+	 * Вернуть первый столбец в виде массива
+	 * 
+	 * @return array
+	 */
+	public function column()
+	{
+		$data = pg_fetch_all_columns($this->_pgsql_result);
+		$this->_free_result();
+		
+		if ($data !== false)
+		{
+			return $data;
+		}
+		else
+		{
+			return [];
+		}
+	}
+	
+	/**
+	 * Вернуть первую строку в виде ассоциативного массива
+	 * 
+	 * @return array
+	 */
+	public function row()
+	{
+		$data = pg_fetch_assoc($this->_pgsql_result);
+		$this->_free_result();
+		
+		if($data !== false)
+		{
+			return $data;
+		}
+		else
+		{
+			return [];
+		}
+	}
+	
+	/**
+	 * Вернуть первый столбец в первой строке
+	 * 
+	 * @return string
+	 */
+	public function single()
+	{
+		$row = pg_fetch_row($this->_pgsql_result);
+		if (isset($row[0]))
+		{
+			return $row[0];
+		}
+		else
+		{
+			return null;
 		}
 		
-		return true;
+	}
+	
+	/**
+	 * Вернуть результат запроса
+	 * 
+	 * @return resource
+	 */
+	public function result()
+	{
+		return $this->_pgsql_result;
+	}
+	
+	/**
+	 * Очистить результат запроса
+	 */
+	private function _free_result()
+	{
+		pg_free_result($this->_pgsql_result);
+		$this->_pgsql_result = null;
 	}
 }
 ?>

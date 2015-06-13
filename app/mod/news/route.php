@@ -1,37 +1,29 @@
 <?php
-
-/* Список */
-if(Reg::url_path() === "/новости")
+if(G::url_path_ar()[0] === "новости")
 {
-	return "list";
+	/* Все новости */
+	if (count(G::url_path_ar()) === 1)
+	{
+		return "list";
+	}
+	/* Новость */
+	elseif (count(G::url_path_ar()) === 2)
+	{
+		$url_all = News::get_url_all();
+		foreach ($url_all as $url)
+		{
+			if ($url['Url'] === G::url_path_ar()[1])
+			{
+				G::news_id($url['ID']);
+				
+				return "content";
+			}
+		}
+	}
+	/* 404 */
+	else
+	{
+		return false;
+	}
 }
-
-/* Содержание */
-if(Reg::url_path_ar()[0] !== "новости")
-{
-	return false;
-}
-
-if(!isset(Reg::url_path_ar()[1]) or isset(Reg::url_path_ar()[2]))
-{
-	return false;
-}
-
-$query = 
-<<<SQL
-SELECT
-	"ID"
-FROM 
-	"news"
-WHERE 
-	"Url" = $1
-SQL;
-$news_id = Reg::db()->query_one($query, Reg::url_path_ar()[1], "news");
-if(empty($news_id))
-{return false;}
-
-Reg::news_id($news_id);
-
-return "content";
-
 ?>

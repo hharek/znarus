@@ -1,9 +1,5 @@
-<?php packjs_tinymce4("Content"); ?>
-
-<?php packjs_datepick("Date"); ?>
-
-<form action="#articles/edit_post?id=<?php echo $articles['ID']; ?>">
-	<table class="std_form" align="center">
+<form>
+	<table class="std_form">
 		<tr>
 			<td>Заголовок</td>
 			<td>
@@ -13,7 +9,7 @@
 		<tr>
 			<td>Адрес</td>
 			<td>
-				/статьи/<input type="text" name="Url" value="<?php echo htmlspecialchars($articles['Url']) ?>" style="min-width: 276px;"/>
+				/статьи/<input type="text" name="Url" value="<?php echo htmlspecialchars($articles['Url']) ?>" style="min-width: 287px;"/>
 			</td>
 		</tr>
 		<tr>
@@ -44,23 +40,21 @@
 				<textarea name="Tags"><?php echo htmlspecialchars($articles['Tags']); ?></textarea>
 			</td>
 		</tr>
-		<tr>
-			<td>
-				<div class="std_button submit">
-					<div class="icon_edit"></div>
-					Сохранить
-				</div>
-			</td>
-			<td>
-				<a class="std_button" href="#articles/list?year=<?php echo date("Y", strtotime($articles['Date'])); ?>">
-					<div class="icon_back"></div>
-					Назад
-				</a>
-				<div class="icon_delete delete" url="#articles/delete_post?id=<?php echo $articles['ID']; ?>">
-					Вы действительно хотите удалить статью «<?php echo $articles['Title']; ?>» от «<?php echo date("d.m.Y", strtotime($articles['Date'])); ?>»?
-				</div>
-			</td>
-		</tr>
 	</table>
+	<div class="center">
+		<div class="std_button submit">
+			<div class="icon_edit"></div>
+			Сохранить
+		</div>
+		<a class="std_button" href="#articles/list?year=<?php echo date("Y", strtotime($articles['Date'])); ?>">
+			<div class="icon_back"></div>
+			Назад
+		</a>
+		<div 
+			class="icon_basket delete" 
+			url="#articles/delete?id=<?php echo $articles['ID']; ?>"
+			mess="Вы действительно хотите удалить статью «<?php echo $articles['Title']; ?>» от «<?php echo date("d.m.Y", strtotime($articles['Date'])); ?>»?"
+		></div>
+	</div>
 </form>
 

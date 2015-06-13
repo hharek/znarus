@@ -2,8 +2,36 @@
 /**
  * Группы пользователей
  */
-class ZN_User
+class _User
 {
+	/**
+	 * Проверка по ID
+	 * 
+	 * @param int $id
+	 */
+	public static function is($id)
+	{
+		if (!Chf::uint($id))
+		{
+			throw new Exception("Номер у пользователя задан неверно. " . Chf::error());
+		}
+
+		$query = 
+<<<SQL
+SELECT 
+	true
+FROM 
+	"user"
+WHERE 
+	"ID" = $1
+SQL;
+		$rec = G::db_core()->query($query, $id)->single();
+		if ($rec === null)
+		{
+			throw new Exception("Пользователь с номером «{$id}» не существует.");
+		}
+	}
+	
 	/**
 	 * Добавить
 	 * 
@@ -17,39 +45,47 @@ class ZN_User
 	public static function add($name, $email, $password, $group_id, $active)
 	{
 		/* Проверка */
-		Err::check_field($name, "string", false, "Name", "Наименование");
-		Err::check_field($email, "email", false, "Email", "E-mail");
+		_User_Group::is($group_id);
+		self::_check($name, $email, $active);
 		
-		$password = trim($password);
-		Err::check_field($password, "string", false, "Password", "Пароль");
-		if(mb_strlen($password) < Reg::password_length_min())
-		{Err::add("Пароль не должен быть меньше " . Reg::password_length_min() . " символов.", "Password");}
-		if(mb_strlen($password) > Reg::password_length_max())
-		{Err::add("Пароль не должен быть больше " . Reg::password_length_max() . " символов.", "Password");}
+		try
+		{
+			self::check_password($password);
+		}
+		catch (Exception $e)
+		{
+			Err::add($e->getMessage(), "Password");
+			Err::exception();
+		}
 		
-		ZN_User_Group::is_id($group_id);
-		Err::check_field($active, "bool", false, "Active", "Активен");
-		Err::exception();
-		
+		/* Соль */
+		$salt = self::password_salt_random();
+
 		/* Уникальность */
 		self::_unique($name, $email);
-		Err::exception();
-		
-		/* SQL */
+
+		/* SQL - добавить */
 		$data = 
 		[
 			"Name" => $name,
 			"Email" => $email,
-			"Password" => self::password_hash($password),
 			"Group_ID" => $group_id,
-			"Active" => $active
+			"Active" => (int)$active,
+			"Salt" => $salt
 		];
-		$id = Reg::db_core()->insert("user", $data, "ID");
+		$id = G::db_core()->insert("user", $data, "ID");
 		
+		/* SQL - назначить пароль */
+		$data = 
+		[
+			"Password" => self::password_hash($password, $salt)
+		];
+		G::db_core()->update("user", $data, ["ID" => $id]);
+
 		/* Данные добавленного */
-		return self::select_line_by_id($id);
+		return self::get($id);
 	}
-	
+
 	/**
 	 * Редактировать
 	 * 
@@ -63,31 +99,27 @@ class ZN_User
 	public static function edit($id, $name, $email, $group_id, $active)
 	{
 		/* Проверка */
-		self::is_id($id);
-		Err::check_field($name, "string", false, "Name", "Наименование");
-		Err::check_field($email, "email", false, "Email", "E-mail");
-		ZN_User_Group::is_id($group_id);
-		Err::exception();
-		Err::check_field($active, "bool", false, "Active", "Активен");
+		self::is($id);
+		_User_Group::is($group_id);
+		self::_check($name, $email, $active);
 		
 		/* Уникальность */
 		self::_unique($name, $email, $id);
-		Err::exception();
-		
+
 		/* SQL */
-		$data =
+		$data = 
 		[
 			"Name" => $name,
 			"Email" => $email,
 			"Group_ID" => $group_id,
-			"Active" => $active
+			"Active" => (int)$active
 		];
-		Reg::db_core()->update("user", $data, array("ID" => $id));
-		
+		G::db_core()->update("user", $data, ["ID" => $id]);
+
 		/* Данные изменённого */
-		return self::select_line_by_id($id);
+		return self::get($id);
 	}
-	
+
 	/**
 	 * Удалить
 	 * 
@@ -97,63 +129,43 @@ class ZN_User
 	public static function delete($id)
 	{
 		/* Проверка */
-		$user = self::select_line_by_id($id);
-		
-		/* Удалить сессии */
-		Reg::db_core()->delete("user_session", array("User_ID" => $id));
-		
-		/* Удалить */
-		Reg::db_core()->delete("user", array("ID" => $id));
-		
+		$old = self::get($id);
+
+		/* SQL */
+		G::db_core()->delete("user", ["ID" => $id]);
+
 		/* Данные удалённого */
-		return $user;
+		return $old;
 	}
-	
-	/**
-	 * Проверка по ID
-	 * 
-	 * @param int $id
-	 */
-	public static function is_id($id)
-	{
-		if(!Chf::uint($id))
-		{throw new Exception_Admin("Номер у пользователя задан неверно. ".Chf::error());}
-		
-		$query = 
-<<<SQL
-SELECT 
-	COUNT(*) as count
-FROM 
-	"user"
-WHERE 
-	"ID" = $1
-SQL;
-		$count = Reg::db_core()->query_one($query, $id, "user");
-		if($count < 1)
-		{throw new Exception_Admin("Пользователя с номером «{$id}» не существует.");}
-	}
-	
+
 	/**
 	 * Получить хэш пароля
 	 * 
 	 * @param string $password
+	 * @param string salt
 	 * @return string
 	 */
-	public static function password_hash($password)
+	public static function password_hash($password, $salt)
 	{
 		/* Соль */
-		$salt = Reg::salt_admin();								/* Соль в конфигах */
-		$salt = md5($salt);										/* Оставляем только символы a-z 0-9 */
-		$salt = substr($salt, 0, 22);							/* В bcrypt используются только первые 22 символа */
-		$salt = "$2a$" . Reg::password_bcrypt_cost() . "$" . $salt;		/* Соль для функции crypt ($2a$ = bcrypt) */
+		$salt = $salt . SALT;										/* Соль соединяем с общей солью, чтобы у пользователей с одинаковыми паролями были разные хэши */
+		$salt = md5($salt);												/* Оставляем только символы a-z 0-9 */
+		$salt = substr($salt, 0, 22);									/* В bcrypt используются только первые 22 символа */
+		
+		/* Опции хэша */
+		$options = 
+		[
+			"cost" => PASSWORD_BCRYPT_COST,						/* Цена хэша bcrypt */
+			"salt" => $salt
+		];
 		
 		/* Получить хэш */
-		$hash = crypt($password, $salt);						/* Получаем хэш bcrypt */
-		$hash = md5($hash);										/* Делаем в 32 символа и прячим соль */
-		
+		$hash = password_hash($password, PASSWORD_BCRYPT, $options);	/* Получаем хэш bcrypt */
+		$hash = md5($hash);												/* Делаем в 32 символа и прячим соль */
+
 		return $hash;
 	}
-	
+
 	/**
 	 * Назначить пароль
 	 * 
@@ -162,33 +174,60 @@ SQL;
 	 */
 	public static function passwd($id, $password)
 	{
-		self::is_id($id);
+		/* Проверка */
+		self::is($id);
+		self::check_password($password);
 		
-		$password = trim($password);
-		Err::check_field($password, "string", false, "Password", "Пароль");
-		if(mb_strlen($password) < Reg::password_length_min())
-		{Err::add("Пароль не должен быть меньше " . Reg::password_length_min() . " символов.", "Password");}
-		if(mb_strlen($password) > Reg::password_length_max())
-		{Err::add("Пароль не должен быть больше " . Reg::password_length_max() . " символов.", "Password");}
+		/* Соль */
+		$salt = self::password_salt_random();
 		
-		Err::exception();
-		
-		$data =
+		/* SQL */
+		$data = 
 		[
-			"Password" => self::password_hash($password)
+			"Password" => self::password_hash($password, $salt),
+			"Salt" => $salt,
+			"Password_Change_Date" => "now()",
+			"Password_Change_Code" => null
 		];
-		Reg::db_core()->update("user", $data, array("ID" => $id));
+		G::db_core()->update("user", $data, ["ID" => $id]);
 	}
-	
+
 	/**
 	 * Выборка строки по ID
 	 * 
 	 * @param int $id
 	 * @return array
 	 */
-	public static function select_line_by_id($id)
+	public static function get($id)
 	{
-		self::is_id($id);
+		self::is($id);
+
+		$query = 
+<<<SQL
+SELECT
+	"ID",
+	"Name",
+	"Email",
+	"Group_ID",
+	"Active"::int,
+	"Password_Change_Date"
+FROM 
+	"user"
+WHERE 
+	"ID" = $1
+SQL;
+		return G::db_core()->query($query, $id)->row();
+	}
+
+	/**
+	 * Выборка всех по группе
+	 * 
+	 * @param int $group_id
+	 * @return array
+	 */
+	public static function get_by_group($group_id)
+	{
+		_User_Group::is($group_id);
 		
 		$query = 
 <<<SQL
@@ -197,33 +236,8 @@ SELECT
 	"Name",
 	"Email",
 	"Group_ID",
-	"Active"::int
-FROM 
-	"user"
-WHERE 
-	"ID" = $1
-SQL;
-		$user = Reg::db_core()->query_line($query, $id, "user");
-		
-		return $user;
-	}
-	
-	/**
-	 * Выборка всех по группе
-	 * 
-	 * @param int $group_id
-	 * @return array
-	 */
-	public static function select_list_by_group_id($group_id)
-	{
-		$query =
-<<<SQL
-SELECT
-	"ID",
-	"Name",
-	"Email",
-	"Group_ID",
-	"Active"::int
+	"Active"::int,
+	"Password_Change_Date"
 FROM 
 	"user"
 WHERE 
@@ -231,33 +245,245 @@ WHERE
 ORDER BY
 	"Email" ASC
 SQL;
-		$user = Reg::db_core()->query_assoc($query, $group_id, "user");
-		
-		return $user;
+
+		return G::db_core()->query($query, $group_id)->assoc();
 	}
-	
+
 	/**
-	 * Выборка всех
+	 * Выборка всех пользователей
 	 * 
 	 * @return array
 	 */
-	public static function select_list()
+	public static function get_all()
 	{
-		$query =
+		$query = 
 <<<SQL
 SELECT 
 	"ID", 
 	"Name",
 	"Email", 
 	"Group_ID",
-	"Active"::int
+	"Active"::int,
+	"Password_Change_Date"
 FROM 
 	"user"
 ORDER BY 
 	"Email" ASC
 SQL;
-		$user = Reg::db_core()->query_assoc($query, null, "user");
-		return $user;
+		return G::db_core()->query($query)->assoc();
+	}
+
+	/**
+	 * Отправить код на изменения пароля
+	 * 
+	 * @param string $email
+	 */
+	public static function password_change_code_send($email)
+	{
+		/* Проверка */
+		$email = trim((string) $email);
+		$email = strtolower($email);
+		if ($email === "")
+		{
+			throw new Exception("Почтовый ящик не указан. ");
+		}
+		if (!Chf::email($email))
+		{
+			throw new Exception("Почтовый ящик задан неверно. ");
+		}
+		
+		/* Поиск почтового ящика */
+		$query = 
+<<<SQL
+SELECT
+	"ID",
+	"Email",
+	"Active"::int
+FROM 
+	"user"
+WHERE
+	"Email" = $1
+SQL;
+		$user = G::db_core()->query($query, $email)->row();
+		if (empty($user))
+		{
+			throw new Exception("Пользователь с почтовым ящиком «{$email}» не зарегистрирован.");
+		}
+		if ((bool)$user['Active'] === false)
+		{
+			throw new Exception("Пользователь с почтовым ящиком «{$email}» заблокирован.");
+		}
+		
+		/* Создать код */
+		$password_change_code = md5(microtime() . mt_rand(1, 100000));
+		$data =
+		[
+			"Password_Change_Code" => $password_change_code
+		];
+		G::db_core()->update("user", $data, ["ID" => $user['ID']]);
+		$password_change_code_hash = md5(SALT . $password_change_code);
+		
+		/* Отправить сообщение */
+		ob_start();
+		require DIR_APP . "/smod/_user/html/password_change_code.html";
+		$message = ob_get_contents();
+		ob_end_clean();
+		
+		_Sender::send($email, "Восстановление пароля на сайте «" . DOMAIN . "»", $message);
+	}
+	
+	/**
+	 * Получить ID пользователя по коду
+	 * 
+	 * @param string $code
+	 * @return bool
+	 */
+	public static function password_change_code_user_id($code)
+	{
+		/* Проверка */
+		$code = trim((string)$code);
+		if ($code === "")
+		{
+			return;
+		}
+		
+		if (!Chf::identified($code))
+		{
+			return;
+		}
+		
+		/* Поиск кода */
+		$query = 
+<<<SQL
+SELECT 
+	"ID",
+	"Password_Change_Code"
+FROM
+	"user"
+WHERE
+	"Password_Change_Code" IS NOT NULL AND
+	"Active" = true
+SQL;
+		$user = G::db_core()->query($query)->assoc();
+		$password_isset = false; 
+		foreach ($user as $val)
+		{
+			if (md5(SALT . $val['Password_Change_Code']) === $code)
+			{
+				return $val['ID'];
+			}
+		}
+		if ($password_isset === false)
+		{
+			return;
+		}
+	}
+
+	/**
+	 * Сменить пароль по коду
+	 * 
+	 * @param string $code
+	 * @param string $password
+	 */
+	public static function password_change_code($code, $password)
+	{
+		/* Проверка кода */
+		$user_id = self::password_change_code_user_id($code);
+		if ($user_id === null)
+		{
+			throw new Exception("Код задан неверно.");
+		}
+		
+		/* Сменить пароль */
+		self::passwd($user_id, $password);
+	}
+
+	/**
+	 * Проверка пароля
+	 * 
+	 * @param string $password
+	 */
+	public static function check_password(&$password)
+	{
+		$password = trim((string)$password);
+		
+		if ($password === "")
+		{
+			throw new Exception("Не задан пароль.");
+		}
+		
+		if (!Chf::string($password))
+		{
+			throw new Exception("Пароль задан неверно. " . Chf::error());
+		}
+		
+		if (mb_strlen($password) < PASSWORD_LENGTH_MIN)
+		{
+			throw new Exception("Пароль не должен быть меньше " . PASSWORD_LENGTH_MIN . " символов.");
+		}
+		
+		if (mb_strlen($password) > PASSWORD_LENGTH_MAX)
+		{
+			throw new Exception("Пароль не должен быть больше " . PASSWORD_LENGTH_MAX . " символов.");
+		}
+	}
+	
+	/**
+	 * Получить соль для пароля пользователя
+	 * 
+	 * @return string
+	 */
+	public static function password_salt_random()
+	{
+		$str = md5(microtime(true) . mt_rand(0, 100000));
+		$str = substr($str, 0, 4);
+		return $str;
+	}
+	
+	/**
+	 * Создать открытый и закрытый ключ для авторизации через jsencrypt
+	 */
+	public static function jsencrypt_key_create()
+	{
+		/* Конфигурация для закрытого ключа */
+		$config = 
+		[
+			"digest_alg" => "sha256",
+			"private_key_bits" => 1024,
+			"private_key_type" => OPENSSL_KEYTYPE_RSA
+		];
+		
+		/* Создаём ресурс закрытого ключа */
+		$res = openssl_pkey_new($config);
+		
+		/* Создать закрытый ключ */
+		$private_key = "";
+		openssl_pkey_export($res, $private_key);
+		G::file_app()->put(JSENCRYPT_PRIVATE_KEY, $private_key);
+		
+		/* Создать открытый ключ на основе закрытого ключа */
+		$public_key = openssl_pkey_get_details($res)['key'];
+		G::file_app()->put(JSENCRYPT_PUBLIC_KEY, $public_key);
+	}
+	
+	/**
+	 * Проверка полей
+	 * 
+	 * @param string $name
+	 * @param string $email
+	 * @param bool $active
+	 */
+	private static function _check($name, &$email, &$active)
+	{
+		Err::check_field($name, "string", false, "Name", "Наименование");
+		
+		Err::check_field($email, "email", false, "Email", "E-mail");
+		$email = strtolower($email);
+
+		Err::check_field($active, "bool", false, "Active", "Активен");
+		$active = (bool)$active;
+		
+		Err::exception();
 	}
 	
 	/**
@@ -267,37 +493,41 @@ SQL;
 	 * @param string $email
 	 * @param int $id
 	 */
-	private static function _unique($name, $email, $id=null)
+	private static function _unique($name, $email, $id = null)
 	{
 		$query = 
 <<<SQL
 SELECT 
-	COUNT(*) as count
+	true
 FROM 
 	"user"
 WHERE 
-	"Name" = $1 
+	"Name" = $1 AND
+	"ID" != $2
 SQL;
-		if(!is_null($id))
-		{$query .= " AND \"ID\" != '{$id}'";}
-		$count = Reg::db_core()->query_one($query, $name, "user");
-		if($count > 0)
-		{Err::add("Пользователь с полем «Наименование» : «{$name}» уже существует.", "Name");}
-		
+		$rec = G::db_core()->query($query, [$name, (int)$id])->single();
+		if ($rec !== null)
+		{
+			Err::add("Пользователь с полем «Наименование» : «{$name}» уже существует.", "Name");
+		}
+
 		$query = 
 <<<SQL
 SELECT 
-	COUNT(*) as count
+	true
 FROM 
 	"user"
 WHERE 
-	"Email" = $1 
+	"Email" = $1 AND
+	"ID" != $2
 SQL;
-		if(!is_null($id))
-		{$query .= " AND \"ID\" != '{$id}'";}
-		$count = Reg::db_core()->query_one($query, $email, "user");
-		if($count > 0)
-		{Err::add("Пользователь с полем «E-mail» : «{$email}» уже существует.", "Email");}
+		$rec = G::db_core()->query($query, [$email, (int)$id])->single();
+		if ($rec !== null)
+		{
+			Err::add("Пользователь с полем «E-mail» : «{$email}» уже существует.", "Email");
+		}
+		
+		Err::exception();
 	}
 }
 ?>

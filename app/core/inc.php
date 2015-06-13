@@ -2,8 +2,36 @@
 /**
  * Инки
  */
-class ZN_Inc
+class _Inc
 {
+	/**
+	 * Проверка по ID
+	 * 
+	 * @param int $id
+	 */
+	public static function is($id)
+	{
+		if (!Chf::uint($id))
+		{
+			throw new Exception("Номер у инка задан неверно. " . Chf::error());
+		}
+
+		$query = 
+<<<SQL
+SELECT 
+	true
+FROM 
+	"inc"
+WHERE 
+	"ID" = $1
+SQL;
+		$rec = G::db_core()->query($query, $id)->single();
+		if ($rec === null)
+		{
+			throw new Exception("Инка с номером «{$id}» не существует.");
+		}
+	}
+
 	/**
 	 * Добавить
 	 * 
@@ -15,48 +43,51 @@ class ZN_Inc
 	public static function add($name, $identified, $module_id)
 	{
 		/* Проверка */
-		Err::check_field($name, "string", false, "Name", "Наименование");
-		Err::check_field($identified, "identified", false, "Identified", "Идентификатор");
-		ZN_Module::is_id($module_id);
-		
-		Err::exception();
-		
+		self::_check($name, $identified);
+		_Module::is($module_id);
+
 		/* Уникальность */
 		self::_unique($name, $identified, $module_id);
-		
-		Err::exception();
-		
+
 		/* Файлы */
-		$module = ZN_Module::select_line_by_id($module_id);
-		
-		if(!Reg::file_app()->is_dir("{$module['Type']}/{$module['Identified']}/inc"))
-		{Reg::file_app()->mkdir("{$module['Type']}/{$module['Identified']}/inc");}
-		
-		if(!Reg::file_app()->is_dir("{$module['Type']}/{$module['Identified']}/inc/act"))
-		{Reg::file_app()->mkdir("{$module['Type']}/{$module['Identified']}/inc/act");}
-		
-		Reg::file_app()->put("{$module['Type']}/{$module['Identified']}/inc/act/{$identified}.php", "<?php\n?>");
-		
-		if(!Reg::file_app()->is_dir("{$module['Type']}/{$module['Identified']}/inc/html"))
-		{Reg::file_app()->mkdir("{$module['Type']}/{$module['Identified']}/inc/html");}
-		
-		Reg::file_app()->put("{$module['Type']}/{$module['Identified']}/inc/html/{$identified}.html", "");
-		
-		
+		$module = _Module::get($module_id);
+		$dir_inc = $module['Type'] . "/" . $module['Identified'] . "/inc";
+
+		if (!G::file_app()->is_dir($dir_inc))
+		{
+			G::file_app()->mkdir($dir_inc);
+		}
+
+		if (!G::file_app()->is_dir($dir_inc . "/act"))
+		{
+			G::file_app()->mkdir($dir_inc . "/act");
+		}
+
+		G::file_app()->put($dir_inc . "/act/" . $identified . ".php", "<?php\n?>");
+
+		if (!G::file_app()->is_dir($dir_inc . "/html"))
+		{
+			G::file_app()->mkdir($dir_inc . "/html");
+		}
+
+		G::file_app()->put($dir_inc . "/html/" . $identified. ".html", "");
+
 		/* SQL */
 		$data = 
 		[
 			"Name" => $name,
 			"Identified" => $identified,
-			"Active" => true,
 			"Module_ID" => $module_id
 		];
-		$id = Reg::db_core()->insert("inc", $data, "ID");
+		$id = G::db_core()->insert("inc", $data, "ID");
 		
+		/* Удалить кэш */
+		G::cache_db_core()->delete_tag("inc");
+
 		/* Данные добавленного */
-		return self::select_line_by_id($id);
+		return self::get($id);
 	}
-	
+
 	/**
 	 * Редактировать
 	 * 
@@ -69,47 +100,44 @@ class ZN_Inc
 	public static function edit($id, $name, $identified, $active)
 	{
 		/* Проверка */
-		self::is_id($id);
-		Err::check_field($name, "string", false, "Name", "Наименование");
-		Err::check_field($identified, "identified", false, "Identified", "Идентификатор");
-		Err::check_field($active, "bool", false, "Active", "Активность");
-		
-		Err::exception();
+		self::is($id);
+		self::_check($name, $identified, $active);
 		
 		/* Уникальность */
-		$inc = self::select_line_by_id($id);
+		$inc = self::get($id);
 		self::_unique($name, $identified, $inc['Module_ID'], $id);
-		
-		Err::exception();
-		
+
 		/* Файлы */
-		$module = ZN_Module::select_line_by_id($inc['Module_ID']);
-		Reg::file_app()->mv
+		$module = _Module::get($inc['Module_ID']);
+		$dir_inc = $module['Type'] . "/" . $module['Identified'] . "/inc";
+		G::file_app()->mv
 		(
-			"{$module['Type']}/{$module['Identified']}/inc/act/{$inc['Identified']}.php",
-			"{$module['Type']}/{$module['Identified']}/inc/act/{$identified}.php"
+			$dir_inc . "/act/" . $inc['Identified'] . ".php", 
+			$dir_inc . "/act/" . $identified . ".php"
 		);
-		
-		Reg::file_app()->mv
+
+		G::file_app()->mv
 		(
-			"{$module['Type']}/{$module['Identified']}/inc/html/{$inc['Identified']}.html",
-			"{$module['Type']}/{$module['Identified']}/inc/html/{$identified}.html"
+			$dir_inc . "/html/".  $inc['Identified'] . ".html", 
+			$dir_inc . "/html/" . $identified . ".html"
 		);
-		
-		
+
 		/* SQL */
-		$data =
+		$data = 
 		[
 			"Name" => $name,
 			"Identified" => $identified,
-			"Active" => $active
+			"Active" => (int)$active
 		];
-		Reg::db_core()->update("inc", $data, array("ID" => $id));
+		G::db_core()->update("inc", $data, ["ID" => $id]);
 		
+		/* Удалить кэш */
+		G::cache_db_core()->delete_tag("inc");
+
 		/* Данные изменённого */
-		return self::select_line_by_id($id);
+		return self::get($id);
 	}
-	
+
 	/**
 	 * Удалить
 	 * 
@@ -119,105 +147,84 @@ class ZN_Inc
 	public static function delete($id)
 	{
 		/* Проверка */
-		$inc = self::select_line_by_id($id);
-		$module = ZN_Module::select_line_by_id($inc['Module_ID']);
-		
-		/* Удалить привязки к html */
-		Reg::db_core()->delete("html_inc", array("Inc_ID" => $id));
-		
+		$inc = self::get($id);
+
 		/* Файлы */
-		Reg::file_app()->rm("{$module['Type']}/{$module['Identified']}/inc/act/{$inc['Identified']}.php");
-		if(Reg::file_app()->is_file("{$module['Type']}/{$module['Identified']}/inc/html/{$inc['Identified']}.html"))
+		$module = _Module::get($inc['Module_ID']);
+		$dir_inc = $module['Type'] . "/" . $module['Identified'] . "/inc";
+		
+		G::file_app()->rm($dir_inc . "/act/" . $inc['Identified'] . ".php");
+		if (count(G::file_app()->ls($dir_inc . "/act")) === 0)
 		{
-			Reg::file_app()->rm("{$module['Type']}/{$module['Identified']}/inc/html/{$inc['Identified']}.html");
+			G::file_app()->rm($dir_inc . "/act");
+		}
+
+		G::file_app()->rm($dir_inc . "/html/" . $inc['Identified'] . ".html");
+		if (count(G::file_app()->ls($dir_inc . "/html")) === 0)
+		{
+			G::file_app()->rm($dir_inc . "/html");
 		}
 		
-		if(count(Reg::file_app()->ls("{$module['Type']}/{$module['Identified']}/inc/act")) === 0)
-		{Reg::file_app()->rm("{$module['Type']}/{$module['Identified']}/inc/act");}
-		
-		if(Reg::file_app()->is_dir("{$module['Type']}/{$module['Identified']}/inc/html"))
+		/* Удалить папку inc если пустая */
+		if (count(G::file_app()->ls($dir_inc)) === 0)
 		{
-			if(count(Reg::file_app()->ls("{$module['Type']}/{$module['Identified']}/inc/html")) === 0)
-			{Reg::file_app()->rm("{$module['Type']}/{$module['Identified']}/inc/html");}
+			G::file_app()->rm($dir_inc);
 		}
-		
+
 		/* Удалить */
-		Reg::db_core()->delete("inc", array("ID" => $id));
+		G::db_core()->delete("inc", ["ID" => $id]);
 		
+		/* Удалить кэш */
+		G::cache_db_core()->delete_tag("inc");
+
 		/* Данные удалённого */
 		return $inc;
 	}
-	
-	/**
-	 * Проверка по ID
-	 * 
-	 * @param int $id
-	 */
-	public static function is_id($id)
-	{
-		if(!Chf::uint($id))
-		{throw new Exception_Constr("Номер у инка задан неверно. ".Chf::error());}
-		
-		$query = 
-<<<SQL
-SELECT 
-	COUNT(*) as count
-FROM 
-	"inc"
-WHERE 
-	"ID" = $1
-SQL;
-		$count = Reg::db_core()->query_one($query, $id, "inc");
-		if($count < 1)
-		{throw new Exception_Constr("Инка с номером «{$id}» не существует.");}
-	}
-	
+
 	/**
 	 * Выборка строки по ID
 	 * 
 	 * @param int $id
 	 * @return array
 	 */
-	public static function select_line_by_id($id)
+	public static function get($id)
 	{
-		self::is_id($id);
-		
+		self::is($id);
+
 		$query = 
 <<<SQL
 SELECT
 	"ID",
 	"Name",
 	"Identified",
-	"Active"::int,
-	"Module_ID"
+	"Module_ID",
+	"Active"::int
 FROM 
 	"inc"
 WHERE 
 	"ID" = $1
 SQL;
-		$inc = Reg::db_core()->query_line($query, $id, "inc");
-		
-		return $inc;
+		return G::db_core()->query($query, $id)->row();
 	}
-	
+
 	/**
 	 * Выборка всех по модулю
 	 * 
 	 * @param int $module_id
 	 * @return array
 	 */
-	public static function select_list_by_module_id($module_id)
+	public static function get_by_module($module_id)
 	{
-		ZN_Module::is_id($module_id);
-		
-		$query =
+		_Module::is($module_id);
+
+		$query = 
 <<<SQL
 SELECT
 	"ID",
 	"Name",
 	"Identified",
-	"Active"::int,
-	"Module_ID"
+	"Module_ID",
+	"Active"::int
 FROM 
 	"inc"
 WHERE 
@@ -225,11 +232,67 @@ WHERE
 ORDER BY
 	"Identified" ASC
 SQL;
-		$inc = Reg::db_core()->query_assoc($query, $module_id, "inc");
+		return G::db_core()->query($query, $module_id)->assoc();
+	}
+	
+	/**
+	 * Получить инк по идентфикатору
+	 * 
+	 * @param string $module_identified
+	 * @param string $identified
+	 * @return array
+	 */
+	public static function get_by_identified($module_identified, $identified)
+	{
+		/* Проверка */
+		if (!Chf::identified($module_identified))
+		{
+			throw new Exception("Идентификатор модуля задан неверно.");
+		}
+		
+		if (!Chf::identified($identified))
+		{
+			throw new Exception("Идентификатор инка задан неверно.");
+		}
+		
+		/* Выборка */
+		$inc = G::cache_db_core()->get("inc_" . $module_identified . "_" . $identified);
+		if ($inc === null)
+		{
+			$inc = G::db_core()->inc_by_identified($module_identified, $identified)->row();
+			if (empty($inc))
+			{
+				throw new Exception("Инк «{$module_identified}» / «{$identified}» не существует.");
+			}
+			G::cache_db_core()->set("inc_" . $module_identified . "_" . $identified, $inc, "inc");
+		}
 		
 		return $inc;
 	}
-	
+
+	/**
+	 * Проверка полей
+	 * 
+	 * @param string $name
+	 * @param string $identified
+	 * @param bool $active
+	 */
+	private static function _check($name, &$identified, &$active = null)
+	{
+		Err::check_field($name, "string", false, "Name", "Наименование");
+		
+		Err::check_field($identified, "identified", false, "Identified", "Идентификатор");
+		$identified = strtolower($identified);
+		
+		if ($active !== null)
+		{
+			Err::check_field($active, "bool", false, "Active", "Активность");
+			$active = (bool)$active;
+		}
+		
+		Err::exception();
+	}
+
 	/**
 	 * Уникальность
 	 * 
@@ -238,39 +301,43 @@ SQL;
 	 * @param int $module_id
 	 * @param int $id
 	 */
-	private static function _unique($name, $identified, $module_id, $id=null)
+	private static function _unique($name, $identified, $module_id, $id = null)
 	{
 		$query = 
 <<<SQL
 SELECT 
-	COUNT(*) as count
+	true
 FROM 
 	"inc"
 WHERE 
-	"Name" = $1 AND 
-	"Module_ID" = $2 
+	"Name" ILIKE $1 AND 
+	"Module_ID" = $2 AND
+	"ID" != $3
 SQL;
-		if(!is_null($id))
-		{$query .= " AND \"ID\" != '{$id}'";}
-		$count = Reg::db_core()->query_one($query, array($name, $module_id), "inc");
-		if($count > 0)
-		{Err::add("Инк с полем «Наименование» : «{$name}» уже существует.", "Name");}
+		$rec = G::db_core()->query($query, [$name, $module_id, (int)$id])->single();
+		if ($rec !== null)
+		{
+			Err::add("Инк с полем «Наименование» : «{$name}» уже существует.", "Name");
+		}
 
 		$query = 
 <<<SQL
 SELECT 
-	COUNT(*) as count
+	true
 FROM 
 	"inc"
 WHERE 
 	"Identified" = $1 AND
-	"Module_ID" = $2
+	"Module_ID" = $2 AND
+	"ID" != $3
 SQL;
-		if(!is_null($id))
-		{$query .= " AND \"ID\" != '{$id}'";}
-		$count = Reg::db_core()->query_one($query, array($identified, $module_id), "inc");
-		if($count > 0)
-		{Err::add("Инк с полем «Идентификатор» : «{$identified}» уже существует.", "Identified");}
+		$rec = G::db_core()->query($query, [$identified, $module_id, (int)$id])->single();
+		if ($rec !== null)
+		{
+			Err::add("Инк с полем «Идентификатор» : «{$identified}» уже существует.", "Identified");
+		}
+		
+		Err::exception();
 	}
 }
 ?>

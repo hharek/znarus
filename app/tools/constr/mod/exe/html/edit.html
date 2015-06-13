@@ -1,0 +1,74 @@
+<form>
+	<table class="std_form">
+		<tr>
+			<td>Идентификатор</td>
+			<td>
+				<input type="text" name="Identified" value="<?php echo htmlspecialchars($exe['Identified']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Наименование</td>
+			<td>
+				<input type="text" name="Name" value="<?php echo htmlspecialchars($exe['Name']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Кэшировать маршруты</td>
+			<td>
+				<input type="hidden" name="Cache_Route" value="0"/>
+				<input type="checkbox" name="Cache_Route" value="1"<?php if($exe['Cache_Route'] === "1"): ?> checked="checked"<?php endif; ?>/>
+			</td>
+		</tr>
+		<tr id="tr_cache_page">
+			<td>Кэшировать страницы</td>
+			<td>
+				<input type="hidden" name="Cache_Page" value="0"/>
+				<input type="checkbox" name="Cache_Page" value="1"<?php if($exe['Cache_Page'] === "1"): ?> checked="checked"<?php endif; ?>/>
+			</td>
+		</tr>
+		<tr>
+			<td>Активность</td>
+			<td>
+				<input type="hidden" name="Active" value="0"/>
+				<input type="checkbox" name="Active" value="1"<?php if($exe['Active'] === "1"): ?> checked="checked"<?php endif; ?>/>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="std_button submit">
+					<div class="icon_edit"></div>
+					Редактировать
+				</div>
+			</td>
+			<td>
+				<a class="std_button" href="#module/edit?id=<?php echo $module['ID']; ?>#tab_structure_exe">
+					<div class="icon_back"></div>
+					Назад
+				</a>
+				<div 
+					class="icon_basket delete" 
+					url="#exe/delete?id=<?php echo $exe['ID']; ?>" 
+					mess="Вы действительно хотите удалить exe «<?php echo $exe['Identified']; ?> (<?php echo $exe['Name']; ?>)» ?" 
+					style="margin: 0 0 -8px 0"
+				></div>
+			</td>
+		</tr>
+	</table>
+</form>
+
+<script>
+cache_page_show();
+$("input[type=checkbox][name=Cache_Route]").click(cache_page_show);
+
+function cache_page_show()
+{
+	if ($("input[type=checkbox][name=Cache_Route]").prop("checked") === true)
+	{
+		$("#tr_cache_page").show();
+	}
+	else
+	{
+		$("#tr_cache_page").hide();
+	}
+}
+</script>

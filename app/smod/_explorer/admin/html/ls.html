@@ -1,0 +1,68 @@
+<div class="explorer">
+	
+	<!-- Панель управления -->
+	<div class="panel">
+		<div class="check_all">
+			<input id="file_check_all" type="checkbox" value="all"/>
+		</div>
+		<div class="icon_main act_home" title="На главную"></div>
+		<div class="icon_list act_put" title="Править" style="display: none;"></div>
+		<div class="icon_rename act_rename" title="Переименовать" style="display: none;"></div>
+		<div class="icon_delete act_rm" title="Удалить" style="display: none;"></div>
+		<div class="icon_download act_download" title="Скачать" style="display: none;"></div>
+		<div class="icon_add act_add" title="Создать файл"></div>
+		<div class="icon_dir act_mkdir" title="Создать папку"></div>
+	</div>
+
+	<!-- Путь -->
+	<div class="path" id="path" path="<?php echo $path; ?>">
+		<?php if($path === "."): ?>
+			/
+		<?php else: ?>
+			/<?php echo $path; ?>
+		<?php endif; ?>
+	</div>
+
+	<!-- Файлы -->
+	<div class="list">
+		<form id="file">
+			<?php if($path !== "."): ?>
+				<div class="file up">
+					<div class="name">..</div>
+				</div>
+			<?php endif; ?>
+
+			<?php foreach ($dir as $val): ?>
+				<div class="file dir">
+					<div class="check">
+						<input type="checkbox" name="file[]" value="<?php echo $val['name']; ?>"/>
+					</div>
+					<div class="icon_dir"></div>
+					<div class="name"><?php echo $val['name']; ?></div>
+				</div>
+			<?php endforeach; ?>
+
+			<?php foreach ($file as $val): ?>
+				<div class="file">
+					<div class="check">
+						<input type="checkbox" name="file[]" value="<?php echo $val['name']; ?>"/>
+					</div>
+					<div class="name"><?php echo $val['name']; ?></div>
+				</div>
+			<?php endforeach; ?>
+		</form>
+	</div>
+
+	<!-- Загрузка -->
+	<div class="upload">
+		<form action="#_explorer/upload">
+			<input type="hidden" name="path" value="<?php echo $path; ?>" />
+			<input type="file" name="file[]" multiple="multiple" required="required"/>
+			<div class="std_button">
+				<div class="icon_add"></div>
+				Закачать
+			</div>
+		</form>
+	</div>
+	
+</div>

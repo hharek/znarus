@@ -2,7 +2,7 @@
 /**
  * Теги
  */
-class ZN_Tags
+class _Tags
 {
 	/**
 	 * Добавить тег
@@ -14,11 +14,13 @@ class ZN_Tags
 	{
 		/* Проверка */
 		$name = trim($name);
-		if(!Chf::string($name))
-		{ throw new Exception("Тег задан неверно."); }
-		
+		if (!Chf::string($name))
+		{
+			throw new Exception("Тег задан неверно.");
+		}
+
 		$name = mb_strtolower($name);
-		
+
 		/* Проверка на уникальность */
 		$query = 
 <<<SQL
@@ -31,31 +33,31 @@ FROM
 WHERE 
 	"Name" = $1 
 SQL;
-		$tags = Reg::db_core()->query_line($query, $name);
-		
+		$tags = G::db_core()->query($query, $name)->row();
+
 		/* Добавить новый тег */
-		if(empty($tags))
+		if (empty($tags))
 		{
 			$data = 
 			[
 				"Name" => $name
 			];
-			$id = Reg::db_core()->insert("tags", $data, "ID");
+			$id = G::db_core()->insert("tags", $data, "ID");
 		}
 		/* Добавить счётчик */
 		else
 		{
-			$data =
+			$data = 
 			[
-				"Count" => (int)$tags['Count'] + 1
+				"Count" => (int) $tags['Count'] + 1
 			];
-			Reg::db_core()->update("tags", $data, array("ID" => $tags['ID']));
+			G::db_core()->update("tags", $data, ["ID" => $tags['ID']]);
 			$id = $tags['ID'];
 		}
-		
+
 		return $id;
 	}
-	
+
 	/**
 	 * Выборка строки по имени
 	 * 
@@ -66,11 +68,13 @@ SQL;
 	{
 		/* Проверка */
 		$name = trim($name);
-		if(!Chf::string($name))
-		{ throw new Exception("Тег задан неверно."); }
-		
+		if (!Chf::string($name))
+		{
+			throw new Exception("Тег задан неверно.");
+		}
+
 		$name = mb_strtolower($name);
-		
+
 		/* SQL */
 		$query = 
 <<<SQL
@@ -83,11 +87,11 @@ FROM
 WHERE 
 	"Name" = $1 
 SQL;
-		$tags = Reg::db_core()->query_line($query, $name);
-		
+		$tags = G::db_core()->query($query, $name)->row();
+
 		return $tags;
 	}
-	
+
 	/**
 	 * Удалить все теги
 	 */
@@ -97,15 +101,15 @@ SQL;
 <<<SQL
 TRUNCATE "tags"
 SQL;
-		Reg::db_core()->query($query);
-		
+		G::db_core()->query($query);
+
 		$query = 
 <<<SQL
 ALTER SEQUENCE "tags_seq" RESTART
 SQL;
-		Reg::db_core()->query($query);
+		G::db_core()->query($query);
 	}
-	
+
 	/**
 	 * Выборка всех тегов
 	 * 
@@ -113,7 +117,7 @@ SQL;
 	 */
 	public static function select_list()
 	{
-		$query =
+		$query = 
 <<<SQL
 SELECT 
 	"ID",
@@ -124,8 +128,8 @@ FROM
 ORDER BY 
 	"Name" ASC
 SQL;
-		$tags = Reg::db_core()->query_assoc($query, null);
-		
+		$tags = G::db_core()->query($query)->assoc();
+
 		return $tags;
 	}
 }

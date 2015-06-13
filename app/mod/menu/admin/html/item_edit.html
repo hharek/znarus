@@ -23,8 +23,7 @@ function parent_html($item, $level, $current)
 }
 ?>
 
-
-<form action="#menu/item_edit_post?id=<?php echo $item['ID']; ?>">
+<form>
 	<table class="std_form">
 		<tr>
 			<td>Наименование</td>
@@ -47,22 +46,20 @@ function parent_html($item, $level, $current)
 				</select>
 			</td>
 		</tr>
-		<tr>
-			<td>
-				<div class="std_button submit">
-					<div class="icon_edit"></div>
-					Редактировать
-				</div>
-			</td>
-			<td>
-				<a class="std_button" href="#menu/item?menu_id=<?php echo $menu['ID']; ?>">
-					<div class="icon_back"></div>
-					Назад
-				</a>
-				<div class="icon_delete delete" url="#menu/item_delete_post?id=<?php echo $item['ID']; ?>">
-					Вы действительно хотите удалить пункт меню «<?php echo $item['Name']; ?>»?
-				</div>
-			</td>
-		</tr>
 	</table>
+	<div class="center">
+		<div class="std_button submit">
+			<div class="icon_edit"></div>
+			Редактировать
+		</div>
+		<a class="std_button" href="#menu/item?menu_id=<?php echo $menu['ID']; ?>">
+			<div class="icon_back"></div>
+			Назад
+		</a>
+		<div 
+			class="icon_delete delete" 
+			url="#menu/item_delete?id=<?php echo $item['ID']; ?>"
+			mess="Вы действительно хотите удалить пункт меню «<?php echo $item['Name']; ?>»?"
+		></div>
+	</div>
 </form>

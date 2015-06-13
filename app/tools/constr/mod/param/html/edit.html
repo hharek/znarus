@@ -1,0 +1,52 @@
+<form>
+	<table class="std_form">
+		<tr>
+			<td>Идентификатор</td>
+			<td>
+				<input type="text" name="Identified" value="<?php echo htmlspecialchars($param['Identified']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Наименование</td>
+			<td>
+				<input type="text" name="Name" value="<?php echo htmlspecialchars($param['Name']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Тип</td>
+			<td>
+				<select name="Type">
+					<option<?php if($param['Type'] == "string"): ?> selected="selected"<?php endif; ?>>string</option>
+					<option<?php if($param['Type'] == "int"): ?> selected="selected"<?php endif; ?>>int</option>
+					<option<?php if($param['Type'] == "bool"): ?> selected="selected"<?php endif; ?>>bool</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>Значение</td>
+			<td>
+				<input type="text" name="Value" value="<?php echo htmlspecialchars($param['Value']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="std_button submit">
+					<div class="icon_edit"></div>
+					Редактировать
+				</div>
+			</td>
+			<td>
+				<a class="std_button" href="#module/edit?id=<?php echo $module['ID']; ?>#tab_structure_param">
+					<div class="icon_back"></div>
+					Назад
+				</a>
+				<div 
+					class="icon_basket delete" 
+					url="#param/delete?id=<?php echo $param['ID']; ?>" 
+					mess="Вы действительно хотите удалить param «<?php echo $param['Identified']; ?> (<?php echo $param['Name']; ?>)» ?" 
+					style="margin: 0 0 -8px 0"
+				></div>
+			</td>
+		</tr>
+	</table>
+</form>

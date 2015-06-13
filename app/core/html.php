@@ -2,8 +2,58 @@
 /**
  * Основной шаблон
  */
-class ZN_Html
+class _Html
 {
+	/**
+	 * HTML-код для новых шаблонов
+	 * 
+	 * @var string
+	 */
+	private static $html_code = 
+<<<HTML
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title><!--_meta_title--></title>
+		<meta name="description" content="<!--_meta_description-->" />
+		<meta name="keywords" content="<!--_meta_keywords-->" />
+	</head>
+	<body>
+		<h1><!--_title--></h1>
+		<!--_content-->
+	</body>
+</html>
+HTML;
+
+		/**
+	 * Проверка по ID
+	 * 
+	 * @param int $id
+	 */
+	public static function is($id)
+	{
+		if (!Chf::uint($id))
+		{
+			throw new Exception("Номер у шаблона задан неверно. " . Chf::error());
+		}
+
+		$query = 
+<<<SQL
+SELECT 
+	true
+FROM 
+	"html"
+WHERE 
+	"ID" = $1
+SQL;
+		$rec = G::db_core()->query($query, $id)->single();
+		if ($rec === null)
+		{
+			throw new Exception("Шаблона с номером «{$id}» не существует.");
+		}
+	}
+	
 	/**
 	 * Добавить
 	 * 
@@ -14,76 +64,75 @@ class ZN_Html
 	public static function add($name, $identified)
 	{
 		/* Проверка */
-		Err::check_field($name, "string", false, "Name", "Наименование");
-		Err::check_field($identified, "identified", false, "Identified", "Идентификатор");
-		
-		Err::exception();
-		
+		self::_check($name, $identified);
+
 		/* Уникальность */
 		self::_unique($name, $identified);
-		
-		Err::exception();
-		
+
 		/* Файл */
-		Reg::file_app()->put("html/" . $identified . ".html", Reg::file_app()->get("constr/tpl/html.tpl"));
-		
+		G::file_app()->put("html/" . $identified . ".html", self::$html_code);
+
 		/* SQL */
 		$data = 
 		[
 			"Name" => $name,
 			"Identified" => $identified
 		];
-		$id = Reg::db_core()->insert("html", $data, "ID");
+		$id = G::db_core()->insert("html", $data, "ID");
 		
+		/* Удалить кэш */
+		G::cache_db_core()->delete_tag("html");
+
 		/* Данные добавленного */
-		return self::select_line_by_id($id);
+		return self::get($id);
 	}
-	
+
 	/**
 	 * Редактировать
 	 * 
 	 * @param int $id
 	 * @param string $name
 	 * @param string $identified
-	 * @param bool
 	 * @return array
 	 */
-	public static function edit($id, $name, $identified, $default)
+	public static function edit($id, $name, $identified)
 	{
 		/* Проверка */
-		self::is_id($id);
-		
-		Err::check_field($name, "string", false, "Name", "Наименование");
-		Err::check_field($identified, "identified", false, "Identified", "Идентификатор");
-		Err::check_field($default, "bool", false, "Default", "По умолчанию");
-		
-		Err::exception();
+		self::is($id);
+		self::_check($name, $identified);
 		
 		/* Уникальность */
 		self::_unique($name, $identified, $id);
-		
-		Err::exception();
-		
+
 		/* Файл */
-		$html = self::select_line_by_id($id);
-		Reg::file_app()->mv("html/{$html['Identified']}.html", "html/{$identified}.html");
-		
+		$old = self::get($id);
+		G::file_app()->mv
+		(
+			"html/" . $old['Identified'] . ".html", 
+			"html/" . $identified . ".html"
+		);
+
 		/* SQL */
-		$data =
+		$data = 
 		[
-			"Name" => $name, 
+			"Name" => $name,
 			"Identified" => $identified
 		];
-		Reg::db_core()->update("html", $data, array("ID" => $id));
+		G::db_core()->update("html", $data, ["ID" => $id]);
 		
-		/* Назначить шаблоном по умолчанию */
-		if((bool)$default === true)
-		{P::set("html_default", $identified);}
+		/* Удалить кэш */
+		G::cache_db_core()->delete_tag("html");
+		
+		/* Переименовать шаблон по умолчанию */
+		if ($old['Identified'] === P::get("html_default"))
+		{
+			P::set("html_default", $identified);
+		}
 		
 		/* Данные изменённого */
-		return self::select_line_by_id($id);
+		return self::get($id);
 	}
-	
+
 	/**
 	 * Удалить
 	 * 
@@ -93,49 +142,39 @@ class ZN_Html
 	public static function delete($id)
 	{
 		/* Проверка */
-		$html = self::select_line_by_id($id);
-		
+		$old = self::get($id);
+
 		/* Нельзя удалить шаблон по умолчанию */
-		if(P::get("html_default") === $html['Identified'])
-		{throw new Exception_Constr("Нельзя удалить шаблон по умолчанию.");}
-		
-		/* Удалить привязки к html */
-		Reg::db_core()->delete("html_inc", array("Html_ID" => $id));
-		
+		if (P::get("html_default") === $old['Identified'])
+		{
+			throw new Exception("Нельзя удалить шаблон по умолчанию.");
+		}
+
 		/* Файл */
-		Reg::file_app()->rm("html/{$html['Identified']}.html");
-		
+		G::file_app()->rm("html/" . $old['Identified'] . ".html");
+
 		/* SQL */
-		Reg::db_core()->delete("html", array("ID" => $id));
+		G::db_core()->delete("html", ["ID" => $id]);
 		
+		/* Удалить кэш */
+		G::cache_db_core()->delete_tag("html");
+
 		/* Данные удалённого */
-		return $html;
+		return $old;
 	}
 
 	/**
-	 * Проверка по ID
+	 * Назначить шаблоном по умолчанию
 	 * 
 	 * @param int $id
 	 */
-	public static function is_id($id)
+	public static function set_default($id)
 	{
-		if(!Chf::uint($id))
-		{throw new Exception_Constr("Номер у шаблона задан неверно. ".Chf::error());}
+		$html = self::get($id);
 		
-		$query = 
-<<<SQL
-SELECT 
-	COUNT(*) as count
-FROM 
-	"html"
-WHERE 
-	"ID" = $1
-SQL;
-		$count = Reg::db_core()->query_one($query, $id, "html");
-		if($count < 1)
-		{throw new Exception_Constr("Шаблона с номером «{$id}» не существует.");}
+		P::set("html_default", $html['Identified']);
 	}
-	
+
 	/**
 	 * Проверка по идентификатору
 	 * 
@@ -143,66 +182,62 @@ SQL;
 	 */
 	public static function is_identified($identified)
 	{
-		if(!Chf::identified($identified))
-		{throw new Exception_Constr("Идентификатор у шаблона задан неверно. ".Chf::error());}
+		if (!Chf::identified($identified))
+		{
+			throw new Exception("Идентификатор у шаблона задан неверно. " . Chf::error());
+		}
 		
-		$query = 
-<<<SQL
-SELECT 
-	COUNT(*) as count
-FROM 
-	"html"
-WHERE 
-	"Identified" = $1
-SQL;
-		$count = Reg::db_core()->query_one($query, $identified, "html");
-		if($count < 1)
-		{throw new Exception_Constr("Шаблона с идентификтором «{$identified}» не существует.");}
+		$html_is = G::cache_db_core()->get("html_is_identified_" . $identified);
+		if ($html_is === null)
+		{
+			$html_is = (bool)G::db_core()->html_is_identified($identified)->single();
+			G::cache_db_core()->set("html_is_identified_" . $identified, $html_is, "html");
+		}
+		
+		if (!$html_is)
+		{
+			throw new Exception("Шаблона с идентификтором «{$identified}» не существует.");
+		}
 	}
 	
 	/**
-	 * Подключить инк к шаблону
+	 * Проверка на существование по идентификатору
 	 * 
-	 * @param int $html_id
-	 * @param int $inc_id
+	 * @param string $identified
+	 * @return boolean
 	 */
-	public static function inc_add($html_id, $inc_id)
+	public static function exist($identified)
 	{
-		ZN_Html::is_id($html_id);
-		ZN_Inc::is_id($inc_id);
+		if (!Chf::identified($identified))
+		{
+			return false;
+		}
 		
-		$data = 
-		[
-			"Html_ID" => $html_id,
-			"Inc_ID" => $inc_id
-		];
-		Reg::db_core()->insert("html_inc", $data);
-	}
-	
-	/**
-	 * Отключить инк от шаблона
-	 * 
-	 * @param int $html_id
-	 * @param int $inc_id
-	 */
-	public static function inc_delete($html_id, $inc_id)
-	{
-		ZN_Html::is_id($html_id);
-		ZN_Inc::is_id($inc_id);
+		$html_is = G::cache_db_core()->get("html_is_identified_" . $identified);
+		if ($html_is === null)
+		{
+			$html_is = (bool)G::db_core()->html_is_identified($identified)->single();
+			G::cache_db_core()->set("html_is_identified_" . $identified, $html_is, "html");
+		}
 		
-		Reg::db_core()->delete("html_inc", ["Html_ID" => $html_id, "Inc_ID" => $inc_id]);
+		if ($html_is === false)
+		{
+			return false;
+		}
+		
+		return true;
 	}
-	
+
 	/**
 	 * Выборка строки по ID
 	 * 
 	 * @param int $id
 	 * @return array
 	 */
-	public static function select_line_by_id($id)
+	public static function get($id)
 	{
-		self::is_id($id);
-		
+		self::is($id);
+
 		$query = 
 <<<SQL
 SELECT
@@ -214,17 +249,15 @@ FROM
 WHERE 
 	"ID" = $1
 SQL;
-		$html = Reg::db_core()->query_line($query, $id, "html");
-		
-		return $html;
+		return G::db_core()->query($query, $id)->row();
 	}
-	
+
 	/**
 	 * Выборка всех
 	 * 
 	 * @return array
 	 */
-	public static function select_list()
+	public static function get_all()
 	{
 		$query = 
 <<<SQL
@@ -237,11 +270,54 @@ FROM
 ORDER BY 
 	"Identified" ASC
 SQL;
-		$html = Reg::db_core()->query_assoc($query, null, "html");
+		return G::db_core()->query($query)->assoc();
+	}
+	
+	/**
+	 * Получить html по идентификатору
+	 * 
+	 * @param string $identified
+	 * @return array
+	 */
+	public static function get_by_identified($identified)
+	{
+		/* Проверка */
+		if (!Chf::identified($identified))
+		{
+			throw new Exception("Идентификатор шаблона задан неверно. ");
+		}
+		
+		/* Выборка */
+		$html = G::cache_db_core()->get("html_" . $identified);
+		if ($html === null)
+		{
+			$html = G::db_core()->html_by_identified($identified)->row();
+			if (empty($html))
+			{
+				throw new Exception("Шаблона с идентификатором «{$identified}» не существует.");
+			}
+			G::cache_db_core()->set("html_" . $identified, $html, "html");
+		}
 		
 		return $html;
 	}
-	
+
+	/**
+	 * Проверка полей
+	 * 
+	 * @param string $name
+	 * @param string $identified
+	 */
+	private static function _check($name, &$identified)
+	{
+		Err::check_field($name, "string", false, "Name", "Наименование");
+		
+		Err::check_field($identified, "identified", false, "Identified", "Идентификатор");
+		$identified = strtolower($identified);
+		
+		Err::exception();
+	}
+
 	/**
 	 * Уникальность
 	 * 
@@ -249,37 +325,41 @@ SQL;
 	 * @param string $identified
 	 * @param int $id
 	 */
-	private static function _unique($name, $identified, $id=null)
+	private static function _unique($name, $identified, $id = null)
 	{
 		$query = 
 <<<SQL
 SELECT 
-	COUNT(*) as count
+	true
 FROM 
 	"html"
 WHERE 
-	"Name" = $1
+	"Name" ILIKE $1 AND 
+	"ID" != $2
 SQL;
-		if(!is_null($id))
-		{$query .= " AND \"ID\" != '{$id}'";}
-		$count = Reg::db_core()->query_one($query, $name, "html");
-		if($count > 0)
-		{Err::add("Шаблон с полем «Наименование» : «{$name}» уже существует.", "Name");}
+		$rec = G::db_core()->query($query, [$name, (int)$id])->single();
+		if ($rec !== null)
+		{
+			Err::add("Шаблон с полем «Наименование» : «{$name}» уже существует.", "Name");
+		}
 
 		$query = 
 <<<SQL
 SELECT 
-	COUNT(*) as count
+	true
 FROM 
 	"html"
 WHERE 
-	"Identified" = $1
+	"Identified" = $1 AND
+	"ID" != $2
 SQL;
-		if(!is_null($id))
-		{$query .= " AND \"ID\" != '{$id}'";}
-		$count = Reg::db_core()->query_one($query, $identified, "html");
-		if($count > 0)
-		{Err::add("Шаблон с полем «Идентификатор» : «{$identified}» уже существует.", "Identified");}
+		$rec = G::db_core()->query($query, [$identified, (int)$id])->single();
+		if ($rec !== null)
+		{
+			Err::add("Шаблон с полем «Идентификатор» : «{$identified}» уже существует.", "Identified");
+		}
+		
+		Err::exception();
 	}
 }
 ?>

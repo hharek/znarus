@@ -1,0 +1,83 @@
+<?php
+/* Заголовок указывающий на требование авторизации */
+header("HTTP/1.0 401 Unauthorized");
+
+/* Токен авторизации */
+$_SESSION['_auth_token'] = md5(microtime(true) . mt_rand(0, 1000000));
+
+/* Проверить наличие ключей */
+if (JSENCRYPT_AUTH === true)
+{
+	if (!is_file(JSENCRYPT_PRIVATE_KEY) or !is_file(JSENCRYPT_PUBLIC_KEY))
+	{
+		throw new Exception("Отсутствуют ключи для JSEncrypt. Отключите параметр «jsencrypt_auth» или создайте ключи в конструкторе.");
+	}
+}
+?>
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="stylesheet" href="auth.css" />
+		<script src="auth.js"></script>
+		<?php if (G::location() === "constr"): ?>
+			<title>Конструктор. Вход</title>
+		<?php elseif (G::location() === "admin"): ?>
+			<title>Админка. Вход</title>
+		<?php endif; ?>
+	</head>
+	<body>
+		<form>
+			<input type="hidden" name="token" value="<?php echo md5(SALT . $_SESSION['_auth_token']); ?>"/>
+			<?php if (JSENCRYPT_AUTH === true): ?>
+				<input type="hidden" name="public_key" value="<?php echo file_get_contents(JSENCRYPT_PUBLIC_KEY); ?>"/>
+			<?php endif; ?>
+			
+			<div class="_auth">
+				<!-- Логотип -->
+				<div class="_logo">
+					<img src="img/logo_<?php echo G::location(); ?>.png"/>
+				</div>
+
+				<!-- Поля -->
+				<div class="_field">
+					<?php if (G::location() === "constr"): ?>
+						<input type="text" name="Email" placeholder="Имя"/>
+					<?php elseif (G::location() === "admin"): ?>
+						<input type="text" name="Email" placeholder="Почтовый ящик"/>
+					<?php endif; ?>
+					<input type="password" name="Password" placeholder="Пароль"/>
+				</div>
+
+				<!-- Кнопка -->
+				<div class="_button">
+					<div class="_icon"></div>
+					Вход
+				</div>
+				
+				<?php if (G::location() === "admin"): ?>
+					<!-- Забыли пароль -->
+					<div class="_restore">
+						<a href="?restore">Забыли пароль</a>
+					</div>
+				<?php endif; ?>
+
+			</div>
+			
+			<!-- Чтобы при нажатии enter срабатывал submit -->
+			<input type="submit" value="" style="display: none;"/>
+		</form>
+		
+		<!-- Загрузка -->
+		<div id="_loader" class="_loader">
+			<img src="img/loader.gif" width="220" height="19"/>
+		</div>
+		
+		<!-- Перекрытие -->
+		<div id="_overlay" class="_overlay"></div>
+		
+		<!-- Стандартные окна (alert, confirm, prompt) -->
+		<?php require "part/okno.html"; ?>
+		
+	</body>
+</html>

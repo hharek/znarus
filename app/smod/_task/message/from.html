@@ -1,0 +1,33 @@
+<body>
+	<?php if($task['Status'] === "done"): ?>
+		<p>Выполнено задание на сайте «<?php echo DOMAIN; ?>».</p>
+	<?php elseif($task['Status'] === "fail"): ?>
+		<p>Получен отказ от задания на «<?php echo DOMAIN; ?>».</p>
+	<?php endif; ?>
+		
+	<p>Дата создания: <?php echo date("d.m.Y - H:i:s", strtotime($task['Date_Create'])); ?></p>
+	
+	<?php if($task['Status'] === "done"): ?>
+		<p>Дата выполнения: <?php echo date("d.m.Y - H:i:s", strtotime($task['Date_Done'])); ?></p>
+	<?php elseif($task['Status'] === "fail"): ?>
+		<p>Дата отказа: <?php echo date("d.m.Y - H:i:s", strtotime($task['Date_Fail'])); ?></p>
+	<?php endif; ?>
+	
+	<p>Исполнитель: <?php echo !empty($task['To_Name']) ? $task['To_Name'] : ROOT_NAME_FULL; ?></p>
+	
+	<p>Наименование: <?php echo htmlspecialchars($task['Name']); ?></p>
+	
+	<p>Описание: <?php echo htmlspecialchars($task['Content']); ?></p>
+	
+	<?php if($task['Status'] === "done"): ?>
+		<p>Примечания по выполнению: <?php echo htmlspecialchars($task['Note']); ?></p>
+	<?php elseif($task['Status'] === "fail"): ?>
+		<p>Причина отказа: <?php echo htmlspecialchars($task['Note']); ?></p>
+	<?php endif; ?>
+	
+	<p>
+		<a href="http://<?php echo DOMAIN; ?>/<?php echo URL_ADMIN; ?>/#zn_task/from_edit?id=<?php echo $task['ID']; ?>">
+			Подробнее
+		</a>
+	</p>
+</body>

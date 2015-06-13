@@ -1,0 +1,48 @@
+<form>
+	<table class="std_form">
+		<tr>
+			<td>Идентификатор</td>
+			<td>
+				<input type="text" name="Identified" value="<?php echo htmlspecialchars($html['Identified']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Наименование</td>
+			<td>
+				<input type="text" name="Name" value="<?php echo htmlspecialchars($html['Name']); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td>По умолчанию</td>
+			<td>
+				<?php if(P::get("html_default") === $html['Identified']): ?>
+					<input type="hidden" name="Default" value="1"/>
+				<?php else: ?>
+					<input type="hidden" name="Default" value="0"/>
+				<?php endif; ?>
+				
+				<input type="checkbox" name="Default" value="1"<?php if(P::get("html_default") === $html['Identified']): ?> checked disabled<?php endif; ?>/>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="std_button submit">
+					<div class="icon_edit"></div>
+					Редактировать
+				</div>
+			</td>
+			<td>
+				<a class="std_button" href="#html/list">
+					<div class="icon_back"></div>
+					Назад
+				</a>
+				<div 
+					class="icon_basket delete" 
+					url="#html/delete?id=<?php echo $html['ID']; ?>" 
+					mess="Вы действительно хотите удалить шаблон «<?php echo $html['Identified']; ?> (<?php echo $html['Name']; ?>)» ?" 
+					style="margin: 0 0 -8px 0"
+				></div>
+			</td>
+		</tr>
+	</table>
+</form>

@@ -1,0 +1,26 @@
+<table class="std_list" style="width: 600px;">
+	<col width="40%" />
+	<col width="45%" />
+	<col width="15%" />
+	<thead>
+		<tr>
+			<td colspan="3">Процедуры</td>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($proc as $val): ?>
+			<tr <?php if((bool)$val['Active'] === false or (bool)$val['Module_Active'] === false): ?>style="color: gray;"<?php endif; ?>>
+				<td>
+					<?php echo $val['Module_Identified']; ?> - <?php echo $val['Identified']; ?>
+				</td>
+				<td>
+					<?php echo $val['Name']; ?>
+				</td>
+				<td>
+					<div onclick="_exe('#proc/order', { id: <?php echo $val['ID']; ?>, sort: 'up'});" class="icon_up up"></div>
+					<div onclick="_exe('#proc/order', { id: <?php echo $val['ID']; ?>, sort: 'down'});" class="icon_down down"></div>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>

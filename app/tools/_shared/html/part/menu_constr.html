@@ -1,0 +1,66 @@
+<?php
+$mod = _Module::get_by_type("mod");
+$smod = _Module::get_by_type("smod");
+$html = _Html::get_all();
+$packjs = _Packjs::get_all();
+?>
+
+<div id="_menu" class="_menu">
+
+	<div class="_item">
+		<div class="_title _constr">
+			<a href="#module/list">Модули</a>
+		</div>
+		<a href="#module/add" class="icon_add"></a>
+		<div class="_podmenu _constr">
+			<?php foreach ($mod as $val): ?>
+				<a href="#module/edit?id=<?php echo $val['ID']; ?>"><?php echo $val['Identified']; ?> - <?php echo $val['Name']; ?></a>
+			<?php endforeach; ?>
+			
+			<hr style="border: 1px dashed #ccc;"/>
+			<?php foreach ($smod as $val): ?>
+				<a href="#module/edit?id=<?php echo $val['ID']; ?>"><?php echo $val['Identified']; ?> - <?php echo $val['Name']; ?></a>
+			<?php endforeach; ?>
+		</div>
+	</div>
+
+	<div class="_item">
+		<div class="_title _constr">
+			<a href="#html/list">Шаблоны</a>
+		</div>
+		<a href="#html/add" class="icon_add"></a>
+		<div class="_podmenu _constr">
+			<?php foreach ($html as $val): ?>
+				<a href="#html/edit?id=<?php echo $val['ID']; ?>"><?php echo $val['Identified']; ?> - <?php echo $val['Name']; ?></a>
+			<?php endforeach; ?>
+		</div>
+	</div>
+	
+	<div class="_item">
+		<div class="_title _constr">
+			<a href="#packjs/list">Пакеты JavaScript</a>
+		</div>
+		<a href="#packjs/add" class="icon_add"></a>
+		<div class="_podmenu _constr">
+			<?php if (!empty($packjs)): ?>
+				<?php foreach ($packjs as $val): ?>
+					<a href="#packjs/edit?id=<?php echo $val['ID']; ?>"><?php echo $val['Name']; ?></a>
+				<?php endforeach; ?>
+			<?php endif; ?>
+		</div>
+	</div>
+	
+	<div class="_item">
+		<div class="_title _constr">Другое</div>
+		<div class="_podmenu _constr">
+			<a href="#param/sys">Системные параметры</a>
+			<a href="#text/sys">Системные тексты</a>
+			<a href="#other/autoloader">Автозагрузчик</a>
+			<a href="#other/jsencrypt">JSEncrypt</a>
+			<a href="#other/cache_truncate">Очистить кэш</a>
+			<a href="#proc/order">Сортировка процедур</a>
+			<a href="#other/other_page">Другие страницы</a>
+		</div>
+	</div>
+
+</div>

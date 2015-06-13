@@ -1,0 +1,81 @@
+._okno
+{
+	width: 340px;
+	/*min-height: 100px;*/
+	padding: 0px 0px 0px 0px;
+	
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	margin-left: -200px;
+	margin-top: -100px;
+	
+	border: 1px solid #000;
+	border-radius: 20px;
+	background-color: #fff;
+	z-index: 11;
+	
+	display: none;
+	
+	._str
+	{
+		min-width: 308px;
+		min-height: 20px;
+
+		margin: 14px auto;
+		text-align: center;
+		padding: 5px 20px;
+	}
+	
+	._down
+	{
+		width: 316px;
+		height: 22px;
+		margin: 20px auto 24px auto;
+		
+		._confirm_ok
+		{
+			float: left;
+			margin: 0px;
+		}
+		
+		._confirm_back
+		{
+			float: right;
+			margin: 0px;
+		}
+		
+		._alert_back
+		{
+			width: 120px;
+			display: block;
+			margin: 0px auto;
+		}
+		
+		._prompt_ok
+		{
+			float: left;
+			margin: 0px;
+		}
+		
+		._prompt_back
+		{
+			float: right;
+			margin: 0px;
+		}
+	}
+	
+	._input
+	{
+		width: 260px;
+		display: block;
+		margin: 0px auto 0px auto;
+		
+		input
+		{
+			width: 250px;
+			border: 1px solid #a19d9a;
+			border-radius: 4px;
+		}
+	}
+}

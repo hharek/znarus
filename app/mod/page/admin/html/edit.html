@@ -23,9 +23,7 @@ function parent_html($page, $level, $current)
 }
 ?>
 
-<?php packjs_tinymce4("Content"); ?>
-
-<form action="#page/edit_post?id=<?php echo $page['ID']; ?>">
+<form>
 	<table class="std_form" align="center">
 		<tr>
 			<td>Наименование</td>
@@ -41,7 +39,7 @@ function parent_html($page, $level, $current)
 		</tr>
 		<tr>
 			<td colspan="2">
-				<textarea style="width: 100%; height: 450px;" name="Content"><?php echo htmlspecialchars($page['Content']); ?></textarea>
+				<textarea name="Content"><?php echo htmlspecialchars($page['Content']); ?></textarea>
 			</td>
 		</tr>
 		<tr>
@@ -51,6 +49,12 @@ function parent_html($page, $level, $current)
 			</td>
 		</tr>
 		<tr>
+			<td>Другое</td>
+			<td>
+				<input type="checkbox" id="show_other"/>
+			</td>
+		</tr>
+		<tr id="tr_parent" style="display:none;">
 			<td>Корень</td>
 			<td>
 				<select name="Parent">
@@ -59,55 +63,51 @@ function parent_html($page, $level, $current)
 				</select>
 			</td>
 		</tr>
-		<tr>
-			<td>Другое</td>
-			<td>
-				<input type="checkbox" id="show_other"/>
-			</td>
-		</tr>
 		<tr id="tr_html" style="display:none;">
 			<td>Шаблон</td>
 			<td>
-				<select name="Html_Identified">
+				<select name="Html_ID">
 					<option value=""></option>
 					<?php foreach ($html as $val): ?>
-						<option value="<?php echo $val['Identified']; ?>"<?php if($page['Html_Identified'] == $val['Identified']): ?> selected="selected"<?php endif; ?>>
+						<option value="<?php echo $val['ID']; ?>"<?php if($page['Html_ID'] == $val['ID']): ?> selected="selected"<?php endif; ?>>
 							<?php echo $val['Name']; ?>
 						</option>
 					<?php endforeach; ?>
 				</select>
 			</td>
 		</tr>
-		<tr>
-			<td>
-				<div class="std_button submit">
-					<div class="icon_edit"></div>
-					Сохранить
-				</div>
-			</td>
-			<td>
-				<a class="std_button" href="#page/list">
-					<div class="icon_back"></div>
-					Назад
-				</a>
-				<div class="icon_delete delete" 
-					 url="#page/delete_post?id=<?php echo $page['ID']; ?>"
-				>Вы действительно хотите удалить страницу «<?php echo $page['Name']; ?>» ?</div>
-			</td>
-		</tr>
 	</table>
+	<div class="center">
+		<div class="std_button submit">
+			<div class="icon_edit"></div>
+			Сохранить
+		</div>
+		<a class="std_button" href="#page/list">
+			<div class="icon_back"></div>
+			Назад
+		</a>
+		<div 
+			class="icon_basket delete" 
+			url="#page/delete?id=<?php echo $page['ID']; ?>"
+			mess="Вы действительно хотите удалить страницу «<?php echo $page['Name']; ?>» ?"
+		></div>
+	</div>
 </form>
-
-
 
 <script>
 /* Отображить другое */
 $("#show_other").click(function()
 {
 	if($(this).is(":checked") === true)
-	{$("#tr_html").show();}
+	{
+		$("#tr_parent").show();
+		$("#tr_html").show();
+	}
 	else
-	{$("#tr_html").hide();}
+	{
+		$("#tr_parent").show();
+		$("#tr_html").hide();
+	}
 });
 
 /* Транслит */

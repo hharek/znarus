@@ -1,16 +1,26 @@
 <?php
 //header("Content-type: text/plain");
 
-require "01_init.php";
-require "02_proc_start.php";
-require "03_router.php";
-require "04_access.php";
-require "05_html_set.php";
-require "06_inc.php";
-require "07_exe.php";
-require "08_html.php";
-require "09_proc_end.php";
-require "10_data.php";
+require __DIR__ . "/../init.php";
+require "function.php";
 
-echo Reg::output();
+_Front::redirect();
+_Front::url_check();
+_Front::route();
+_Front::cache_page_get();
+
+if (_Front::$_cache_page === false)
+{
+	_Front::proc();
+	_Front::access();
+	_Front::html_set();
+	_Front::exe();
+	_Front::html();
+	_Front::cache_page_set();	
+}
+
+_Front::is_modified();
+_Front::data();
+_Front::header();
+_Front::output();
 ?>

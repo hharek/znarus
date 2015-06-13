@@ -1,0 +1,38 @@
+<form>
+	<table class="std_form">
+		<tr>
+			<td>Источник - http://<?php echo DOMAIN; ?></td>
+			<td>
+				<input type="text" name="From" value="<?php echo htmlspecialchars($redirect['From']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Назначение</td>
+			<td>
+				<input type="text" name="To" value="<?php echo htmlspecialchars($redirect['To']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Делать переход на другой урл</td>
+			<td>
+				<input type="hidden" name="Location" value="0"/>
+				<input type="checkbox" name="Location" value="1" <?php if ((bool)$redirect['Location'] === true): ?>checked="checked"<?php endif; ?>/>
+			</td>
+		</tr>
+	</table>
+	<div class="center">
+		<div class="std_button submit">
+			<div class="icon_edit"></div>
+			Изменить
+		</div>
+		<a class="std_button" href="#_seo/redirect">
+			<div class="icon_back"></div>
+			Назад
+		</a>
+		<div 
+			class="icon_basket delete" 
+			url="#_seo/redirect_delete?id=<?php echo $redirect['ID']; ?>"
+			mess="Вы действительно хотите удалить переадресацию с «<?php echo $redirect['From']; ?>»?"
+		></div>
+	</div>
+</form>

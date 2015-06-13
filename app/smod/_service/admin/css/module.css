@@ -1,0 +1,39 @@
+.module
+{
+	width: 270px;
+	height: 135px;
+	margin: 0px 0px 10px 10px;
+	border: 1px solid #ccc;
+	border-radius: 10px;
+	background: white;
+	float: left;
+	
+	.title
+	{
+		height: 20px;
+		border-bottom: 1px solid #ccc;
+		border-radius: 10px 10px 0px 0px;
+		text-align: center;
+		padding: 3px 0px;
+		font-weight: bold;
+		background: #dde783;
+	}
+	
+	.m_center
+	{
+		min-height: 60px;
+		
+		.image
+		{
+			min-width: 40px;
+			float: left;
+			margin: 5px 0px 0px 15px;
+		}
+		
+		.admin
+		{
+			min-width: 120px;
+			margin: 10px 0px 0px 50px;
+		}
+	}	
+}

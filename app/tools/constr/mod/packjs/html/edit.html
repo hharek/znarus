@@ -1,0 +1,69 @@
+<form>
+	<table class="std_form">
+		<tr>
+			<td>Идентификатор</td>
+			<td>
+				<input type="text" name="Identified" value="<?php echo htmlspecialchars($packjs['Identified']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Наименование</td>
+			<td>
+				<input type="text" name="Name" value="<?php echo htmlspecialchars($packjs['Name']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Описание</td>
+			<td>
+				<textarea name="Description"><?php echo htmlspecialchars($packjs['Description']); ?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td>Версия</td>
+			<td>
+				<input type="text" name="Version" value="<?php echo htmlspecialchars($packjs['Version']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Урл</td>
+			<td>
+				<input type="text" name="Url" value="<?php echo htmlspecialchars($packjs['Url']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Категория</td>
+			<td>
+				<input type="text" name="Category" value="<?php echo htmlspecialchars($packjs['Category']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Зависемости</td>
+			<td>
+				<input type="text" name="Depend" value="<?php echo htmlspecialchars($packjs['Depend']); ?>"/>
+			</td>
+		</tr>
+	</table>
+	
+	<center>
+		<div class="std_button submit">
+			<div class="icon_edit"></div>
+			Сохранить
+		</div>
+		<a class="std_button" href="#packjs/list">
+			<div class="icon_back"></div>
+			Назад
+		</a>
+		<a class="std_button" href="#packjs/dump?id=<?php echo $packjs['ID']; ?>">
+			<div class="icon_install"></div>
+			Создать установочный файл
+		</a>
+		<div 
+			title="Удалить"
+			class="icon_basket delete" 
+			url="#packjs/delete?id=<?php echo $packjs['ID']; ?>" 
+			mess="Вы действительно хотите удалить Пакет JavaScript «<?php echo $packjs['Identified']; ?> (<?php echo $packjs['Name']; ?>)» ?" 
+			style="margin: 0 0 -8px 0"
+		></div>
+	</center>
+	
+</form>

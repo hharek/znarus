@@ -1,0 +1,35 @@
+<form>
+	<input type="hidden" name="path" value="<?php echo $path; ?>"/>
+	<table class="std_form" align="center">
+		<tr>
+			<td>Имя файла:</td>
+			<td>
+				<?php if(!empty($path)): ?>
+					/<?php echo $path; ?>/
+				<?php else: ?>
+					/
+				<?php endif; ?>
+				<input type="text" name="file" value=""/>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<textarea name="content" style="width: 100%; height: 450px;"></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="std_button submit">
+					<div class="icon_add"></div>
+					Добавить
+				</div>
+			</td>
+			<td>
+				<a href="#_explorer/ls?path=<?php echo $path; ?>" class="std_button">
+					<div class="icon_back"></div>
+					Назад
+				</a>
+			</td>
+		</tr>
+	</table>
+</form>

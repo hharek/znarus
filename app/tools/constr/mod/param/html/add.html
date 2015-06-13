@@ -1,0 +1,46 @@
+<form>
+	<table class="std_form">
+		<tr>
+			<td>Идентификатор</td>
+			<td>
+				<input type="text" name="Identified"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Наименование</td>
+			<td>
+				<input type="text" name="Name"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Тип</td>
+			<td>
+				<select name="Type">
+					<option>string</option>
+					<option>int</option>
+					<option>bool</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>Значение</td>
+			<td>
+				<input type="text" name="Value"/>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="std_button submit">
+					<div class="icon_add"></div>
+					Добавить
+				</div>
+			</td>
+			<td>
+				<a class="std_button" href="#module/edit?id=<?php echo $module['ID']; ?>#tab_structure_param">
+					<div class="icon_back"></div>
+					Назад
+				</a>
+			</td>
+		</tr>
+	</table>
+</form>

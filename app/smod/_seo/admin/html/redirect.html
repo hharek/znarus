@@ -1,0 +1,30 @@
+<table class="std_list" style="width: 600px;" align="center">
+	<thead>
+		<tr>
+			<td>Переадресация</td>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($redirect as $val): ?>
+			<tr url="#_seo/redirect_edit?id=<?php echo $val['ID']; ?>">
+				<td style="text-align: left; padding-left: 20px;">
+					<?php echo $val['From']; ?>
+					<?php if ((bool)$val['Location'] === true): ?>
+						<span>↴</span>
+					<?php else: ?>
+						<span>=</span>
+					<?php endif; ?>
+					<br/>
+					<?php echo $val['To']; ?>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+<br/>
+<center>
+	<a class="std_button" href="#_seo/redirect_add">
+		<div class="icon_add"></div>
+		Добавить
+	</a>
+</center>

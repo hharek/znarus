@@ -1,14 +1,16 @@
 <?php
-$news = News::select_line_by_id(Reg::news_id());
+/* Новости */
+$news = News::get(G::news_id());
 
-Reg::title($news['Title']);
-Reg::meta_title($news['Title']. ". Новости");
-Reg::meta_description(ZN_Seo::meta_description_prepare($news['Anons']));
-Reg::meta_keywords($news['Tags']);
-
-Reg::path
+/* Мета */
+title($news['Title']);
+meta_title($news['Title']. ". Новости");
+meta_description($news['Anons']);
+tags($news['Tags']);
+path
 ([
 	"Новости [/новости]",
 	"{$news['Title']} [/новости/{$news['Url']}]"
 ]);
+last_modified($news['Last_Modified']);
 ?>

@@ -1,0 +1,43 @@
+<form>
+	<table class="std_form">
+		<tr>
+			<td>Адрес - http://<?php echo DOMAIN; ?></td>
+			<td>
+				<input type="text" name="Url" value="<?php echo htmlspecialchars($url['Url']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Тэг title</td>
+			<td>
+				<input type="text" name="Title" value="<?php echo htmlspecialchars($url['Title']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td style="vertical-align: top;">Тэг meta keywords</td>
+			<td>
+				<textarea name="Keywords"><?php echo htmlspecialchars($url['Keywords']); ?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td style="vertical-align: top;">Тэг meta description</td>
+			<td>
+				<textarea name="Description"><?php echo htmlspecialchars($url['Description']); ?></textarea>
+			</td>
+		</tr>
+	</table>
+	<div class="center">
+		<div class="std_button submit">
+			<div class="icon_edit"></div>
+			Изменить
+		</div>
+		<a class="std_button" href="#_seo/url">
+			<div class="icon_back"></div>
+			Назад
+		</a>
+		<div 
+			class="icon_basket delete" 
+			url="#_seo/url_delete?id=<?php echo $url['ID']; ?>"
+			mess="Вы действительно хотите удалить адрес для продвижения «<?php echo $url['Url']; ?>»?"
+		></div>
+	</div>
+</form>

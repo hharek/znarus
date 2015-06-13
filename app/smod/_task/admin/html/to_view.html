@@ -1,0 +1,72 @@
+<table class="std_form">
+	<tr>
+		<td>Наименование</td>
+		<td>
+			<?php echo $task['Name']; ?>
+		</td>
+	</tr>
+	<tr>
+		<td>Заказчик</td>
+		<td>
+			<?php echo empty($task['From_Name']) ? ROOT_NAME_FULL : $task['From_Name']; ?>
+		</td>
+	</tr>
+	<tr>
+		<td>Описание</td>
+		<td>
+			<?php echo $task['Content']; ?>
+		</td>
+	</tr>
+	<tr>
+		<tr>
+			<td>Статус</td>
+			<td>
+				<?php if($task['Status'] === "create"): ?>Создан<?php endif; ?>
+				<?php if($task['Status'] === "done"): ?><span style="color:green;">Выполен</span><?php endif; ?>
+				<?php if($task['Status'] === "fail"): ?><span style="color:red;">Отказ</span><?php endif; ?>
+			</td>
+		</tr>
+	</tr>
+	<tr>
+		<td>Дата создания:</td>
+		<td>
+			<?php echo date("d.m.Y - H:i:s", strtotime($task['Date_Create'])); ?>
+		</td>
+	</tr>
+	<?php if($task['Status'] === "create"): ?>
+		<tr>
+			<td>Выполнить до:</td>
+			<td>
+				<?php echo !empty($task['Date_Require']) ? date("d.m.Y - H:i:s", strtotime($task['Date_Require'])) : "Бессрочно"; ?>
+			</td>
+		</tr>
+	<?php endif; ?>
+	<?php if($task['Status'] === "done"): ?>
+		<tr>
+			<td>Дата выполнения:</td>
+			<td>
+				<?php echo date("d.m.Y - H:i:s", strtotime($task['Date_Done'])); ?>
+			</td>
+		</tr>
+	<?php endif; ?>
+	<?php if($task['Status'] === "fail"): ?>
+		<tr>
+			<td>Дата выполнения:</td>
+			<td>
+				<?php echo date("d.m.Y - H:i:s", strtotime($task['Date_Fail'])); ?>
+			</td>
+		</tr>
+	<?php endif; ?>
+</table>
+<?php if($task['Status'] === "create"): ?>
+	<div class="center">
+		<a class="std_button" href="#_task/to_status?id=<?php echo $task['ID']; ?>&status=done">
+			<div class="icon_active"></div>
+			Выполнить
+		</a>
+		<a class="std_button" href="#_task/to_status?id=<?php echo $task['ID']; ?>&status=fail">
+			<div class="icon_deactive"></div>
+			Отказать
+		</a>
+	</div>
+<?php endif; ?>

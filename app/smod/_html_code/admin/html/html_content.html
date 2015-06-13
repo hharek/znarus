@@ -1,0 +1,25 @@
+<!-- Форма -->
+<form>
+	<table class="std_form">
+		<tr>
+			<td colspan="2" style="text-align: center;">
+				<?php echo $html['Identified']; ?>.html (<?php echo $html['Name']; ?>)
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2" style="text-align: left;">
+				<textarea name="Content" ><?php echo htmlspecialchars(G::file_app()->get("html/{$html['Identified']}.html")); ?></textarea>
+			</td>
+		</tr>
+	</table>
+	<div class="center">
+		<div class="std_button submit">
+			<div class="icon_edit"></div>
+			Сохранить
+		</div>
+		<a href="<?php echo $back_url; ?>" class="std_button">
+			<div class="icon_back"></div>
+			Назад
+		</a>
+	</div>
+</form>

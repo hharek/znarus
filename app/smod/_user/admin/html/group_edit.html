@@ -1,0 +1,29 @@
+<form>
+	<table class="std_form">
+		<tr>
+			<td>Наименование</td>
+			<td>
+				<input type="text" name="Name" value="<?php echo htmlspecialchars($group['Name']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="std_button submit">
+					<div class="icon_edit"></div>
+					Редактировать
+				</div>
+			</td>
+			<td>
+				<a class="std_button" href="#_user/user">
+					<div class="icon_back"></div>
+					Назад
+				</a>
+				
+				<div class="icon_basket delete" 
+					 url="#_user/group_delete?id=<?php echo $group['ID']; ?>" 
+					 mess="Вы действительно хотите удалить группу «<?php echo htmlspecialchars($group['Name']); ?>» ?"
+				></div>
+			</td>
+		</tr>
+	</table>
+</form>

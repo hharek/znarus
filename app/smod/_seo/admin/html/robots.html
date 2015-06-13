@@ -1,0 +1,29 @@
+<form>
+	<table class="std_form" align="center">
+		<tr>
+			<td colspan="2" style="text-align: center;">
+				robots.txt
+				<?php if($is_robots === false): ?>
+				<span style="color: #ccc;">(Файл будет создан)</span>
+				<?php endif; ?>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<textarea name="Content" style="width: 100%; height: 450px;"><?php echo htmlspecialchars($robots); ?></textarea>
+			</td>
+		</tr>
+	</table>
+	<div class="center">
+		<div class="std_button submit">
+			<div class="icon_edit"></div>
+			Править
+		</div>
+		<div 
+			class="icon_basket delete" 
+			url="#_seo/robots_delete" 
+			title="Удалить robots.txt" style="margin-top: 9px;"
+			mess="Вы действительно хотите удалить файл «robots.txt»?"
+		></div>
+	</div>
+</form>

@@ -1,6 +1,6 @@
 <table align="center" class="std_list">
-	<col width="40%" />
-	<col width="40%" />
+	<col width="45%" />
+	<col width="45%" />
 	<col width="10%" />
 	<thead>
 		<tr>
@@ -10,22 +10,17 @@
 		</tr>
 	</thead>
 	<tbody>
-		<?php foreach ($faq as $key=>$val): ?>
+		<?php foreach ($faq as $key => $val): ?>
 			<tr>
-				<td url="#faq/edit?id=<?php echo $val['ID']; ?>" style="text-align: left; padding-left: 10px; vertical-align: top;">
+				<td url="#faq/edit?id=<?php echo $val['ID']; ?>" style="text-align: left; padding-left: 10px;">
 					<?php echo $val['Question']; ?>
 				</td>
 				<td url="#faq/edit?id=<?php echo $val['ID']; ?>" style="text-align: left; padding-left: 10px;">
 					<?php echo $val['Answer']; ?>
 				</td>
 				<td>
-					<?php if($key !== 0): ?>
-						<div onclick="zn('#faq/sort_up_post', { id: <?php echo $val['ID']; ?>});" class="icon_up" style="cursor: pointer;"></div>
-					<?php endif; ?>
-
-					<?php if(count($faq) != $key + 1): ?>
-						<div onclick="zn('#faq/sort_down_post', { id: <?php echo $val['ID']; ?>});" class="icon_down" style="cursor: pointer;"></div>
-					<?php endif; ?>
+					<div onclick="_exe('#faq/sort', { type: 'up', id: <?php echo $val['ID']; ?> });" class="icon_up up"></div>
+					<div onclick="_exe('#faq/sort', { type: 'down', id: <?php echo $val['ID']; ?> });" class="icon_down down"></div>
 				</td>
 			</tr>
 		<?php endforeach; ?>

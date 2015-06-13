@@ -1,55 +1,64 @@
 <?php
-/* Конфигурация и реестр */
-require dirname(__FILE__)."/sys/reg.php";
+/* Конфигурация  */
 require dirname(__FILE__)."/conf/conf.php";
 require dirname(__FILE__)."/conf/options.php";
+require dirname(__FILE__)."/conf/ini.php";
 
-/* Общее */
-if(Reg::error_reporting())
-{error_reporting(-1);}
-else
-{error_reporting(0);}
-
-mb_internal_encoding("UTF-8");
+/* Глобальные переменные */
+require dirname(__FILE__)."/sys/g.php";
 
 /* Разбор урла */
-Reg::url(urldecode($_SERVER['REQUEST_URI']));
-Reg::url_path(parse_url("http://{$_SERVER['SERVER_NAME']}" . Reg::url(), PHP_URL_PATH));
-if(Reg::url_path() !== "/")
-{Reg::url_path_ar(explode("/", mb_substr(Reg::url_path(), 1)));}
+G::url(urldecode($_SERVER['REQUEST_URI']));
+G::url_path(parse_url(G::url(), PHP_URL_PATH));
+if (G::url_path() !== "/")
+{
+	G::url_path_ar(explode("/", mb_substr(G::url_path(), 1)));
+}
 else
-{Reg::url_path_ar(array());}
-
-/* Нет слэша на конце */
-if(in_array(Reg::url(), array("/" . Reg::url_constr(), "/" . Reg::url_admin())))
 {
-	header("Location: " . Reg::url() . "/");
+	G::url_path_ar([]);
 }
 
-/* Конструктор */
-if (mb_substr(Reg::url(), 0, mb_strlen(Reg::url_constr()) + 2) === "/" . Reg::url_constr(). "/")
+/* Инструменты (конструктор или админка) */
+if 
+(
+	(
+		isset(G::url_path_ar()[0]) and
+		G::url_path_ar()[0] === URL_CONSTR and 
+		is_dir(DIR_TOOLS . "/constr") and
+		CONSTR_ENABLE === true
+	) 
+	or
+	(
+		isset(G::url_path_ar()[0]) and
+		G::url_path_ar()[0] === URL_ADMIN and 
+		is_dir(DIR_TOOLS . "/admin") and
+		ADMIN_ENABLE === true
+	)
+)
 {
-	Reg::url_constr_path("/" . implode("/", array_slice(Reg::url_path_ar(), 1)));
-	Reg::location("constr");
-	require Reg::path_app()."/constr/index.php";
+	require DIR_APP."/tools/index.php";
 }
-/* Админка */
-elseif (mb_substr(Reg::url(), 0, mb_strlen(Reg::url_admin()) + 2) === "/" . Reg::url_admin(). "/")
+/* Тест */
+elseif (G::url_path() === "/" . URL_TEST)
 {
-	Reg::url_admin_path("/" . implode("/", array_slice(Reg::url_path_ar(), 1)));
-	Reg::location("admin");
-	require Reg::path_app()."/admin/index.php";
+	G::location("test");
+	require DIR_APP."/test/index.php";
 }
-/* Тестирование */
-elseif (Reg::url_path() == "/test")
+/* Аякс */
+elseif 
+(
+	isset(G::url_path_ar()[0]) and
+	G::url_path_ar()[0] === URL_AJAX
+)
 {
-	Reg::location("test");
-	require Reg::path_app()."/test/index.php";
+	G::location("ajax");
+	require DIR_APP."/ajax/index.php";
 }
 /* Основной вывод */
 else
 {
-	Reg::location("front");
-	require Reg::path_app()."/front/index.php";
+	G::location("front");
+	require DIR_APP."/front/index.php";
 }
 ?>

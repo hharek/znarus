@@ -9,7 +9,7 @@
  * @version		0.2.3
  * @link		https://github.com/hharek/zn_ftp/
  */
-class ZN_FTP
+class _FTP
 {
 
 	/**

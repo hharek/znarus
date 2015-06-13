@@ -1,0 +1,144 @@
+<div class="center">
+	<div class="std_button tab_button active" tab="create">
+		<div class="icon_task"></div>
+		Текущие
+	</div>
+	
+	<div class="std_button tab_button" tab="done">
+		<div class="icon_active"></div>
+		Выполненные
+	</div>
+	
+	<div class="std_button tab_button" tab="fail">
+		<div class="icon_delete"></div>
+		Отказанные
+	</div>
+</div>
+<br/>
+
+<div id="tab_create" class="tab">
+	<table class="std_list" align="center">
+		<col width="40%"/>
+		<col width="30%"/>
+		<col width="15%"/>	
+		<col width="15%"/>	
+		<thead>
+			<tr>
+				<td>Наименование</td>
+				<td>Заказчик</td>
+				<td>Дата создания</td>
+				<td>Выполнить до</td>
+			</tr>
+		</thead>
+		<tbody>
+			<?php if (!empty($task)): ?>
+				<?php foreach ($task as $val): ?>
+					<?php if($val['Status'] === "create"): ?>
+						<tr url="#_task/to_view?id=<?php echo $val['ID']; ?>">
+							<td style="text-align: left; padding-left: 20px;">
+								<?php echo $val['Name']; ?>
+							</td>
+							<td>
+								<?php echo empty($val['From_Name']) ? ROOT_NAME_FULL : $val['From_Name']; ?>
+							</td>
+							<td>
+								<?php echo date("d.m.Y", strtotime($val['Date_Create'])); ?><br/>
+								<?php echo date("H:i:s", strtotime($val['Date_Create'])); ?>
+							</td>
+							<td>
+								<?php if(!empty($val['Date_Require'])): ?>
+									<?php echo date("d.m.Y", strtotime($val['Date_Require'])); ?><br/>
+									<?php echo date("H:i:s", strtotime($val['Date_Require'])); ?>
+								<?php else : ?>
+									Бессрочно
+								<?php endif; ?>
+							</td>
+						</tr>
+					<?php endif; ?>
+				<?php endforeach; ?>
+			<?php endif; ?>
+		</tbody>
+	</table>
+</div>
+
+<div id="tab_done" class="tab">
+	<table class="std_list" align="center">
+		<col width="40%"/>
+		<col width="30%"/>
+		<col width="15%"/>	
+		<col width="15%"/>	
+		<thead>
+			<tr>
+				<td>Наименование</td>
+				<td>Заказчик</td>
+				<td>Дата создания</td>
+				<td>Дата выполнения</td>
+			</tr>
+		</thead>
+		<tbody>
+			<?php if (!empty($task)): ?>
+				<?php foreach ($task as $val): ?>
+					<?php if($val['Status'] === "done"): ?>
+						<tr url="#_task/to_view?id=<?php echo $val['ID']; ?>">
+							<td style="text-align: left; padding-left: 20px;">
+								<?php echo $val['Name']; ?>
+							</td>
+							<td>
+								<?php echo empty($val['From_Name']) ? ROOT_NAME_FULL : $val['From_Name']; ?>
+							</td>
+							<td>
+								<?php echo date("d.m.Y", strtotime($val['Date_Create'])); ?><br/>
+								<?php echo date("H:i:s", strtotime($val['Date_Create'])); ?>
+							</td>
+							<td>
+								<?php echo date("d.m.Y", strtotime($val['Date_Done'])); ?><br/>
+								<?php echo date("H:i:s", strtotime($val['Date_Done'])); ?>
+							</td>
+						</tr>
+					<?php endif; ?>
+				<?php endforeach; ?>
+			<?php endif; ?>
+		</tbody>
+	</table>
+</div>
+
+<div id="tab_fail" class="tab">
+	<table class="std_list" align="center">
+		<col width="40%"/>
+		<col width="30%"/>
+		<col width="15%"/>	
+		<col width="15%"/>	
+		<thead>
+			<tr>
+				<td>Наименование</td>
+				<td>Заказчик</td>
+				<td>Дата создания</td>
+				<td>Дата отказа</td>
+			</tr>
+		</thead>
+		<tbody>
+			<?php if (!empty($task)): ?>
+				<?php foreach ($task as $val): ?>
+					<?php if($val['Status'] === "fail"): ?>
+						<tr url="#_task/to_view?id=<?php echo $val['ID']; ?>">
+							<td style="text-align: left; padding-left: 20px;">
+								<?php echo $val['Name']; ?>
+							</td>
+							<td>
+								<?php echo empty($val['From_Name']) ? ROOT_NAME_FULL : $val['From_Name']; ?>
+							</td>
+							<td>
+								<?php echo date("d.m.Y", strtotime($val['Date_Create'])); ?><br/>
+								<?php echo date("H:i:s", strtotime($val['Date_Create'])); ?>
+							</td>
+							<td>
+								<?php echo date("d.m.Y", strtotime($val['Date_Fail'])); ?><br/>
+								<?php echo date("H:i:s", strtotime($val['Date_Fail'])); ?>
+							</td>
+						</tr>
+					<?php endif; ?>
+				<?php endforeach; ?>
+			<?php endif; ?>
+		</tbody>
+	</table>
+</div>

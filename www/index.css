@@ -1,0 +1,113 @@
+/* Базовые */
+*
+{
+	font-family: "Trebuchet MS";
+	font-size: 16px;
+}
+
+div.clear
+{
+	clear:both;
+}
+
+h1
+{
+	font-size: 20px;
+}
+
+.path
+{
+	margin: 11px 0 0 2px;
+}
+
+/*------------- Модуль «menu» -------------*/
+.menu_top > a
+{
+	border: 1px solid #ccc;
+	border-radius: 10px;
+	float: left;
+	margin: 0px 20px 0px 0px;
+	width: 160px;
+	height: 20px;
+	text-align: center;
+	color: #000;
+	text-decoration: none;
+	background: #fff;
+}
+
+.menu_top > a.active
+{
+	background: #f6e39f;
+}
+
+/*------------- Модуль «news» -------------*/
+.news
+{
+	width: 500px;
+	padding: 4px;
+	margin: 0px 0px 10px 0px;
+}
+
+.news > .title
+{
+	float: left;
+	margin-right: 200px;
+}
+
+.news > .title > a
+{
+	color: black;
+}
+
+.news > .date
+{
+	width: 100px;
+	float:  right;
+}
+
+.news > .anons
+{
+	font-style: italic;
+}
+
+/*------------- Модуль «articles» -------------*/
+.articles
+{
+	width: 500px;
+	padding: 4px;
+	margin: 0px 0px 10px 0px;
+}
+
+.articles > .title
+{
+	float: left;
+	margin-right: 200px;
+}
+
+.articles > .title > a
+{
+	color: black;
+}
+
+.articles > .date
+{
+	width: 100px;
+	float:  right;
+}
+
+.articles > .anons
+{
+	font-style: italic;
+}
+
+/*------------- Модуль «faq» -------------*/
+.faq > .question
+{
+	margin: 0px 0px 0px 10px;
+	font-weight: bold;
+}
+
+.faq > .answer
+{
+	margin: 0px 0px 20px 10px;
+}

@@ -1,0 +1,59 @@
+<form>
+	<table id="priv" class="priv">
+		<thead>
+			<tr>
+				<td>&nbsp;</td>
+				<?php foreach ($group as $g_val): ?>
+					<td>
+						<?php echo $g_val['vertical']; ?>
+					</td>
+				<?php endforeach; ?>
+			</tr>
+		</thead>
+		<tbody>
+			<!-- Модули -->
+			<?php foreach ($module as $m_val): ?>
+				<tr class="module">
+					<td>
+						<span>+</span> <?php echo $m_val['Name']; ?>
+					</td>
+					<?php foreach ($m_val['group'] as $mg_val): ?>
+						<td>
+							<input 
+								type="checkbox" 
+								value="1"
+							/>
+						</td>
+					<?php endforeach; ?>
+				</tr>
+				<!-- Адмники -->
+				<?php foreach ($m_val['admin'] as $a_val): ?>
+					<tr class="admin">
+						<td>
+							<span <?php if($a_val['Visible'] === "1"): ?>style="color:indigo;"<?php endif; ?>>
+								<?php echo $a_val['Name']; ?>
+							</span>
+						</td>
+						<?php foreach ($a_val['group_priv'] as $gp_val): ?>
+							<td>
+								<input 
+									type="checkbox" value="1"
+									<?php if($gp_val['priv'] === true or $a_val['Allow_All'] === "1"): ?>checked<?php endif; ?>
+									<?php if ($a_val['Allow_All'] === "1"): ?>disabled<?php endif; ?>
+									name="priv_<?php echo $a_val['ID']; ?>_<?php echo $gp_val['group_id']; ?>"
+								/>
+							</td>
+						<?php endforeach; ?>
+					</tr>
+				<?php endforeach; ?>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+	<br/>
+	<center>
+		<div class="std_button submit">
+			<div class="icon_edit"></div>
+			Назначить привилегии
+		</div>
+	</center>
+</form>

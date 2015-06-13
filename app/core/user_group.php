@@ -2,8 +2,36 @@
 /**
  * Группы пользователей
  */
-class ZN_User_Group
+class _User_Group
 {
+	/**
+	 * Проверка по ID
+	 * 
+	 * @param int $id
+	 */
+	public static function is($id)
+	{
+		if (!Chf::uint($id))
+		{
+			throw new Exception("Номер у группы задан неверно. " . Chf::error());
+		}
+
+		$query = 
+<<<SQL
+SELECT 
+	true
+FROM 
+	"user_group"
+WHERE 
+	"ID" = $1
+SQL;
+		$rec = G::db_core()->query($query, $id)->single();
+		if ($rec === null)
+		{
+			throw new Exception("Группы с номером «{$id}» не существует.");
+		}
+	}
+	
 	/**
 	 * Добавить
 	 * 
@@ -13,24 +41,22 @@ class ZN_User_Group
 	public static function add($name)
 	{
 		/* Проверка */
-		Err::check_field($name, "string", false, "Name", "Наименование");
-		Err::exception();
-		
+		self::_check($name);
+
 		/* Уникальность */
 		self::_unique($name);
-		Err::exception();
-		
+
 		/* SQL */
 		$data = 
 		[
 			"Name" => $name
 		];
-		$id = Reg::db_core()->insert("user_group", $data, "ID");
-		
+		$id = G::db_core()->insert("user_group", $data, "ID");
+
 		/* Данные добавленного */
-		return self::select_line_by_id($id);
+		return self::get($id);
 	}
-	
+
 	/**
 	 * Редактировать
 	 * 
@@ -41,25 +67,23 @@ class ZN_User_Group
 	public static function edit($id, $name)
 	{
 		/* Проверка */
-		self::is_id($id);
-		Err::check_field($name, "string", false, "Name", "Наименование");
-		Err::exception();
-		
+		self::is($id);
+		self::_check($name);
+
 		/* Уникальность */
 		self::_unique($name, $id);
-		Err::exception();
-		
+
 		/* SQL */
-		$data =
+		$data = 
 		[
 			"Name" => $name
 		];
-		Reg::db_core()->update("user_group", $data, array("ID" => $id));
-		
+		G::db_core()->update("user_group", $data, ["ID" => $id]);
+
 		/* Данные изменённого */
-		return self::select_line_by_id($id);
+		return self::get($id);
 	}
-	
+
 	/**
 	 * Удалить
 	 * 
@@ -69,57 +93,25 @@ class ZN_User_Group
 	public static function delete($id)
 	{
 		/* Проверка */
-		$group = self::select_line_by_id($id);
-		
-		/* Удаление пользователей */
-		$user = ZN_User::select_list_by_group_id($id);
-		foreach ($user as $val)
-		{ZN_User::delete($val['ID']);}
-		
-		/* Удалить привилегии */
-		Reg::db_core()->delete("user_priv", array("Group_ID" => $id));
-		
-		/* Удалить */
-		Reg::db_core()->delete("user_group", array("ID" => $id));
-		
+		$old = self::get($id);
+
+		/* SQL */
+		G::db_core()->delete("user_group", ["ID" => $id]);
+
 		/* Данные удалённого */
-		return $group;
+		return $old;
 	}
-	
-	/**
-	 * Проверка по ID
-	 * 
-	 * @param int $id
-	 */
-	public static function is_id($id)
-	{
-		if(!Chf::uint($id))
-		{throw new Exception_Admin("Номер у группы задан неверно. ".Chf::error());}
-		
-		$query = 
-<<<SQL
-SELECT 
-	COUNT(*) as count
-FROM 
-	"user_group"
-WHERE 
-	"ID" = $1
-SQL;
-		$count = Reg::db_core()->query_one($query, $id, "user_group");
-		if($count < 1)
-		{throw new Exception_Admin("Группы с номером «{$id}» не существует.");}
-	}
-	
+
 	/**
 	 * Выборка строки по ID
 	 * 
 	 * @param int $id
 	 * @return array
 	 */
-	public static function select_line_by_id($id)
+	public static function get($id)
 	{
-		self::is_id($id);
-		
+		self::is($id);
+
 		$query = 
 <<<SQL
 SELECT
@@ -130,19 +122,17 @@ FROM
 WHERE 
 	"ID" = $1
 SQL;
-		$group = Reg::db_core()->query_line($query, $id, "user_group");
-		
-		return $group;
+		return G::db_core()->query($query, $id)->row();
 	}
-	
+
 	/**
-	 * Выборка всех
+	 * Все группы
 	 * 
 	 * @return array
 	 */
-	public static function select_list()
+	public static function get_all()
 	{
-		$query =
+		$query = 
 <<<SQL
 SELECT
 	"ID",
@@ -152,33 +142,46 @@ FROM
 ORDER BY
 	"Name" ASC
 SQL;
-		$group = Reg::db_core()->query_assoc($query, null, "user_group");
-		
-		return $group;
+		return G::db_core()->query($query)->assoc();
 	}
-	
+
+	/**
+	 * Проверка полей
+	 * 
+	 * @param string $name
+	 */
+	private static function _check($name)
+	{
+		Err::check_field($name, "string", false, "Name", "Наименование");
+		
+		Err::exception();
+	}
+
 	/**
 	 * Уникальность
 	 * 
 	 * @param string $name
 	 * @param int $id
 	 */
-	public static function _unique($name, $id=null)
+	private static function _unique($name, $id = null)
 	{
 		$query = 
 <<<SQL
 SELECT 
-	COUNT(*) as count
+	true
 FROM 
 	"user_group"
 WHERE 
-	"Name" = $1
+	"Name" = $1 AND
+	"ID" != $2
 SQL;
-		if(!is_null($id))
-		{$query .= " AND \"ID\" != '{$id}'";}
-		$count = Reg::db_core()->query_one($query, $name, "user_group");
-		if($count > 0)
-		{Err::add("Группа с полем «Наименование» : «{$name}» уже существует.", "Name");}
+		$rec = G::db_core()->query($query, [$name, (int)$id])->single();
+		if ($rec !== null)
+		{
+			Err::add("Группа с полем «Наименование» : «{$name}» уже существует.", "Name");
+		}
+		
+		Err::exception();
 	}
 }
 ?>

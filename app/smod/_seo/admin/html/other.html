@@ -1,0 +1,74 @@
+<form>
+	<table class="std_form">
+		<tr>
+			<td colspan="2" style="text-align: center; font-weight: bold;">Главная страница</td>
+		</tr>
+		<tr>
+			<td>Тэг title</td>
+			<td>
+				<input type="text" name="Home_Title" value="<?php echo P::get("_seo", "home_title"); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td>Тэг meta name="description"</td>
+			<td>
+				<input type="text" name="Home_Description" value="<?php echo T::get("_seo", "home_description"); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td>Тэг meta name="keywords"</td>
+			<td>
+				<input type="text" name="Home_Keywords" value="<?php echo P::get("_seo", "home_keywords"); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2" style="text-align: center; font-weight: bold;">Страница 404</td>
+		</tr>
+		<tr>
+			<td>Тэг title</td>
+			<td>
+				<input type="text" name="404_Title" value="<?php echo P::get("_seo", "404_title"); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td>Тэг meta name="description"</td>
+			<td>
+				<input type="text" name="404_Description" value="<?php echo T::get("_seo", "404_description"); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td>Тэг meta name="keywords"</td>
+			<td>
+				<input type="text" name="404_Keywords" value="<?php echo P::get("_seo", "404_keywords"); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2" style="text-align: center; font-weight: bold;">Страница 403</td>
+		</tr>
+		<tr>
+			<td>Тэг title</td>
+			<td>
+				<input type="text" name="403_Title" value="<?php echo P::get("_seo", "403_title"); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td>Тэг meta name="description"</td>
+			<td>
+				<input type="text" name="403_Description" value="<?php echo T::get("_seo", "403_description"); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td>Тэг meta name="keywords"</td>
+			<td>
+				<input type="text" name="403_Keywords" value="<?php echo P::get("_seo", "403_keywords"); ?>" />
+			</td>
+		</tr>
+	</table>
+	<br/>
+	<div class="center">
+		<div class="std_button submit">
+			<div class="icon_edit"></div>
+			Править
+		</div>
+	</div>
+</form>

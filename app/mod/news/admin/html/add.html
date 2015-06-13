@@ -1,7 +1,3 @@
-<?php packjs_tinymce4("Content"); ?>
-
-<?php packjs_datepick("Date"); ?>
-
 <!-- Транслит -->
 <script>
 $("input[name=Title]").keyup(function()
@@ -11,7 +7,7 @@ $("input[name=Title]").keyup(function()
 </script>
 
 
-<form action="#news/add_post">
+<form>
 	<table class="std_form" align="center">
 		<tr>
 			<td>Заголовок</td>
@@ -44,7 +40,7 @@ $("input[name=Title]").keyup(function()
 		</tr>
 		<tr>
 			<td colspan="2">
-				<textarea style="width: 100%; height: 450px;" name="Content"></textarea>
+				<textarea name="Content"></textarea>
 			</td>
 		</tr>
 		<tr>
@@ -53,20 +49,16 @@ $("input[name=Title]").keyup(function()
 				<textarea name="Tags"></textarea>
 			</td>
 		</tr>
-		<tr>
-			<td>
-				<div class="std_button submit">
-					<div class="icon_add"></div>
-					Добавить
-				</div>
-			</td>
-			<td>
-				<a class="std_button" href="#news/list">
-					<div class="icon_back"></div>
-					Назад
-				</a>
-			</td>
-		</tr>
 	</table>
+	<div class="center">
+		<div class="std_button submit">
+			<div class="icon_add"></div>
+			Добавить
+		</div>
+		<a class="std_button" href="#news/list">
+			<div class="icon_back"></div>
+			Назад
+		</a>
+	</div>
 </form>
 

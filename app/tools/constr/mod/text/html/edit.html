@@ -1,0 +1,42 @@
+<form>
+	<table class="std_form">
+		<tr>
+			<td>Идентификатор</td>
+			<td>
+				<input type="text" name="Identified" value="<?php echo htmlspecialchars($text['Identified']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Наименование</td>
+			<td>
+				<input type="text" name="Name" value="<?php echo htmlspecialchars($text['Name']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Значение</td>
+			<td>
+				<textarea name="Value"><?php echo htmlspecialchars($text['Value']); ?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="std_button submit">
+					<div class="icon_edit"></div>
+					Редактировать
+				</div>
+			</td>
+			<td>
+				<a class="std_button" href="#module/edit?id=<?php echo $module['ID']; ?>#tab_structure_text">
+					<div class="icon_back"></div>
+					Назад
+				</a>
+				<div 
+					class="icon_basket delete" 
+					url="#text/delete?id=<?php echo $text['ID']; ?>" 
+					mess="Вы действительно хотите удалить text «<?php echo $text['Identified']; ?> (<?php echo $text['Name']; ?>)» ?" 
+					style="margin: 0 0 -8px 0"
+				></div>
+			</td>
+		</tr>
+	</table>
+</form>

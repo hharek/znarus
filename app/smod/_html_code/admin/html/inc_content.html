@@ -1,0 +1,25 @@
+<form>
+	<table class="std_form" align="center">
+		<tr>
+			<td colspan="2" style="text-align: center;">
+				Inc <?php echo $module['Identified']; ?>_<?php echo $inc['Identified']; ?>.html (<?php echo $module['Name']; ?> / <?php echo $inc['Name']; ?>)
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2" style="border: 1px solid #ccc; padding: 0px; text-align: left;">
+				<textarea name="Content"><?php echo htmlspecialchars(G::file_app()->get("{$module['Type']}/{$module['Identified']}/inc/html/{$inc['Identified']}.html")); ?></textarea>
+			</td>
+		</tr>
+	</table>
+	
+	<div class="center">
+		<div class="std_button submit">
+			<div class="icon_edit"></div>
+			Сохранить
+		</div>
+		<a href="<?php echo $back_url; ?>" class="std_button">
+			<div class="icon_back"></div>
+			Назад
+		</a>
+	</div>
+</form>

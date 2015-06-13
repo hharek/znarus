@@ -1,0 +1,46 @@
+<table class="std_list" align="center" style="width: 600px;">
+	<col width="40%"/>
+	<col width="50%"/>
+	<col width="10%"/>
+	<thead>
+		<tr>
+			<td colspan="3">Группы и пользователи</td>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($group as $g_val): ?>
+			<tr url="#_user/group_edit?id=<?php echo $g_val['ID']; ?>">
+				<td colspan="3" style="text-align: left; padding-left: 20px;">
+					<?php echo $g_val['Name']; ?>
+				</td>
+			</tr>
+			<?php foreach ($user as $u_val): ?>
+				<?php if($g_val['ID'] === $u_val['Group_ID']): ?>
+					<tr <?php if($u_val['Active'] === "0"): ?> style="color:#ccc;"<?php endif; ?>>
+						<td url="#_user/user_edit?id=<?php echo $u_val['ID']; ?>" style="text-align: left; padding-left: 40px;">
+							<?php echo $u_val['Email']; ?>
+						</td>
+						<td url="#_user/user_edit?id=<?php echo $u_val['ID']; ?>">
+							<?php echo $u_val['Name']; ?>
+						</td>
+						<td>
+							<a href="#_user/user_passwd?id=<?php echo $u_val['ID']; ?>" class="icon_password"></a>
+						</td>
+					</tr>
+				<?php endif; ?>
+			<?php endforeach; ?>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+
+<br/>
+<center>
+	<a href="#_user/group_add" class="std_button">
+		<div class="icon_add"></div>
+		Добавить группу
+	</a>
+	<a href="#_user/user_add" class="std_button">
+		<div class="icon_add"></div>
+		Добавить пользователя
+	</a>
+</center>

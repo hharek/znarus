@@ -1,7 +1,5 @@
-<?php packjs_tinymce4("Content"); ?>
-
 <h1 style="text-align: center;">Страница 404</h1>
-<form action="#page/404_post">
+<form>
 	<table class="std_form" align="center">
 		<tr>
 			<td colspan="2" style="text-align: center;">
@@ -14,18 +12,53 @@
 			</td>
 		</tr>
 		<tr>
+			<td>Тэги</td>
 			<td>
-				<div class="std_button submit">
-					<div class="icon_edit"></div>
-					Сохранить
-				</div>
+				<textarea name="Tags"><?php echo P::get("page", "404_tags"); ?></textarea>
 			</td>
+		</tr>
+		<tr>
+			<td>Другое</td>
 			<td>
-				<a class="std_button" href="#page/other">
-					<div class="icon_back"></div>
-					Назад
-				</a>
+				<input type="checkbox" id="show_other"/>
+			</td>
+		</tr>
+		<tr id="tr_html" style="display: none;">
+			<td>Шаблон</td>
+			<td>
+				<select name="Html">
+					<option value=""></option>
+					<?php foreach ($html as $val): ?>
+					<option value="<?php echo $val['Identified']; ?>" <?php if(P::get("page","404_html") === $val['Identified']): ?>selected<?php endif; ?>>
+							<?php echo $val['Name']; ?>
+						</option>
+					<?php endforeach; ?>
+				</select>
 			</td>
 		</tr>
 	</table>
+	<div class="center">
+		<div class="std_button submit">
+			<div class="icon_edit"></div>
+			Сохранить
+		</div>
+		<a class="std_button" href="#page/other">
+			<div class="icon_back"></div>
+			Назад
+		</a>
+	</div>
 </form>
+
+<script>
+$("#show_other").click(function()
+{
+	if($(this).is(":checked") === true)
+	{
+		$("#tr_html").show();
+	}
+	else
+	{
+		$("#tr_html").hide();
+	}
+});
+</script>

@@ -1,0 +1,87 @@
+<?php
+/* Токен восстановления пароля */
+$_SESSION['_restore_token'] = md5(microtime(true) . mt_rand(0, 1000000));
+
+/* ID пользователя по коду восстановления */
+$user_id_by_code = _User::password_change_code_user_id($_GET['restore']);
+?>
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="stylesheet" href="restore.css" />
+		<script src="restore.js"></script>
+		<title>Восстановить пароль</title>
+	</head>
+	<body>
+		<form>
+			<input type="hidden" name="token" value="<?php echo md5(SALT . $_SESSION['_restore_token']); ?>"/>
+			
+			<div class="_restore">
+				
+				<div class="_logo">
+					<img src="img/logo_admin.png"/>
+				</div>
+				
+				<!-- Указать почтовый ящик -->
+				<?php if (empty($_GET['restore'])): ?>
+				
+					<input type="hidden" name="Type" value="send"/>
+					
+					<div class="_text">Укажите почтовый ящик, на который зарегистрированна учётная запись.</div>
+					
+					<input class="_email" type="text" name="Email" placeholder="Почтовый ящик"/>
+
+					<div class="_button">
+						<div class="_icon"></div>
+						Восстановить пароль
+					</div>
+					
+				<!-- Код задан неверно -->
+				<?php elseif ($user_id_by_code === null): ?>
+				
+					<div class="_text">Код для восстановления пароля задан неверно.</div>
+					
+				<!-- Смена пароля -->
+				<?php elseif ($user_id_by_code !== null): ?>
+				
+					<input type="hidden" name="Type" value="passwd"/>
+					<input type="hidden" name="Code" value="<?php echo $_GET['restore']; ?>"/>
+				
+					<div class="_text">Укажите новый пароль.</div>
+					
+					<input class="_password" type="password" name="Password" placeholder="Пароль"/>
+					
+					<input class="_password" type="password" name="Password_Repeat" placeholder="Повторите пароль"/>
+					
+					<div class="_button">
+						<div class="_icon"></div>
+						Сменить пароль
+					</div>
+					
+					<a href="/<?php echo urlencode(URL_ADMIN); ?>/" class="_button _login">
+						<div class="_icon"></div>
+						Войти
+					</a>
+					
+				<?php endif; ?>
+				
+			</div>
+			
+			<!-- Чтобы при нажатии enter срабатывал submit -->
+			<input type="submit" value="" style="display: none;"/>
+		</form>
+		
+		<!-- Загрузка -->
+		<div id="_loader" class="_loader">
+			<img src="img/loader.gif" width="220" height="19"/>
+		</div>
+		
+		<!-- Перекрытие -->
+		<div id="_overlay" class="_overlay"></div>
+		
+		<!-- Стандартные окна (alert, confirm, prompt) -->
+		<?php require "part/okno.html"; ?>
+		
+	</body>
+</html>

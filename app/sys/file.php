@@ -9,7 +9,7 @@
  * @version		0.1.2
  * @link		https://github.com/hharek/zn_file/
  */
-class ZN_File
+class _File
 {
 
 	/**
@@ -222,32 +222,32 @@ class ZN_File
 				switch ($type)
 				{
 					case "all":
-						{
-							$ls[] = array("name" => $val, "type" => $file_type);
-						}
-						break;
+					{
+						$ls[] = array("name" => $val, "type" => $file_type);
+					}
+					break;
 
 					case "dir":
+					{
+						if ($file_type == "dir")
 						{
-							if ($file_type == "dir")
-							{
-								$ls[] = array("name" => $val, "type" => "dir");
-							}
+							$ls[] = array("name" => $val, "type" => "dir");
 						}
-						break;
+					}
+					break;
 
 					case "file":
+					{
+						if ($file_type == "file")
 						{
-							if ($file_type == "file")
+							/* Поиск по расширению */
+							if (mb_substr($val, mb_strlen($val) - mb_strlen($ext), mb_strlen($ext)) == $ext)
 							{
-								/* Поиск по расширению */
-								if (mb_substr($val, mb_strlen($val) - mb_strlen($ext), mb_strlen($ext)) == $ext)
-								{
-									$ls[] = array("name" => $val, "type" => "file");
-								}
+								$ls[] = array("name" => $val, "type" => "file");
 							}
 						}
-						break;
+					}
+					break;
 				}
 			}
 		}

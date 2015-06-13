@@ -1,0 +1,44 @@
+<h2 style="text-align: center">Пакеты JavaScript</h2>
+<table class="std_list" align="center" style="width: 700px;">
+	<colgroup>
+		<col width="30%"/>
+		<col width="40%"/>
+		<col width="30%"/>
+	</colgroup>
+	<thead>
+		<tr>
+			<td>Идентификатор</td>
+			<td>Наименование</td>
+			<td>Категория</td>
+		</tr>
+	</thead>
+	<tbody>
+		<?php if (!empty($packjs)): ?>
+			<?php foreach ($packjs as $val): ?>
+				<tr url="#packjs/edit?id=<?php echo $val['ID']; ?>">
+					<td>
+						<?php echo $val['Identified']; ?>
+					</td>
+					<td>
+						<?php echo $val['Name']; ?>
+					</td>
+					<td>
+						<?php echo $val['Category']; ?>
+					</td>
+				</tr>
+			<?php endforeach; ?>
+		<?php endif; ?>
+	</tbody>
+</table>
+
+<br/>
+<center>
+	<a class="std_button" href="#packjs/add">
+		<div class="icon_add"></div>
+		Добавить
+	</a>
+	<a class="std_button" href="#packjs/install">
+		<div class="icon_install"></div>
+		Установить
+	</a>
+</center>

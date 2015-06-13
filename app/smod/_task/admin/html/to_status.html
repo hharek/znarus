@@ -1,0 +1,53 @@
+<form>
+	<input name="Status" type="hidden" value="<?php echo $status; ?>"/>
+	<table class="std_form">
+		<tr>
+			<td>Наименование</td>
+			<td>
+				<?php echo $task['Name']; ?>
+			</td>
+		</tr>
+		<tr>
+			<td>Описание</td>
+			<td>
+				<?php echo $task['Content']; ?>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<?php if($status === "done"): ?>
+					Примечания по выполнению
+				<?php elseif($status === "fail"): ?>
+					Причина отказа
+				<?php endif; ?>
+			</td>
+			<td>
+				<textarea name="Note"><?php echo htmlspecialchars($task['Note']); ?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td>Уведомить заказчика</td>
+			<td>
+				<input type="hidden" name="Send" value="0"/>
+				<input type="checkbox" name="Send" value="1" checked="checked"/>
+			</td>
+		</tr>
+	</table>
+	<div class="center">
+		<?php if($status === "done"): ?>
+			<div class="std_button submit">
+				<div class="icon_active"></div>
+				Выполнено
+			</div>
+		<?php elseif($status === "fail"): ?>
+			<div class="std_button submit">
+				<div class="icon_deactive"></div>
+				Отказано
+			</div>
+		<?php endif; ?>
+		<a class="std_button" href="#_task/to_view?id=<?php echo $task['ID']; ?>">
+			<div class="icon_back"></div>
+			Назад
+		</a>
+	</div>
+</form>

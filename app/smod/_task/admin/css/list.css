@@ -1,0 +1,11 @@
+.filter
+{
+	width: 905px; 
+	margin: 0px auto 0px auto;
+}
+
+.filter > div
+{
+	width: 300px; 
+	float: left;
+}

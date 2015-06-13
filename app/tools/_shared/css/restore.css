@@ -1,0 +1,93 @@
+._restore
+{
+	border: 1px solid #c0c0c0;
+	border-radius: 4px;
+	width: 400px;
+	min-height: 66px;
+	position: absolute;
+	left: 50%;
+	top: 45%;
+	margin: -110px 0px 0px -220px;
+	padding: 20px;
+	background: #eef7cf;
+	overflow: hidden;
+	
+	._logo
+	{
+		width: 58px;
+		height: 64px;
+		border: 1px solid #c0c0c0;
+		position: absolute;
+		margin: 0px;
+	}
+	
+	._text
+	{
+		margin: 0px 0px 20px 78px;
+		text-align: center;
+	}
+	
+	._email
+	{
+		display: block;
+		width: 200px;
+		height: 24px;
+		margin: 20px auto 0px auto;
+		font-size: 20px;
+		font-style: italic;
+		padding: 8px;
+		border: 1px solid #c0c0c0;
+		border-radius: 4px;
+	}
+	
+	._password
+	{
+		display: block;
+		width: 220px;
+		height: 24px;
+		margin: 10px 0px 0px 120px;
+		font-size: 20px;
+		font-style: italic;
+		padding: 8px;
+		border: 1px solid #c0c0c0;
+		border-radius: 4px;
+	}
+	
+	._button
+	{
+		display: block;
+		width: 260px;
+		margin: 20px auto 0px auto;
+		border: 1px solid #c0c0c0;
+		border-radius: 4px;
+		height: 32px;
+		padding: 6px 2px 0px 6px;
+		text-align: center;
+		background: #e3e3e3;
+		position: relative;
+		font-size: 20px;
+		cursor: pointer;
+		
+		&:hover
+		{
+			background: #f0f0f0;
+		}
+		
+		._icon
+		{
+			background: url("img/icon.png") no-repeat 0px -96px;
+			width: 24px;
+			height: 24px;
+			position: absolute;
+			top: 7px;
+			left: 5px;
+		}
+	}
+	
+	._login
+	{
+		color: #000;
+		display: none;
+		margin: 10px 0px 0px 104px;
+	}
+}

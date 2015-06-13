@@ -1,0 +1,23 @@
+<table class="std_list" align="center" style="width: 700px;">
+	<col width="40%"/>
+	<col width="60%"/>
+	<thead>
+		<tr>
+			<td colspan="2">Шаблоны</td>
+		</tr>
+	</thead>
+	<tbody>
+		
+		<?php foreach ($html as $h_val): ?>
+			<tr url="#_html_code/html_content?id=<?php echo $h_val['ID']; ?>&from=html">
+				<td style="text-align: left; padding-left: 20px;">
+					<?php echo $h_val['Identified']; ?>.html
+				</td>
+				<td style="text-align: left; padding-left: 20px;">
+					<?php echo $h_val['Name']; ?>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+				
+	</tbody>
+</table>

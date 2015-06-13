@@ -1,20 +1,20 @@
 <div class="faq">
 	<ul>
-		<?php foreach ($faq as $val): ?>
+		<?php foreach ($faq as $key => $val): ?>
 		<li>
-			<a href="#question_<?php echo $val['ID']; ?>">
+			<a href="#question_<?php echo $key + 1; ?>">
 				<?php echo $val['Question']; ?>
 			</a>
 		</li>
 		<?php endforeach; ?>
 	</ul>
-
-	<?php foreach ($faq as $val): ?>
-	<div class="question" id="question_<?php echo $val['ID']; ?>">
-		<?php echo $val['Question']; ?>
-	</div>
-	<div class="answer">
-		<?php echo $val['Answer']; ?>
-	</div>
+	<br/><br/>
+	<?php foreach ($faq as $key => $val): ?>
+		<div class="question" id="question_<?php echo $key + 1; ?>">
+			<?php echo $val['Question']; ?>
+		</div>
+		<div class="answer">
+			<?php echo $val['Answer']; ?>
+		</div>
 	<?php endforeach; ?>
 </div>

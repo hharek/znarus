@@ -1,0 +1,92 @@
+<!-- Фильтр -->
+<div class="filter" >
+	<div>
+		Заказчик: 
+		<select name="from">
+			<option value="">Не указано</option>
+			<option value="0"<?php if(isset($_GET['from']) and $_GET['from'] === "0"): ?> selected="selected"<?php endif; ?>>
+				<?php echo ROOT_NAME_FULL; ?>
+			</option>
+			<?php foreach ($user as $val): ?>
+				<option value="<?php echo $val['ID']; ?>"<?php if(isset($_GET['from']) and $val['ID'] === $_GET['from']): ?> selected="selected"<?php endif; ?>>
+					<?php echo $val['Name']; ?>
+				</option>
+			<?php endforeach; ?>
+		</select>
+	</div>
+	<div>
+		Исполнитель: 
+		<select name="to">
+			<option value="">Не указано</option>
+			<option value="0"<?php if(isset($_GET['to']) and $_GET['to'] === "0"): ?> selected="selected"<?php endif; ?>>
+				<?php echo ROOT_NAME_FULL; ?>
+			</option>
+			<?php foreach ($user as $val): ?>
+				<option value="<?php echo $val['ID']; ?>"<?php if(isset($_GET['to']) and $val['ID'] === $_GET['to']): ?> selected="selected"<?php endif; ?>>
+					<?php echo $val['Name']; ?>
+				</option>
+			<?php endforeach; ?>
+		</select>
+	</div>
+	<div>
+		<div class="std_button">
+			<div class="icon_view"></div>
+			Найти
+		</div>
+	</div>
+</div>
+<div class="clear"></div>
+<br/>
+
+<!-- Задания -->
+<table class="std_list" align="center">
+	<col width="40%"/>
+	<col width="30%"/>
+	<col width="15%"/>	
+	<col width="15%"/>
+	<thead>
+		<tr>
+			<td>Наименование</td>
+			<td>Пользователь</td>
+			<td>Статус</td>
+			<td>Создан</td>
+		</tr>
+	</thead>
+	<tbody>
+		<?php if (!empty($task)): ?>
+			<?php foreach ($task as $val): ?>
+				<tr url="#_task/edit?id=<?php echo $val['ID']; ?>">
+					<td style="padding-left: 20px; text-align: left;">
+						<?php echo $val['Name']; ?>
+					</td>
+					<td>
+						<?php echo empty($val['From_Name']) ? ROOT_NAME_FULL : $val['From_Name']; ?>
+						-> 
+						<?php echo empty($val['To_Name']) ? ROOT_NAME_FULL : $val['To_Name']; ?>
+					</td>
+					<td>
+						<?php if($val['Status'] === "create"): ?>
+							Создан
+						<?php elseif ($val['Status'] === "done"): ?>
+							<span style="color:green;">Выполнен</span>
+						<?php elseif ($val['Status'] === "fail"): ?>
+							<span style="color:red;">Отказ</span><br/>
+						<?php endif; ?>
+					</td>
+					<td>
+						<?php echo date("d.m.Y", strtotime($val['Date_Create'])); ?><br/>
+						<?php echo date("H:i:s", strtotime($val['Date_Create'])); ?>
+					</td>
+				</tr>
+			<?php endforeach; ?>
+		<?php endif; ?>
+	</tbody>
+</table>
+
+<br/>
+<center>
+	<a href="#_task/add" class="std_button">
+		<div class="icon_add"></div>
+		Добавить задание
+	</a>
+</center>

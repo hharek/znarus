@@ -2,8 +2,36 @@
 /**
  * Исполнители
  */
-class ZN_Admin
+class _Admin
 {
+	/**
+	 * Проверка по ID
+	 * 
+	 * @param int $id
+	 */
+	public static function is($id)
+	{
+		if (!Chf::uint($id))
+		{
+			throw new Exception("Номер у админки задан неверно. " . Chf::error());
+		}
+
+		$query = 
+<<<SQL
+SELECT 
+	true
+FROM 
+	"admin"
+WHERE 
+	"ID" = $1
+SQL;
+		$rec = G::db_core()->query($query, $id)->single();
+		if ($rec === null)
+		{
+			throw new Exception("Админки с номером «{$id}» не существует.");
+		}
+	}
+	
 	/**
 	 * Добавить
 	 * 
@@ -13,56 +41,44 @@ class ZN_Admin
 	 * @param bool $post
 	 * @param bool $visible
 	 * @param int $module_id
-	 * @return string
+	 * @return array
 	 */
 	public static function add($name, $identified, $get, $post, $visible, $module_id)
 	{
 		/* Проверка */
-		Err::check_field($name, "string", false, "Name", "Наименование");
-		Err::check_field($identified, "identified", false, "Identified", "Идентификатор");
-		$identified = strtolower($identified);
-		Err::check_field($get, "bool", false, "Get", "Метод GET");
-		Err::check_field($post, "bool", false, "Post", "Метод POST");
-		if($get === "0" and $post === "0")
-		{
-			Err::add("Необходимо выбрать метод GET или метод POST", "Get");
-			Err::add("Необходимо выбрать метод GET или метод POST", "Post");
-		}
-		Err::check_field($visible, "bool", false, "Visible", "Видимость");
-		ZN_Module::is_id($module_id);
-		Err::exception();
-		
+		self::_check($name, $identified, $get, $post, $visible);
+		_Module::is($module_id);
+
 		/* Уникальность */
 		self::_unique($name, $identified, $module_id);
-		Err::exception();
 		
 		/* Файлы */
-		if($get === "1")
+		if ($get === true)
 		{
 			self::file_add($identified, "get", $module_id);
 		}
-		
-		if ($post === "1") 
+
+		if ($post === true)
 		{
 			self::file_add($identified, "post", $module_id);
 		}
-		
+
 		/* SQL */
 		$data = 
 		[
 			"Name" => $name,
 			"Identified" => $identified,
-			"Get" => $get,
-			"Post" => $post,
-			"Visible" => $visible,
+			"Get" => (int)$get,
+			"Post" => (int)$post,
+			"Visible" => (int)$visible,
 			"Module_ID" => $module_id
 		];
-		$id = Reg::db_core()->insert("admin", $data, "ID");
-		
+		$id = G::db_core()->insert("admin", $data, "ID");
+
 		/* Данные добавленного */
-		return self::select_line_by_id($id);
+		return self::get($id);
 	}
-	
+
 	/**
 	 * Редактировать
 	 * 
@@ -79,78 +95,64 @@ class ZN_Admin
 	public static function edit($id, $name, $identified, $get, $post, $visible, $window, $allow_all)
 	{
 		/* Проверка */
-		self::is_id($id);
-		Err::check_field($name, "string", false, "Name", "Наименование");
-		Err::check_field($identified, "identified", false, "Identified", "Идентификатор");
-		$identified = strtolower($identified);
-		Err::check_field($get, "bool", false, "Get", "Метод GET");
-		Err::check_field($post, "bool", false, "Post", "Метод POST");
-		if($get === "0" and $post === "0")
-		{
-			Err::add("Необходимо выбрать метод GET или метод POST", "Get");
-			Err::add("Необходимо выбрать метод GET или метод POST", "Post");
-		}
-		Err::check_field($visible, "bool", false, "Visible", "Видимость");
-		Err::check_field($window, "bool", false, "Window", "В новом окне");
-		Err::check_field($allow_all, "bool", false, "Allow_All", "Разрешино всем");
-		Err::exception();
+		self::is($id);
+		self::_check($name, $identified, $get, $post, $visible, $window, $allow_all);
 		
 		/* Уникальность */
-		$admin = self::select_line_by_id($id);
-		self::_unique($name, $identified, $admin['Module_ID'], $id);
-		Err::exception();
-		
+		$old = self::get($id);
+		self::_unique($name, $identified, $old['Module_ID'], $id);
+
 		/* Файлы GET */
-		if($admin['Get'] === "0" and $get === "1")
+		if ((bool)$old['Get'] === false and $get === true)
 		{
-			self::file_add($identified, "get", $admin['Module_ID']);
+			self::file_add($identified, "get", $old['Module_ID']);
 		}
-		elseif($admin['Get'] === "1" and $get === "1")
+		elseif ((bool)$old['Get'] === true and $get === true)
 		{
-			if($admin['Identified'] !== $identified)
+			if ($old['Identified'] !== $identified)
 			{
-				self::file_edit($admin['Identified'], $identified, "get", $admin['Module_ID']);
+				self::file_edit($old['Identified'], $identified, "get", $old['Module_ID']);
 			}
 		}
-		elseif($admin['Get'] === "1" and $get === "0")
+		elseif ((bool)$old['Get'] === true and $get === false)
 		{
-			self::file_delete($admin['Identified'], "get", $admin['Module_ID']);
+			self::file_delete($old['Identified'], "get", $old['Module_ID']);
 		}
-		
+
 		/* Файлы POST */
-		if($admin['Post'] === "0" and $post === "1")
+		if ((bool)$old['Post'] === false and $post === true)
 		{
-			self::file_add($identified, "post", $admin['Module_ID']);
+			self::file_add($identified, "post", $old['Module_ID']);
 		}
-		elseif($admin['Post'] === "1" and $post === "1")
+		elseif ((bool)$old['Post'] === true and $post === true)
 		{
-			if($admin['Identified'] !== $identified)
+			if ($old['Identified'] !== $identified)
 			{
-				self::file_edit($admin['Identified'], $identified, "post", $admin['Module_ID']);
+				self::file_edit($old['Identified'], $identified, "post", $old['Module_ID']);
 			}
 		}
-		elseif($admin['Post'] === "1" and $post === "0")
+		elseif ((bool)$old['Post'] === true and $post === false)
 		{
-			self::file_delete($admin['Identified'], "post", $admin['Module_ID']);
+			self::file_delete($old['Identified'], "post", $old['Module_ID']);
 		}
-		
+
 		/* SQL */
-		$data =
+		$data = 
 		[
 			"Name" => $name,
 			"Identified" => $identified,
-			"Get" => $get,
-			"Post" => $post,
-			"Visible" => $visible,
-			"Window" => $window,
-			"Allow_All" => $allow_all
+			"Get" => (int)$get,
+			"Post" => (int)$post,
+			"Visible" => (int)$visible,
+			"Window" => (int)$window,
+			"Allow_All" => (int)$allow_all
 		];
-		Reg::db_core()->update("admin", $data, array("ID" => $id));
-		
+		G::db_core()->update("admin", $data, ["ID" => $id]);
+
 		/* Данные изменённого */
-		return self::select_line_by_id($id);
+		return self::get($id);
 	}
-	
+
 	/**
 	 * Удалить
 	 * 
@@ -160,63 +162,36 @@ class ZN_Admin
 	public static function delete($id)
 	{
 		/* Проверка */
-		$admin = self::select_line_by_id($id);
-		
+		$old = self::get($id);
+
 		/* Файлы */
-		if($admin['Get'] === "1")
+		if ((bool)$old['Get'] === true)
 		{
-			self::file_delete($admin['Identified'], "get", $admin['Module_ID']);
+			self::file_delete($old['Identified'], "get", $old['Module_ID']);
 		}
-		
-		if($admin['Post'] === "1")
+
+		if ((bool)$old['Post'] === true)
 		{
-			self::file_delete($admin['Identified'], "post", $admin['Module_ID']);
+			self::file_delete($old['Identified'], "post", $old['Module_ID']);
 		}
-		
-		/* Удалить привилегии */
-		Reg::db_core()->delete("user_priv", array("Admin_ID" => $id));
-		
+
 		/* Удалить */
-		Reg::db_core()->delete("admin", array("ID" => $id));
-		
+		G::db_core()->delete("admin", ["ID" => $id]);
+
 		/* Данные удалённого */
-		return $admin;
+		return $old;
 	}
-	
-	/**
-	 * Проверка по ID
-	 * 
-	 * @param int $id
-	 */
-	public static function is_id($id)
-	{
-		if(!Chf::uint($id))
-		{throw new Exception_Constr("Номер у админки задан неверно. ".Chf::error());}
-		
-		$query = 
-<<<SQL
-SELECT 
-	COUNT(*) as count
-FROM 
-	"admin"
-WHERE 
-	"ID" = $1
-SQL;
-		$count = Reg::db_core()->query_one($query, $id, "admin");
-		if($count < 1)
-		{throw new Exception_Constr("Админки с номером «{$id}» не существует.");}
-	}
-	
+
 	/**
 	 * Выборка строки по ID
 	 * 
 	 * @param int $id
 	 * @return array
 	 */
-	public static function select_line_by_id($id)
+	public static function get($id)
 	{
-		self::is_id($id);
-		
+		self::is($id);
+
 		$query = 
 <<<SQL
 SELECT
@@ -235,22 +210,20 @@ FROM
 WHERE 
 	"ID" = $1
 SQL;
-		$admin = Reg::db_core()->query_line($query, $id, "admin");
-		
-		return $admin;
+		return G::db_core()->query($query, $id)->row();
 	}
-	
+
 	/**
 	 * Выборка всех по модулю
 	 * 
 	 * @param int $module_id
 	 * @return array
 	 */
-	public static function select_list_by_module_id($module_id)
+	public static function get_by_module($module_id)
 	{
-		ZN_Module::is_id($module_id);
-		
-		$query =
+		_Module::is($module_id);
+
+		$query = 
 <<<SQL
 SELECT
 	"ID",
@@ -270,11 +243,9 @@ WHERE
 ORDER BY
 	"Sort" ASC
 SQL;
-		$admin = Reg::db_core()->query_assoc($query, $module_id, "admin");
-		
-		return $admin;
+		return G::db_core()->query($query, $module_id)->assoc();
 	}
-	
+
 	/**
 	 * Задать сортировку
 	 * 
@@ -283,24 +254,24 @@ SQL;
 	 */
 	public static function sort($id, $sort)
 	{
-		$id = (int)$id;
-		self::is_id($id);
-		
-		if(!in_array($sort, array('up','down')))
+		$id = (int) $id;
+		self::is($id);
+
+		if (!in_array($sort, ['up', 'down']))
 		{
-			$sort = (int)$sort;
-			
-			$data =
+			$sort = (int) $sort;
+
+			$data = 
 			[
 				"Sort" => $sort
 			];
-			Reg::db_core()->update("admin", $data, array("ID" => $id));
+			G::db_core()->update("admin", $data, ["ID" => $id]);
 		}
-		else 
+		else
 		{
-			$admin = self::select_line_by_id($id);
-			
-			$query =
+			$admin = self::get($id);
+
+			$query = 
 <<<SQL
 SELECT 
 	"ID", 
@@ -312,52 +283,58 @@ WHERE
 ORDER BY 
 	"Sort" ASC
 SQL;
-			$other = Reg::db_core()->query_assoc($query, $admin['Module_ID'], "admin");
-			
-			if(count($other) < 2)
+			$other = G::db_core()->query($query, $admin['Module_ID'])->assoc();
+
+			if (count($other) < 2)
 			{
-				throw new Exception_Constr("Необходимо хотя бы два исполнителя.");
+				throw new Exception("Необходимо хотя бы два исполнителя.");
 			}
 
-			foreach ($other as $key=>$val)
+			foreach ($other as $key => $val)
 			{
-				if($val['ID'] == $id)
-				{break;}
+				if ($val['ID'] == $id)
+				{
+					break;
+				}
 			}
 
-			if($sort == "up")
+			if ($sort == "up")
 			{
-				if($key == 0)
-				{throw new Exception_Constr("Выше некуда.");}
-				
-				$id_next = $other[$key-1]['ID'];
-				$sort_int = $other[$key-1]['Sort'];
+				if ($key == 0)
+				{
+					throw new Exception("Выше некуда.");
+				}
+
+				$id_next = $other[$key - 1]['ID'];
+				$sort_int = $other[$key - 1]['Sort'];
 				$sort_int_next = $other[$key]['Sort'];
 			}
-			elseif($sort == "down")
+			elseif ($sort == "down")
 			{
-				if($key == count($other)-1)
-				{throw new Exception_Constr("Ниже некуда.");}
-		
-				$id_next = $other[$key+1]['ID'];
-				$sort_int = $other[$key+1]['Sort'];
+				if ($key == count($other) - 1)
+				{
+					throw new Exception("Ниже некуда.");
+				}
+
+				$id_next = $other[$key + 1]['ID'];
+				$sort_int = $other[$key + 1]['Sort'];
 				$sort_int_next = $other[$key]['Sort'];
 			}
 
-			$data =
+			$data = 
 			[
 				"Sort" => $sort_int
 			];
-			Reg::db_core()->update("admin", $data, array("ID" => $id));
-		
-			$data =
+			G::db_core()->update("admin", $data, ["ID" => $id]);
+
+			$data = 
 			[
 				"Sort" => $sort_int_next
 			];
-			Reg::db_core()->update("admin", $data, array("ID" => $id_next));
+			G::db_core()->update("admin", $data, ["ID" => $id_next]);
 		}
 	}
-	
+
 	/**
 	 * Добавить файл
 	 * 
@@ -367,30 +344,44 @@ SQL;
 	 */
 	private static function file_add($identified, $type, $module_id)
 	{
-		$module = ZN_Module::select_line_by_id($module_id);
+		$module = _Module::get($module_id);
 		$path_admin = "{$module['Type']}/{$module['Identified']}/admin";
-		
-		if(!Reg::file_app()->is_dir($path_admin))
-		{Reg::file_app()->mkdir($path_admin);}
-		
-		if(!Reg::file_app()->is_dir($path_admin . "/act"))
-		{Reg::file_app()->mkdir($path_admin . "/act");}
-		
-		if($type === "get")
+
+		/* Создать папку admin если нет */
+		if (!G::file_app()->is_dir($path_admin))
 		{
-			Reg::file_app()->put($path_admin . "/act/{$identified}.php", "<?php\n\n?>");
-			
-			if(!Reg::file_app()->is_dir($path_admin . "/html"))
-			{Reg::file_app()->mkdir($path_admin . "/html");}
-			
-			Reg::file_app()->put($path_admin . "/html/{$identified}.html", "");
+			G::file_app()->mkdir($path_admin);
 		}
-		elseif ($type === "post") 
+
+		/* Создать файлы для GET запроса */
+		if ($type === "get")
 		{
-			Reg::file_app()->put($path_admin . "/act/{$identified}_post.php", "<?php\n\n?>");
+			if (!G::file_app()->is_dir($path_admin . "/get"))
+			{
+				G::file_app()->mkdir($path_admin . "/get");
+			}
+			
+			G::file_app()->put($path_admin . "/get/{$identified}.php", "<?php\n\n?>");
+
+			if (!G::file_app()->is_dir($path_admin . "/html"))
+			{
+				G::file_app()->mkdir($path_admin . "/html");
+			}
+
+			G::file_app()->put($path_admin . "/html/{$identified}.html", "");
+		}
+		/* Создать файлы для POST запроса */
+		elseif ($type === "post")
+		{
+			if (!G::file_app()->is_dir($path_admin . "/post"))
+			{
+				G::file_app()->mkdir($path_admin . "/post");
+			}
+			
+			G::file_app()->put($path_admin . "/post/{$identified}.php", "<?php\n\n?>");
 		}
 	}
-	
+
 	/**
 	 * Переименовать файлы
 	 * 
@@ -402,34 +393,33 @@ SQL;
 	 */
 	private static function file_edit($identified_old, $identified_new, $type, $module_id)
 	{
-		$module = ZN_Module::select_line_by_id($module_id);
+		$module = _Module::get($module_id);
 		$path_admin = "{$module['Type']}/{$module['Identified']}/admin";
-		
-		if($type === "get")
+
+		if ($type === "get")
 		{
-			Reg::file_app()->mv
+			G::file_app()->mv
 			(
-				$path_admin . "/act/{$identified_old}.php",
-				$path_admin . "/act/{$identified_new}.php"
+				$path_admin . "/get/{$identified_old}.php", 
+				$path_admin . "/get/{$identified_new}.php"
 			);
 
-			Reg::file_app()->mv
+			G::file_app()->mv
 			(
-				$path_admin . "/html/{$identified_old}.html",
+				$path_admin . "/html/{$identified_old}.html", 
 				$path_admin . "/html/{$identified_new}.html"
 			);
-			
 		}
-		elseif($type === "post")
+		elseif ($type === "post")
 		{
-			Reg::file_app()->mv
+			G::file_app()->mv
 			(
-				$path_admin . "/act/{$identified_old}_post.php",
-				$path_admin . "/act/{$identified_new}_post.php"
+				$path_admin . "/post/{$identified_old}.php", 
+				$path_admin . "/post/{$identified_new}.php"
 			);
 		}
 	}
-	
+
 	/**
 	 * Удалить файлы
 	 * 
@@ -439,34 +429,99 @@ SQL;
 	 */
 	private static function file_delete($identified, $type, $module_id)
 	{
-		$module = ZN_Module::select_line_by_id($module_id);
+		$module = _Module::get($module_id);
 		$path_admin = "{$module['Type']}/{$module['Identified']}/admin";
-		
-		if($type === "get")
+
+		/* Удалить файлы */
+		if ($type === "get")
 		{
-			Reg::file_app()->rm($path_admin . "/act/{$identified}.php");
-			Reg::file_app()->rm($path_admin . "/html/{$identified}.html");
-			
+			G::file_app()->rm($path_admin . "/get/{$identified}.php");
+			G::file_app()->rm($path_admin . "/html/{$identified}.html");
 		}
-		elseif($type === "post")
+		elseif ($type === "post")
 		{
-			Reg::file_app()->rm($path_admin . "/act/{$identified}_post.php");
+			G::file_app()->rm($path_admin . "/post/{$identified}.php");
+		}
+
+		/* Удалить папку если get, post, html если они пустые */
+		if (G::file_app()->is_dir($path_admin . "/get"))
+		{
+			if (count(G::file_app()->ls($path_admin . "/get")) === 0)
+			{
+				G::file_app()->rm($path_admin . "/get");
+			}
 		}
 		
-		/* Удалить папку если админок больше нет */
-		if(Reg::file_app()->is_dir($path_admin . "/html"))
+		if (G::file_app()->is_dir($path_admin . "/html"))
 		{
-			if(count(Reg::file_app()->ls($path_admin . "/html")) === 0)
-			{Reg::file_app()->rm($path_admin . "/html");}
+			if (count(G::file_app()->ls($path_admin . "/html")) === 0)
+			{
+				G::file_app()->rm($path_admin . "/html");
+			}
 		}
 		
-		if(count(Reg::file_app()->ls($path_admin . "/act")) === 0)
+		if (G::file_app()->is_dir($path_admin . "/post"))
 		{
-			Reg::file_app()->rm($path_admin . "/act");
-			Reg::file_app()->rm($path_admin);
+			if (count(G::file_app()->ls($path_admin . "/post")) === 0)
+			{
+				G::file_app()->rm($path_admin . "/post");
+			}
+		}
+		
+		/* Удалить папку admin если админок нет */
+		if (count (G::file_app()->ls($path_admin)) === 0)
+		{
+			G::file_app()->rm($path_admin);
 		}
 	}
-	
+
+	/**
+	 * Проверка полей
+	 * 
+	 * @param string $name
+	 * @param string $identified
+	 * @param bool $get
+	 * @param bool $post
+	 * @param bool $visible
+	 * @param int $module_id
+	 */
+	private static function _check($name, &$identified, &$get, &$post, &$visible, &$window = null, &$allow_all = null)
+	{
+		Err::check_field($name, "string", false, "Name", "Наименование");
+		
+		Err::check_field($identified, "identified", false, "Identified", "Идентификатор");
+		$identified = strtolower($identified);
+		
+		Err::check_field($get, "bool", false, "Get", "Метод GET");
+		$get = (bool)$get;
+		
+		Err::check_field($post, "bool", false, "Post", "Метод POST");
+		$post = (bool)$post;
+		
+		if ($get === false and $post === false)
+		{
+			Err::add("Необходимо выбрать метод GET или метод POST", "Get");
+			Err::add("Необходимо выбрать метод GET или метод POST", "Post");
+		}
+		
+		Err::check_field($visible, "bool", false, "Visible", "Видимость");
+		$visible = (bool)$visible;
+		
+		if ($window !== null)
+		{
+			Err::check_field($window, "bool", false, "Window", "В новом окне");
+			$window = (bool)$window;
+		}
+		
+		if ($allow_all !== null)
+		{
+			Err::check_field($allow_all, "bool", false, "Allow_All", "Разрешино всем");
+			$allow_all = (bool)$allow_all;
+		}
+		
+		Err::exception();
+	}
+
 	/**
 	 * Уникальность
 	 * 
@@ -475,39 +530,43 @@ SQL;
 	 * @param int $module_id
 	 * @param int $id
 	 */
-	private static function _unique($name, $identified, $module_id, $id=null)
+	private static function _unique($name, $identified, $module_id, $id = null)
 	{
 		$query = 
 <<<SQL
 SELECT 
-	COUNT(*) as count
+	true
 FROM 
 	"admin"
 WHERE 
-	"Name" = $1 AND 
-	"Module_ID" = $2 
+	"Name" ILIKE $1 AND 
+	"Module_ID" = $2 AND
+	"ID" != $3
 SQL;
-		if(!is_null($id))
-		{$query .= " AND \"ID\" != '{$id}'";}
-		$count = Reg::db_core()->query_one($query, array($name, $module_id), "admin");
-		if($count > 0)
-		{Err::add("Инк с полем «Наименование» : «{$name}» уже существует.", "Name");}
+		$rec = G::db_core()->query($query, [$name, $module_id, (int)$id])->single();
+		if ($rec !== null)
+		{
+			Err::add("Инк с полем «Наименование» : «{$name}» уже существует.", "Name");
+		}
 
 		$query = 
 <<<SQL
 SELECT 
-	COUNT(*) as count
+	true
 FROM 
 	"admin"
 WHERE 
 	"Identified" = $1 AND
-	"Module_ID" = $2
+	"Module_ID" = $2 AND
+	"ID" != $3
 SQL;
-		if(!is_null($id))
-		{$query .= " AND \"ID\" != '{$id}'";}
-		$count = Reg::db_core()->query_one($query, array($identified, $module_id), "admin");
-		if($count > 0)
-		{Err::add("Инк с полем «Идентификатор» : «{$identified}» уже существует.", "Identified");}
+		$rec = G::db_core()->query($query, [$identified, $module_id, (int)$id])->single();
+		if ($rec !== null)
+		{
+			Err::add("Инк с полем «Идентификатор» : «{$identified}» уже существует.", "Identified");
+		}
+		
+		Err::exception();
 	}
 }
 ?>

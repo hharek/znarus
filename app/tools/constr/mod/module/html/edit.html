@@ -1,0 +1,430 @@
+<center>
+	
+	<div class="std_button tab_button" tab="data">
+		<div class="icon_edit"></div>
+		Данные
+	</div>
+
+	<div class="std_button tab_button active" tab="structure">
+		<div class="icon_list"></div>
+		Структура
+	</div>
+	
+</center>
+<br/>
+
+<!-- Данные -->
+<div id="tab_data" class="tab">
+	<form>
+		<table class="std_form" align="center">
+			<tr>
+				<td>Идентификатор</td>
+				<td>
+					<input type="text"name="Identified" value="<?php echo htmlspecialchars($module['Identified']); ?>"/>
+				</td>
+			</tr>
+			<tr>
+				<td>Наименование</td>
+				<td>
+					<input type="text" name="Name" value="<?php echo htmlspecialchars($module['Name']); ?>"/>
+				</td>
+			</tr>		
+			<tr>
+				<td>Описание</td>
+				<td>
+					<textarea name="Description"><?php echo htmlspecialchars($module['Description']); ?></textarea>
+				</td>
+			</tr>		
+			<tr>
+				<td>Версия</td>
+				<td>
+					<input type="text" name="Version" value="<?php echo htmlspecialchars($module['Version']); ?>"/>
+				</td>
+			</tr>
+			<tr>
+				<td>Влияние на доступ</td>
+				<td>
+					<input type="hidden" name="Access_Enable" value="0"/>
+					<input type="checkbox" name="Access_Enable" value="1"<?php if($module['Access'] !== "no"): ?> checked="checked"<?php endif; ?>/>
+				</td>
+			</tr>
+			<tr id="tr_access_type">
+				<td>Влияние на доступ. Тип</td>
+				<td>
+					<input type="radio" name="Access" value="local" <?php if($module['Access'] === "local"): ?>checked="checked"<?php endif; ?>/> Локальный
+					<input type="radio" name="Access" value="global" <?php if($module['Access'] === "global"): ?>checked="checked"<?php endif; ?>/> Глобальный
+				</td>
+			</tr>
+			<tr>
+				<td title="Функция или метод показывающая информацию по страницам модуля">Функция Page Info</td>
+				<td>
+					<input type="text" name="Page_Info_Function" value="<?php echo htmlspecialchars($module['Page_Info_Function']); ?>"/>
+				</td>
+			</tr>
+			<tr>
+				<td>Активность</td>
+				<td>
+					<input type="hidden" name="Active" value="0"/>
+					<input type="checkbox" name="Active" value="1"<?php if($module['Active'] === "1"): ?> checked="checked"<?php endif; ?>/>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<center>
+						<div class="std_button submit" style="width: 250px;">
+							<div class="icon_edit"></div>
+							Изменить
+						</div>
+						&nbsp;
+						<!-- Кнопка удалить -->
+						<div 
+							class="icon_basket delete" 
+							title="Удалить модуль"
+							url="#module/delete?id=<?php echo $module['ID']; ?>" 
+							mess="Вы действительно хотите удалить модуль «<?php echo $module['Name']; ?>» ?" 
+							style="margin: 0 0 -8px 0;"
+						></div>
+					</center>
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+
+<!-- Структура -->
+<div id="tab_structure" class="tab">
+	<!-- Панель -->
+	<div id="panel">
+		
+		<div id="knopka_all" class="std_button" title="Показать все">Показать все</div>
+		<div id="knopka_bin" class="std_button" title="Bin файлы">
+			bin (<?php echo count($bin); ?>)
+		</div>
+		<div id="knopka_param" class="std_button" title="Параметры">
+			param (<?php echo count($param); ?>)
+			<a href="#param/add?module_id=<?php echo $module['ID']; ?>" class="icon_add" title="Добавить параметр"></a>
+		</div>
+		<div id="knopka_admin" class="std_button" title="Админки">
+			admin (<?php echo count($admin); ?>)
+			<a href="#admin/add?module_id=<?php echo $module['ID']; ?>" class="icon_add" title="Добавить админку"></a>
+		</div>
+		<div id="knopka_exe" class="std_button" title="Исполнители">
+			exe (<?php echo count($exe); ?>)
+			<a href="#exe/add?module_id=<?php echo $module['ID']; ?>" class="icon_add" title="Добавить исполнителя"></a>
+		</div>
+		<div id="knopka_inc" class="std_button" title="Инки">
+			inc (<?php echo count($inc); ?>)
+			<a href="#inc/add?module_id=<?php echo $module['ID']; ?>" class="icon_add" title="Добавить инка"></a>
+		</div>
+		<div id="knopka_ajax" class="std_button" title="Аяксы">
+			ajax (<?php echo count($ajax); ?>)
+			<a href="#ajax/add?module_id=<?php echo $module['ID']; ?>" class="icon_add" title="Добавить аякс"></a>
+		</div>
+		
+		<div id="knopka_proc" class="std_button" title="Процедуры">
+			proc (<?php echo count($proc); ?>)
+			<a href="#proc/add?module_id=<?php echo $module['ID']; ?>" class="icon_add" title="Добавить процедуру"></a>
+		</div>
+		
+		<div id="knopka_text" class="std_button" title="Тексты">
+			text (<?php echo count($text); ?>)
+			<a href="#text/add?module_id=<?php echo $module['ID']; ?>" class="icon_add" title="Добавить текст"></a>
+		</div>
+		
+	</div>
+	
+	<!-- --------------------------- Окно -------------------------- -->
+	<div class="okno">
+		
+		<!-- bin -->
+		<?php if(!empty($bin)): ?>
+			<div id="structure_bin" class="structure_element">
+				<table class="std_list" style="width: 700px;" align="center">
+					<colgroup>
+						<col width="30%"/>
+						<col width="30%"/>
+						<col width="40%"/>
+					</colgroup>
+					<thead>
+						<tr>
+							<td colspan="3" title="Классы">bin</td>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach ($bin as $val): ?>
+							<tr>
+								<td><?php echo $val['file']; ?></td>
+								<td>
+									<?php if(isset($val['class'])): ?>
+										class <?php echo $val['class']; ?>
+									<?php endif; ?>
+								</td>
+								<td><?php echo $val['name']; ?></td>
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+			</div>
+		<?php endif; ?>
+		
+		<!-- param -->
+		<?php if(!empty($param)): ?>
+			<div id="structure_param" class="structure_element">
+				<table class="std_list" style="width: 750px;" align="center">
+					<colgroup>
+						<col width="25%" />
+						<col width="30%" />
+						<col width="10%" />
+						<col width="25%" />
+					</colgroup>
+					<thead>
+						<tr>
+							<td colspan="4" title="Параметры">param</td>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach ($param as $val): ?>
+							<tr url="#param/edit?id=<?php echo $val['ID']; ?>">
+								<td><?php echo $val['Identified']; ?></td>
+								<td><?php echo $val['Name']; ?></td>
+								<td><?php echo $val['Type']; ?></td>
+								<?php if(mb_strlen($val['Value']) > 24): ?>
+									<td title="<?php echo $val['Value']; ?>">
+										<?php echo mb_substr($val['Value'], 0, 24); ?>
+									</td>
+								<?php else: ?>
+									<td>
+										<?php echo $val['Value']; ?>
+									</td>
+								<?php endif; ?>
+
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+				<center>
+					<a class="std_button" href="#param/add?module_id=<?php echo $module['ID']; ?>">
+						<div class="icon_add"></div>
+						Добавить
+					</a>
+				</center>
+			</div>
+		<?php endif; ?>
+		
+		<!-- admin-->
+		<?php if(!empty($admin)): ?>
+			<div id="structure_admin" class="structure_element">
+				<table class="std_list" style="width: 700px;" align="center">
+					<colgroup>
+						<col width="25%" />
+						<col width="40%" />
+						<col width="20%"/>
+						<col width="15%" />
+					</colgroup>
+					<thead>
+						<tr>
+							<td colspan="4" title="Админки">admin</td>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach ($admin as $key=>$val): ?>
+						<tr 
+							url="#admin/edit?id=<?php echo $val['ID']; ?>"
+							<?php if($val['Visible']): ?> style="color: indigo;"<?php endif; ?>
+						>
+								<td><?php echo $val['Identified']; ?></td>
+								<td>
+									<?php echo $val['Name']; ?>
+									<?php if($val['Allow_All']): ?>(+)<?php endif; ?>
+								</td>
+								<td>
+									<?php if($val['Get'] === "1"): ?>GET<?php endif; ?><?php if($val['Get'] === "1" and $val['Post'] === "1"): ?>, <?php endif; ?>
+									<?php if($val['Post'] === "1"): ?>POST<?php endif; ?>
+								</td>
+								<td>
+									<div onclick="_exe('#admin/sort_up', { id: <?php echo $val['ID']; ?>});" class="icon_up up"></div>
+									<div onclick="_exe('#admin/sort_down', { id: <?php echo $val['ID']; ?>});" class="icon_down down"></div>
+								</td>
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+				<center>
+					<a class="std_button" href="#admin/add?module_id=<?php echo $module['ID']; ?>">
+						<div class="icon_add"></div>
+						Добавить
+					</a>
+				</center>
+			</div>
+		<?php endif; ?>
+		
+		<!-- exe -->
+		<?php if(!empty($exe)): ?>
+			<div id="structure_exe" class="structure_element">
+				<table class="std_list" style="width: 500px; " align="center">
+					<colgroup>
+						<col width="45%"/>
+						<col width="55%"/>
+					</colgroup>
+					<thead>
+						<tr>
+							<td colspan="2" title="Исполнители">exe</td>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach ($exe as $key => $val): ?>
+							<tr<?php if($val['Active'] === "0"): ?> style="color: #a0a0a0;"<?php endif; ?>>
+								<td url="#exe/edit?id=<?php echo $val['ID']; ?>"><?php echo $val['Identified']; ?></td>
+								<td url="#exe/edit?id=<?php echo $val['ID']; ?>"><?php echo $val['Name']; ?></td>
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+				<center>
+					<a class="std_button" href="#exe/add?module_id=<?php echo $module['ID']; ?>">
+						<div class="icon_add"></div>
+						Добавить
+					</a>
+				</center>
+			</div>
+		<?php endif; ?>
+		
+		<!-- inc -->
+		<?php if(!empty($inc)): ?>
+			<div id="structure_inc" class="structure_element">
+				<table class="std_list" style="width: 500px;" align="center">
+					<colgroup>
+						<col width="40%"/>
+						<col width="60%"/>
+					</colgroup>
+					<thead>
+						<tr>
+							<td colspan="2" title="Инки">inc</td>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach ($inc as $key=>$val): ?>
+							<tr url="#inc/edit?id=<?php echo $val['ID']; ?>"<?php if($val['Active'] === "0"): ?> style="color: #a0a0a0;"<?php endif; ?>>
+								<td><?php echo $val['Identified']; ?></td>
+								<td><?php echo $val['Name']; ?></td>
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+				<center>
+					<a class="std_button" href="#inc/add?module_id=<?php echo $module['ID']; ?>">
+						<div class="icon_add"></div>
+						Добавить
+					</a>
+				</center>
+			</div>
+		<?php endif; ?>
+		
+		<!-- ajax-->
+		<?php if(!empty($ajax)): ?>
+			<div id="structure_ajax" class="structure_element">
+				<table class="std_list" style="width: 700px;" align="center">
+					<colgroup>
+						<col width="30%" />
+						<col width="40%" />
+						<col width="15%"/>
+						<col width="15%" />
+					</colgroup>
+					<thead>
+						<tr>
+							<td colspan="4" title="Аяксы">ajax</td>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach ($ajax as $key=>$val): ?>
+						<tr url="#ajax/edit?id=<?php echo $val['ID']; ?>" <?php if($val['Token'] === "1"): ?> style="color: indigo;"<?php endif; ?>>
+								<td>
+									<?php echo $val['Identified']; ?>
+								</td>
+								<td>
+									<?php echo $val['Name']; ?>
+								</td>
+								<td>
+									<?php echo $val['Data_Type']; ?>
+								</td>
+								<td>
+									<?php if($val['Get'] === "1"): ?>GET<?php endif; ?><?php if($val['Get'] === "1" and $val['Post'] === "1"): ?>, <?php endif; ?>
+									<?php if($val['Post'] === "1"): ?>POST<?php endif; ?>
+								</td>
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+				<center>
+					<a class="std_button" href="#ajax/add?module_id=<?php echo $module['ID']; ?>">
+						<div class="icon_add"></div>
+						Добавить
+					</a>
+				</center>
+			</div>
+		<?php endif; ?>
+		
+		<!-- Процедуры -->
+		<?php if(!empty($proc)): ?>
+			<div id="structure_proc" class="structure_element">
+				<table class="std_list" style="width: 500px;" align="center">
+					<colgroup>
+						<col width="40%"/>
+						<col width="60%"/>
+					</colgroup>
+					<thead>
+						<tr>
+							<td colspan="2" title="Процедуры">proc</td>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach ($proc as $key=>$val): ?>
+							<tr url="#proc/edit?id=<?php echo $val['ID']; ?>"<?php if($val['Active'] === "0"): ?> style="color: #a0a0a0;"<?php endif; ?>>
+								<td><?php echo $val['Identified']; ?></td>
+								<td><?php echo $val['Name']; ?></td>
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+				<center>
+					<a class="std_button" href="#proc/add?module_id=<?php echo $module['ID']; ?>">
+						<div class="icon_add"></div>
+						Добавить
+					</a>
+				</center>
+			</div>
+		<?php endif; ?>
+		
+		<!-- text -->
+		<?php if(!empty($text)): ?>
+		<div id="structure_text" class="structure_element">
+			<table class="std_list" style="width: 500px;" align="center">
+				<colgroup>
+					<col width="40%"/>
+					<col width="60%"/>
+				</colgroup>
+				<thead>
+					<tr>
+						<td colspan="2" title="Тексты">text</td>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ($text as $val): ?>
+						<tr url="#text/edit?id=<?php echo $val['ID']; ?>">
+							<td><?php echo $val['Identified']; ?></td>
+							<td><?php echo $val['Name']; ?></td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+			<center>
+				<a class="std_button" href="#text/add?module_id=<?php echo $module['ID']; ?>">
+					<div class="icon_add"></div>
+					Добавить
+				</a>
+			</center>
+		</div>
+		<?php endif; ?>
+	</div>
+	
+</div>

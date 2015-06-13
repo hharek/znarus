@@ -1,33 +1,15 @@
 <?php
 /**
- * Checker Field - проверщик полей формы
+ * Checker Field - проверщик полей формы на соответствие типу
  */
 class Chf
 {
-
 	/**
 	 * Текст последней ошибки
 	 * 
 	 * @var string
 	 */
-	private static $error = "";
-	
-	/**
-	 * Максимальный размер строки в байтах (1 Мб)
-	 * 
-	 * @var type 
-	 */
-	private static $max_size = 1048576;
-
-	/**
-	 * Последняя ошибка
-	 * 
-	 * @return string
-	 */
-	public static function error()
-	{
-		return self::$error;
-	}
+	private static $_error_last = "";
 
 	/**
 	 * Функции
@@ -38,392 +20,125 @@ class Chf
 	 */
 	public static function __callStatic($func, $args)
 	{
-		$type_ar = array
-		(
-			"blob",
-			"bool",
-			"date",
-			"email",
-			"file",
-			"float",
-			"html",
-			"identified",
-			"image",
-			"int",
-			"md5",
-			"price",
-			"string",
-			"text",
-			"timestamp",
-			"uint",
-			"url",
-			"url_part",
-			"path",
-			"tags"
-		);
-		
-		if(!in_array($func, $type_ar))
+		/* Существует ли указанный тип */
+		if (!method_exists(get_class(), "_" . $func))
 		{
-			throw new Exception("Не найден тип \"{$func}\".");
+			throw new Exception("Тип «{$func}» отсутствует.");
 		}
-		
-		if (count($args) != 1)
+
+		/* Не указана строка */
+		if (count($args) === 0)
 		{
-			throw new Exception("Аргументы функции заданы неверно.");
+			throw new Exception("Не указана строка для проверки.");
 		}
-		
+
+		/* Много аргументов */
+		if (count($args) > 1)
+		{
+			throw new Exception("Необходимо указать только одну строку для проверки.");
+		}
+
 		try
 		{
-			if($func != "blob")
-			{
-				$args[0] = (string) $args[0];
-				self::check($args[0]);
-			}
-			
-			call_user_func("self::_".$func, $args[0]);
+			/* Общая проверка */
+			self::_check($args[0]);
+
+			/* Проверка на соответствие типу */
+			call_user_func("self::_" . $func, $args[0]);
 		}
 		catch (Exception $e)
 		{
-			self::$error = $e->getMessage();
+			self::$_error_last = $e->getMessage();
+
 			return false;
 		}
-		
+
 		return true;
 	}
 
 	/**
-	 * Общая проверка и удаление пробельных символов
+	 * Текст последней ошибки
+	 * 
+	 * @return string
+	 */
+	public static function error()
+	{
+		return self::$_error_last;
+	}
+
+	/**
+	 * Общая проверка
 	 * 
 	 * @param string $str
-	 * @param string $trim
-	 * @return bool
 	 */
-	public static function check(&$str, $trim=true)
+	private static function _check(&$str)
 	{
-		$str = (string) $str;
-
-		/* Пустая строка */
-		if ($trim)
+		/* Преобразуем в строку */
+		if (is_int($str) or is_float($str) or is_string($str))
 		{
-			$str = trim($str);
-			if (mb_strlen($str) < 1)
+			$str = (string) $str;
+		}
+		elseif (is_bool($str))
+		{
+			if ($str === true)
 			{
-				throw new Exception("Пустая строка.");
+				$str = "1";
 			}
-		}
-
-		/* Строка с нулевым символом */
-		$str_temp = $str;
-		$strlen_before = mb_strlen($str_temp);
-		$str_temp = str_replace(chr(0), '', $str_temp);
-		$strlen_after = mb_strlen($str_temp);
-		if ($strlen_before != $strlen_after)
-		{
-			throw new Exception("Нулевой символ.");
-		}
-
-		/* Бинарная строка, либо символы не в UTF-8 */
-		$result = mb_detect_encoding($str, "UTF-8");
-		if ($result === false)
-		{
-			throw new Exception("Бинарная строка, либо символы не в UTF-8.");
-		}
-		
-		/* Превышает допустимый размер */
-		if(mb_strlen($str, "latin1") > self::$max_size)
-		{
-			throw new Exception("Слишком большая строка.");
-		}
-
-		return true;
-	}
-
-	/**
-	 * Бинарная строка
-	 * 
-	 * @param string $str
-	 * @return boolean
-	 */
-	private static function _blob($str)
-	{
-		if(mb_strlen($str, "latin1") > self::$max_size)
-		{
-			throw new Exception("Слишком большая строка.");
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * Булёвое значение
-	 * 
-	 * @param string $str
-	 * @return boolean 
-	 */
-	private static function _bool($str)
-	{
-		if($str !== "0" and $str !== "1")
-		{
-			throw new Exception("Необходимо указать «0» или «1».");
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * Дата в формате dd.mm.YYYY
-	 * 
-	 * @param string $str
-	 * @return bool 
-	 */
-	private static function _date($str)
-	{
-		if (!preg_match("#^([\d]{2})\.([\d]{2})\.([\d]{4})$#isuD", $str, $sovpal))
-		{
-			throw new Exception("Недопустимые символы.");
-		}
-
-		$day = (int) $sovpal[1];
-		$month = (int) $sovpal[2];
-		$year = (int) $sovpal[3];
-
-		if ($year < 1000)
-		{
-			throw new Exception("Год указан неверно.");
-		}
-
-		if ($month < 1 or $month > 12)
-		{
-			throw new Exception("Месяц указан неверно.");
-		}
-
-		if ($day < 1)
-		{
-			throw new Exception("День указан неверно.");
-		}
-
-		if (in_array($month, array(1, 3, 5, 7, 8, 10, 12)))
-		{
-			if ($day > 31)
+			elseif ($str === false)
 			{
-				throw new Exception("День указан неверно.");
-			}
-		}
-		elseif (in_array($month, array(4, 6, 9, 11)))
-		{
-			if ($day > 30)
-			{
-				throw new Exception("День указан неверно.");
+				$str = "0";
 			}
 		}
 		else
 		{
-			if (($year % 4) == 0)
-			{
-				if ($day > 29)
-				{
-					throw new Exception("День задан неверно.");
-				}
-			}
-			else
-			{
-				if ($day > 28)
-				{
-					throw new Exception("День задан неверно.");
-				}
-			}
+			throw new Exception("Не является скалярной переменной.");
 		}
 
-		return true;
-	}
-	
-	/**
-	 * Почтовый ящик
-	 * 
-	 * @param string $str
-	 * @return bool
-	 */
-	private static function _email($str)
-	{
-		self::check($str);
-
-		if (!preg_match("#^[a-zA-Z0-9_\-\.]+@[a-zA-Z0-9\-\.]+\.[a-z]{2,}$#isuD", $str))
+		/* Пустая строка */
+		if (trim($str) === "")
 		{
-			throw new Exception("Допускается строка в формате [a-z]@[a-z].[a-z].");
+			throw new Exception("Пустая строка");
 		}
 
-		return true;
-	}
-	
-	/**
-	 * Файл
-	 * 
-	 * @param string $str
-	 * @return bool
-	 */
-	private static function _file($str)
-	{
-		if (!preg_match("#^[a-z0-9_-]+\.[a-z0-9]+$#isuD", $str))
+		/* Нулевой символ */
+		if (strlen($str) !== strlen(str_replace(chr(0), "", $str)))
 		{
-			throw new Exception("Неодпустимые символы.");
+			throw new Exception("Обнаружен нулевой символ.");
 		}
 
-		return true;
-	}
-	
-	/**
-	 * Число с плавающей запятой
-	 * 
-	 * @param string $str
-	 * @return bool 
-	 */
-	private static function _float($str)
-	{
-		if (!is_numeric($str))
+		/* Символы не в UTF-8 */
+		if (mb_detect_encoding($str, "UTF-8") === false)
 		{
-			throw new Exception("Не является числом.");
+			throw new Exception("Бинарная строка, либо символы не в UTF-8.");
 		}
-
-		$pos = strpos($str, ".");
-		if ($pos === false)
-		{
-			throw new Exception("Целое число.");
-		}
-
-		return true;
 	}
-	
-	/**
-	 * Строка без содержания тега <script>
-	 * 
-	 * @param string $str
-	 * @return bool
-	 */
-	private static function _html($str)
-	{
-		$result = mb_strpos($str, "<script", 0);
-		if ($result !== false)
-		{
-			throw new Exception("Наличие тега «script».");
-		}
 
-		return true;
-	}
-	
 	/**
 	 * Идентификатор
 	 * 
 	 * @param string $str
-	 * @return bool
 	 */
 	private static function _identified($str)
 	{
-		$str = mb_strtolower($str);
-		$str = strtr($str, "abcdefghijklmnopqrstuvwxyz_0123456789 ", "                                     _");
-		if(strlen(trim($str)) != 0)
+		if (ctype_alnum(str_replace("_", "", $str)) === false)
 		{
 			throw new Exception("Допускаются символы: a-z,0-9,\"_\" .");
 		}
-		
-		return true;
 	}
-	
-	/**
-	 * Наименование файла рисунка
-	 * 
-	 * @param string $str
-	 * @return boolean 
-	 */
-	private static function _image($str)
-	{
-		if (!preg_match("#^[a-z0-9_\-.]+\.(gif|jpg|png)+$#isuD", $str))
-		{
-			throw new Exception("Допускаются символы a-z,0-9,\"_\", \".\" в наименовании и расширение gif, jpg, png.");
-		}
-				
-		return true;
-	}
-	
-	/**
-	 * Число со знаком
-	 * 
-	 * @param string $str
-	 * @return bool
-	 */
-	private static function _int($str)
-	{
-		if (!is_numeric($str))
-		{
-			throw new Exception("Не является числом.");
-		}
 
-		return true;
-	}
-	
-	/**
-	 * Строка MD5
-	 * 
-	 * @param string $str
-	 * @return boolean 
-	 */
-	private static function _md5($str)
-	{
-		if (!preg_match("#^[a-z0-9]+$#isuD", $str))
-		{
-			throw new Exception("Допускаются символы a-z,0-9.");
-		}
-
-		if(mb_strlen($str, "latin1") != 32)
-		{
-			throw new Exception("Строка должна содержать 32 символа.");
-		}
-				
-		return true;
-	}
-	
-	/**
-	 * Цена - два числа после запятой всегда положительная
-	 * 
-	 * @param string $str
-	 * @return bool 
-	 */
-	private static function _price($str)
-	{
-		if (!is_numeric($str))
-		{
-			throw new Exception("Не является числом.");
-		}
-
-		$pos = strpos($str, ".");
-		if ($pos === false)
-		{
-			throw new Exception("Целое число.");
-		}
-
-		if (substr($str, -3, 1) != ".")
-		{
-			throw new Exception("Необходимо две цифры после запятой.");
-		}
-
-		return true;
-	}
-	
 	/**
 	 * Строка не более 255 символов, и без пробельных символов
 	 * 
 	 * @param string $str
-	 * @return bool 
 	 */
 	private static function _string($str)
 	{
-		$result = strpbrk($str, "\n\r\t\v\f");
-		if ($result !== false)
+		if (strpbrk($str, "\n\r\t\v\f") !== false)
 		{
 			throw new Exception("Недопустимые символы.");
 		}
 
-		$result = strpbrk($str, "><");
-		if ($result !== false)
+		if (strpbrk($str, "><") !== false)
 		{
 			throw new Exception("HTML-символы.");
 		}
@@ -432,120 +147,309 @@ class Chf
 		{
 			throw new Exception("Большая строка.");
 		}
-
-		return true;
 	}
-	
+
 	/**
 	 * Cтрока без html-тегов
 	 * 
 	 * @param string $str
-	 * @return bool
 	 */
 	private static function _text($str)
 	{
-		$result = strpbrk($str, "><");
-		if ($result !== false)
+		if (strpbrk($str, "><") !== false)
 		{
 			throw new Exception("HTML-символы.");
 		}
-
-		return true;
 	}
-	
+
 	/**
-	 * Дата и время в формате timestamp
+	 * Строка без содержания тега <script>
 	 * 
 	 * @param string $str
-	 * @return bool 
 	 */
-	private static function _timestamp($str)
+	private static function _html($str)
 	{
-		$result = strtotime($str);
-		if ($result === false)
+		$str = mb_strtolower($str);
+		if (mb_strpos($str, "<script") !== false)
 		{
-			throw new Exception("Не соответствует формату TIMESTAMP.");
+			throw new Exception("Наличие тега «script».");
 		}
+	}
 
-		return true;
+	/**
+	 * Число со знаком
+	 * 
+	 * @param string $str
+	 */
+	private static function _int($str)
+	{
+		if (!is_numeric($str))
+		{
+			throw new Exception("Не является числом.");
+		}
+		
+		if (strpos($str, ".") !== false)
+		{
+			throw new Exception("Тип float.");
+		}
 	}
 
 	/**
 	 * Число без знака
 	 * 
 	 * @param string $str
-	 * @return bool 
 	 */
 	private static function _uint($str)
+	{
+		self::_int($str);
+
+		$str = (int) $str;
+
+		if ($str !== abs($str))
+		{
+			throw new Exception("Отрицательное число.");
+		}
+	}
+
+	/**
+	 * Булёвое значение
+	 * 
+	 * @param string $str
+	 */
+	private static function _bool($str)
+	{
+		if ($str !== "0" and $str !== "1")
+		{
+			throw new Exception("Необходимо указать «0» или «1».");
+		}
+	}
+
+	/**
+	 * Почтовый ящик
+	 * 
+	 * @param string $str
+	 */
+	private static function _email($str)
+	{
+		if (!filter_var($str, FILTER_VALIDATE_EMAIL))
+		{
+			throw new Exception("Не прошёл валидацию.");
+		}
+	}
+
+	/**
+	 * Цена - два числа после точки всегда положительная
+	 * 
+	 * @param string $str
+	 */
+	private static function _price($str)
 	{
 		if (!is_numeric($str))
 		{
 			throw new Exception("Не является числом.");
 		}
 
-		$str = (int) $str;
+		if (strpos($str, ".") === false)
+		{
+			throw new Exception("Целое число.");
+		}
 
-		if ($str != abs($str))
+		if (substr($str, -3, 1) !== ".")
+		{
+			throw new Exception("Необходимо две цифры после точки.");
+		}
+		
+		if ((int)$str !== abs((int)$str))
 		{
 			throw new Exception("Отрицательное число.");
 		}
-
-		return true;
 	}
 
 	/**
-	 * Урл
+	 * Дата и время в формате timestamp
 	 * 
 	 * @param string $str
-	 * @return bool 
+	 */
+	private static function _date($str)
+	{
+		if (strtotime($str) === false)
+		{
+			throw new Exception("Не является строкой даты или времени.");
+		}
+	}
+
+	/**
+	 * Часть урла
+	 * 
+	 * @param string $str
 	 */
 	private static function _url_part($str)
 	{
-		if (!preg_match("#^[a-zа-яё0-9\_\-\.]+$#isuD", $str))
+		/* В нижний регистра */
+		$str = mb_strtolower($str);
+		
+		/* «.» или «..» */
+		if ($str === "." or $str === "..")
 		{
-			throw new Exception("Недопустимые символы.");
-		}
-
-		return true;
-	}
-	
-	/**
-	 * Урл
-	 * 
-	 * @param string $str
-	 * @return bool 
-	 */
-	private static function _url($str)
-	{
-		if (!preg_match("#^[a-zа-яё0-9\_\-\.\/\#]+$#isuD", $str))
-		{
-			throw new Exception("Недопустимые символы.");
-		}
-
-		return true;
-	}
-	
-	/**
-	 * Путь к файлу или каталогу
-	 * 
-	 * @param string $str
-	 * @return bool
-	 */
-	private static function _path($str)
-	{
-		/* Символ "." */
-		if ($str == "." or $str == "/")
-		{
-			return true;
+			throw new Exception("Урл не может быть указан как «.» или «..».");
 		}
 		
+		/* Недопустимые символы */
+		$str = strtr
+		(
+			$str, 
+			[
+				'0'=>'', '1'=>'', '2'=>'', '3'=>'', '4'=>'', '5'=>'', '6'=>'', '7'=>'', '8'=>'', '9'=>'',
+				'a'=>'', 'b'=>'', 'c'=>'', 'd'=>'', 'e'=>'', 'f'=>'', 'g'=>'', 'h'=>'', 'i'=>'', 'j'=>'',
+				'k'=>'', 'l'=>'', 'm'=>'', 'n'=>'', 'o'=>'', 'p'=>'', 'q'=>'', 'r'=>'', 's'=>'', 't'=>'',
+				'u'=>'', 'v'=>'', 'w'=>'', 'x'=>'', 'y'=>'', 'z'=>'', 
+				'а'=>'', 'б'=>'', 'в'=>'', 'г'=>'', 'д'=>'', 'е'=>'', 'ё'=>'', 'ж'=>'', 'з'=>'', 'и'=>'',
+				'й'=>'', 'к'=>'', 'л'=>'', 'м'=>'', 'н'=>'', 'о'=>'', 'п'=>'', 'р'=>'', 'с'=>'', 'т'=>'', 
+				'у'=>'', 'ф'=>'', 'х'=>'', 'ц'=>'', 'ч'=>'', 'ш'=>'', 'щ'=>'', 'ъ'=>'', 'ы'=>'', 'ь'=>'',
+				'э'=>'', 'ю'=>'', 'я'=>'',
+				'_'=>'', '-'=>'', '.'=>'', ' '=>'_'
+			]
+		);
+		
+		if ($str !== "")
+		{
+			throw new Exception("Допускаются символы: 0-9,a-z,а-я,«_»,«-»,«.» .");
+		}
+	}
+
+	/**
+	 * Путь урла
+	 * 
+	 * @param string $str
+	 */
+	private static function _url_path($str)
+	{
 		/* Срезаем символы слэша в начале и конце */
-		if (mb_substr($str, 0, 1) == "/")
+		if (mb_substr($str, 0, 1) === "/")
 		{
 			$str = mb_substr($str, 1, mb_strlen($str) - 1);
 		}
 
-		if (mb_substr($str, mb_strlen($str) - 1, 1) == "/")
+		if (mb_substr($str, mb_strlen($str) - 1, 1) === "/")
+		{
+			$str = mb_substr($str, 0, mb_strlen($str) - 1);
+		}
+		
+		/* Разбор */
+		$str_ar = explode("/", $str);
+		foreach ($str_ar as $val)
+		{
+			self::_url_part($val);
+		}
+	}
+	
+	/**
+	 * Урл
+	 * 
+	 * @param string $str
+	 */
+	private static function _url($str)
+	{
+		$parse_url = parse_url($str);
+		
+		if (!is_string($str))
+		{
+			throw new Exception("Не является строкой");
+		}
+		
+		if ($parse_url === false)
+		{
+			throw new Exception("Не прошёл парсинг");
+		}
+		
+		if (!empty($parse_url['path']))
+		{
+			self::_url_path($parse_url['path']);
+		}
+		
+		if (!empty($parse_url['query']))
+		{
+			self::_string($parse_url['query']);
+		}
+	}
+
+	/**
+	 * Строка с тэгами через запятую
+	 * 
+	 * @param string $str
+	 */
+	private static function _tags($str)
+	{
+		/* В нижний регистр */
+		$str = mb_strtolower($str);
+		
+		/* Проверка на наличие недопустимых символов */
+		$str_trim = strtr
+		(
+			$str, 
+			[
+				'0'=>'', '1'=>'', '2'=>'', '3'=>'', '4'=>'', '5'=>'', '6'=>'', '7'=>'', '8'=>'', '9'=>'',
+				'a'=>'', 'b'=>'', 'c'=>'', 'd'=>'', 'e'=>'', 'f'=>'', 'g'=>'', 'h'=>'', 'i'=>'', 'j'=>'',
+				'k'=>'', 'l'=>'', 'm'=>'', 'n'=>'', 'o'=>'', 'p'=>'', 'q'=>'', 'r'=>'', 's'=>'', 't'=>'',
+				'u'=>'', 'v'=>'', 'w'=>'', 'x'=>'', 'y'=>'', 'z'=>'', 
+				'а'=>'', 'б'=>'', 'в'=>'', 'г'=>'', 'д'=>'', 'е'=>'', 'ё'=>'', 'ж'=>'', 'з'=>'', 'и'=>'',
+				'й'=>'', 'к'=>'', 'л'=>'', 'м'=>'', 'н'=>'', 'о'=>'', 'п'=>'', 'р'=>'', 'с'=>'', 'т'=>'', 
+				'у'=>'', 'ф'=>'', 'х'=>'', 'ц'=>'', 'ч'=>'', 'ш'=>'', 'щ'=>'', 'ъ'=>'', 'ы'=>'', 'ь'=>'',
+				'э'=>'', 'ю'=>'', 'я'=>'',
+				','=>'', ' '=>''
+			]
+		);
+		
+		if ($str_trim !== "")
+		{
+			throw new Exception("Допускаются символы: 0-9,a-z,а-я,«,».");
+		}
+		
+		/* Проверка тэгов на пустоту */
+		$ar = explode(",", $str);
+		if (empty($ar))
+		{
+			throw new Exception("Не указано ни одного тэга");
+		}
+
+		foreach ($ar as $key => $val)
+		{
+			$val = trim($val);
+			if (empty($val))
+			{
+				throw new Exception("Пустой тэг или лишняя зяпятая");
+			}
+
+			$ar[$key] = $val;
+		}
+
+		/* Повторяющиеся тэги */
+		if (count($ar) !== count(array_unique($ar)))
+		{
+			throw new Exception("Повторяющиеся тэги");
+		}
+	}
+
+	/**
+	 * Путь к файлу или каталогу
+	 * 
+	 * @param string $str
+	 */
+	private static function _path($str)
+	{
+		/* Символ "." */
+		if ($str === "." or $str === "/")
+		{
+			return true;
+		}
+
+		/* Срезаем символы слэша в начале и конце */
+		if (mb_substr($str, 0, 1) === "/")
+		{
+			$str = mb_substr($str, 1, mb_strlen($str) - 1);
+		}
+
+		if (mb_substr($str, mb_strlen($str) - 1, 1) === "/")
 		{
 			$str = mb_substr($str, 0, mb_strlen($str) - 1);
 		}
@@ -555,58 +459,36 @@ class Chf
 		foreach ($str_ar as $val)
 		{
 			/* Указание в пути ".." и "." */
-			if ($val == "." or $val == "..")
+			if ($val === "." or $val === "..")
 			{
-				throw new Exception("Путь \"" . func_get_arg(0) . "\" задан неверно. Использовать имя файла как \"..\" и \".\" запрещено.");
+				throw new Exception("Использовать имя файла как «..» и «.» запрещено.");
 			}
 
 			/* Строка с начальными или конечными пробелами */
-			$strlen = mb_strlen($val);
-			$strlen_trim = mb_strlen(trim($val));
-			if ($strlen != $strlen_trim)
+			if (mb_strlen($val) !== mb_strlen(trim($val)))
 			{
-				throw new Exception("Путь \"" . func_get_arg(0) . "\" задан неверно. Пробелы в начале или в конце имени файла.");
+				throw new Exception("Пробелы в начале или в конце имени файла.");
 			}
 
 			/* Не указано имя файла */
-			$val_trim = trim($val);
-			if (mb_strlen($val_trim) < 1)
+			if (trim($val) === "")
 			{
-				throw new Exception("Путь \"" . func_get_arg(0) . "\" задан неверно. Не задано имя файла.");
+				throw new Exception("Не задано имя файла.");
 			}
 		}
 	}
 	
 	/**
-	 * Строка с тегами через запятую
+	 * IP-адрес
 	 * 
 	 * @param string $str
-	 * @return bool 
 	 */
-	private static function _tags($str)
+	private static function _ip($str)
 	{
-		if (!preg_match("#^[a-zа-яё0-9\-\, ]+$#isuD", $str))
+		if (!filter_var($str, FILTER_VALIDATE_IP))
 		{
-			throw new Exception("Недопустимые символы.");
+			throw new Exception("Не прошёл валидацию.");
 		}
-		
-		$ar = explode(",", $str);
-		if(empty($ar))
-		{
-			throw new Exception("Не указано ни одного тега");
-		}
-		
-		foreach ($ar as $val)
-		{
-			$val = trim($val);
-			if(empty($val))
-			{
-				throw new Exception("Пустой тег или лишняя зяпятая");
-			}
-		}
-
-		return true;
 	}
 }
-
 ?>

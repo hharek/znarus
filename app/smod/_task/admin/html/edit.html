@@ -1,0 +1,113 @@
+<form>
+	<input name="ID" type="hidden" value="<?php echo $task['ID']; ?>"/>
+	<table class="std_form">
+		<tr>
+			<td>Заказчик</td>
+			<td>
+				<select name="From">
+					<option value="0"<?php if($task['From'] === "0"): ?> selected="selected"<?php endif; ?>>
+						<?php echo ROOT_NAME_FULL; ?>
+					</option>
+					<?php foreach ($user as $val): ?>
+						<option value="<?php echo $val['ID']; ?>"<?php if($task['From'] === $val['ID']): ?> selected="selected"<?php endif; ?>>
+							<?php echo $val['Name']; ?>
+						</option>
+					<?php endforeach; ?>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>Исполнитель</td>
+			<td>
+				<select name="To">
+					<option value="0"<?php if($task['To'] === "0"): ?> selected="selected"<?php endif; ?>>
+						<?php echo ROOT_NAME_FULL; ?>
+					</option>
+					<?php foreach ($user as $val): ?>
+						<option value="<?php echo $val['ID']; ?>"<?php if($task['To'] === $val['ID']): ?> selected="selected"<?php endif; ?>>
+							<?php echo $val['Name']; ?>
+						</option>
+					<?php endforeach; ?>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>Наименование задания</td>
+			<td>
+				<input name="Name" type="text" value="<?php echo htmlspecialchars($task['Name']); ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Описание задания</td>
+			<td>
+				<textarea name="Content"><?php echo htmlspecialchars($task['Content']); ?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td>Примечание</td>
+			<td>
+				<textarea name="Note"><?php echo htmlspecialchars($task['Note']); ?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td>Статус</td>
+			<td>
+				<select name="Status">
+					<option value="create"<?php if($task['Status'] === "create"): ?> selected="selected"<?php endif; ?>>Создан</option>
+					<option value="done"<?php if($task['Status'] === "done"): ?> selected="selected"<?php endif; ?>>Выполнен</option>
+					<option value="fail"<?php if($task['Status'] === "fail"): ?> selected="selected"<?php endif; ?>>Отказ</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>Дата создания</td>
+			<td>
+				<input type="text" name="Date_Create_Date" style="min-width: 100px; width: 100px;" value="<?php echo date("d.m.Y", strtotime($task['Date_Create'])); ?>"/>
+				<input type="text" name="Date_Create_Time" style="min-width: 100px; width: 100px;" value="<?php echo date("H:i:s", strtotime($task['Date_Create'])); ?>"/>
+				<input type="hidden" name="Date_Create" value=""/>
+			</td>
+		</tr>
+		<tr>
+			<td>Выполнить до:</td>
+			<td>
+				<input type="checkbox" name="Date_Require_Select" value="1"<?php if(!empty($task['Date_Require'])): ?> checked="checked"<?php endif; ?>/>
+				<input type="text" name="Date_Require_Date" style="min-width: 100px; width: 100px;" value="<?php echo empty($task['Date_Require']) ? "" : date("d.m.Y", strtotime($task['Date_Require'])); ?>"/>
+				<input type="text" name="Date_Require_Time" style="min-width: 100px; width: 100px;" value="<?php echo empty($task['Date_Require']) ? "" : date("H:i", strtotime($task['Date_Require'])); ?>"/>
+				<input type="hidden" name="Date_Require" value=""/>
+			</td>
+		</tr>
+		<tr>
+			<td>Дата выполнения:</td>
+			<td>
+				<input type="checkbox" name="Date_Done_Select" value="1"<?php if(!empty($task['Date_Done'])): ?> checked="checked"<?php endif; ?>/>
+				<input type="text" name="Date_Done_Date" style="min-width: 100px; width: 100px;" value="<?php echo empty($task['Date_Done']) ? "" : date("d.m.Y", strtotime($task['Date_Done'])); ?>"/>
+				<input type="text" name="Date_Done_Time" style="min-width: 100px; width: 100px;" value="<?php echo empty($task['Date_Done']) ? "" : date("H:i:s", strtotime($task['Date_Done'])); ?>"/>
+				<input type="hidden" name="Date_Done" value=""/>
+			</td>
+		</tr>
+		<tr>
+			<td>Дата отказа:</td>
+			<td>
+				<input type="checkbox" name="Date_Fail_Select" value="1"<?php if(!empty($task['Date_Fail'])): ?> checked="checked"<?php endif; ?>/>
+				<input type="text" name="Date_Fail_Date" style="min-width: 100px; width: 100px;" value="<?php echo empty($task['Date_Fail']) ? "" : date("d.m.Y", strtotime($task['Date_Fail'])); ?>"/>
+				<input type="text" name="Date_Fail_Time" style="min-width: 100px; width: 100px;" value="<?php echo empty($task['Date_Fail']) ? "" : date("H:i:s", strtotime($task['Date_Fail'])); ?>"/>
+				<input type="hidden" name="Date_Fail" value=""/>
+			</td>
+		</tr>
+	</table>
+	<div class="center">
+		<div class="std_button submit">
+			<div class="icon_edit"></div>
+			Сохранить
+		</div>
+		<a class="std_button" href="#_task/list">
+			<div class="icon_back"></div>
+			Назад
+		</a>
+		<div 
+			class="icon_basket delete" 
+			url="#_task/delete?id=<?php echo $task['ID']; ?>"
+			mess="Вы действительно хотите удалить задание «<?php echo $task['Name']; ?>»?"
+		></div>
+	</div>
+</form>

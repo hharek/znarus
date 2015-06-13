@@ -1,18 +1,17 @@
-.e > .menu
+.menu
 {
-	display: block;
+	display: inline-block;
 	border: 1px solid #ccc;
 	border-radius: 10px;
 	width: 160px;
 	color: #000;
 	text-align: center;
 	padding: 3px 5px;
-	float: left;
 	margin: 0px 10px 10px 0px;
 	background: #d7e6f0;
 }
 
-.e > .active
+.menu.active
 {
 	background: #fff;
 }

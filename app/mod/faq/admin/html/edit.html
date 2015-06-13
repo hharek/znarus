@@ -1,4 +1,4 @@
-<form action="#faq/edit_post?id=<?php echo $faq['ID']; ?>">
+<form>
 	<table class="std_form">
 		<tr>
 			<td style="width: 40%;">Вопрос</td>
@@ -13,20 +13,18 @@
 			</td>
 		</tr>
 	</table>
-	<center>
+	<div class="center">
 		<div class="std_button submit">
 			<div class="icon_edit"></div>
 			Сохранить
 		</div>
-		
 		<a href="#faq/list" class="std_button">
 			<div class="icon_back"></div>
 			Назад
 		</a>
-		
-		<div class="icon_delete delete" url="#faq/delete_post?id=<?php echo $faq['ID']; ?>">
-			Вы действительно хотите удалить вопрос с ответом «<?php echo $faq['Question']; ?>»?
-		</div>
-		
-	</center>
+		<div class="icon_delete delete" 
+			 url="#faq/delete?id=<?php echo $faq['ID']; ?>"
+			 mess="Вы действительно хотите удалить вопрос с ответом «<?php echo $faq['Question']; ?>»?"
+		></div>
+	</div>
 </form>

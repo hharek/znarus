@@ -9,7 +9,7 @@ function item_html($item, $level)
 {
 ?>
 	
-	<?php foreach ($item as $key=>$val): ?>
+	<?php foreach ($item as $val): ?>
 
 		<tr>
 			<td url="#menu/item_edit?id=<?php echo $val['ID']; ?>" style="text-align: left; padding-left: <?php echo 12 + ($level * 22); ?>px;">
@@ -19,13 +19,8 @@ function item_html($item, $level)
 				<?php echo $val['Url']; ?>
 			</td>
 			<td>
-				<?php if($key !== 0): ?>
-					<div onclick="zn('#menu/item_sort_up_post', { id: <?php echo $val['ID']; ?>});" class="icon_up" style="cursor: pointer;"></div>
-				<?php endif; ?>
-					
-				<?php if(count($item) != $key + 1): ?>
-					<div onclick="zn('#menu/item_sort_down_post', { id: <?php echo $val['ID']; ?>});" class="icon_down" style="cursor: pointer;"></div>
-				<?php endif; ?>
+				<div onclick="_exe('#menu/item_sort', { type: 'up', id: <?php echo $val['ID']; ?>});" class="icon_up up"></div>
+				<div onclick="_exe('#menu/item_sort', { type: 'down', id: <?php echo $val['ID']; ?>});" class="icon_down down"></div>
 			</td>
 		</tr>
 		
@@ -38,42 +33,45 @@ function item_html($item, $level)
 ?>
 
 <!-- Меню -->
-<?php foreach ($menu as $val): ?>
-	<a class="menu<?php if((int)$val['ID'] === $menu_id): ?> active<?php endif; ?>" href="#menu/item?menu_id=<?php echo $val['ID']; ?>">
-		<?php echo $val['Name']; ?>
-	</a>
-<?php endforeach; ?>
-
-<!-- Если меню не выбрано -->
-<?php if(empty($menu_id)): ?>
-<div style="text-align: center; margin: 120px auto 0px auto; width: 300px;">
-	Выберите меню
-</div>
+<?php if (!empty($menu_all)): ?>
+	<div class="center">
+		<?php foreach ($menu_all as $val): ?>
+			<a class="menu <?php if($val['ID'] === $menu['ID']): ?>active<?php endif; ?>" href="#menu/item?menu_id=<?php echo $val['ID']; ?>">
+				<?php echo $val['Name']; ?>
+			</a>
+		<?php endforeach; ?>
+	</div>
+	<br/>
 <?php endif; ?>
 
+<!-- Если меню не выбрано -->
+<?php if(empty($menu)): ?>
+	<div style="text-align: center; margin: 120px auto 0px auto; width: 300px;">
+		Выберите меню
+	</div>
 <!-- Пункты меню -->
-<?php if(!empty($menu_id)): ?>
-<table class="std_list" align="center" style="width: 850px;">
-	<col width="30%"/>
-	<col width="40%"/>
-	<col width="10%"/>
-	<thead>
-		<tr>
-			<td>Наименование</td>
-			<td>Адрес</td>
-			<td>Сорт.</td>
-		</tr>
-	</thead>
-	<tbody>
-		<?php item_html($item, 0); ?>
-	</tbody>
-</table>
-<br/>
-<center>
-	<a href="#menu/item_add?menu_id=<?php echo $menu_id; ?>" class="std_button">
-		<div class="icon_add"></div>
-		Добавить
-	</a>
-</center>
+<?php else: ?>
+	<table class="std_list" align="center" style="width: 850px;">
+		<col width="30%"/>
+		<col width="40%"/>
+		<col width="10%"/>
+		<thead>
+			<tr>
+				<td>Наименование</td>
+				<td>Адрес</td>
+				<td>Сорт.</td>
+			</tr>
+		</thead>
+		<tbody>
+			<?php item_html($item, 0); ?>
+		</tbody>
+	</table>
+	<br/>
+	<div class="center">
+		<a href="#menu/item_add?menu_id=<?php echo $menu['ID']; ?>" class="std_button">
+			<div class="icon_add"></div>
+			Добавить
+		</a>
+	</div>
 <?php endif; ?>
 

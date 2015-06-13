@@ -1,0 +1,111 @@
+.explorer
+{
+	width: 600px;
+	margin: 0px auto;
+	border: 1px solid #ccc;
+	
+	/* Панель */
+	> .panel
+	{
+		border-bottom: 1px solid #ccc;
+		height: 40px;
+		
+		.check_all
+		{
+			width: 24px;
+			height: 24px;
+			
+			input
+			{
+				margin: 10px 0px 0px 4px;
+			}
+		}
+		
+		div
+		{
+			display: block;
+			float: left;
+			cursor: pointer;
+			margin: 8px 0px 0px 12px;
+		}
+	}
+	
+	/* Путь */
+	> .path
+	{
+		border-bottom: 1px solid #ccc;
+		height: 24px;
+		padding: 4px 0px 0px 10px;
+	}
+	
+	/* Файлы и папки */
+	> .list
+	{
+		min-height: 400px;
+		
+		.active
+		{
+			background: #f6e0a4;
+		}
+			
+		.file
+		{
+			padding: 5px 0px;
+			cursor: pointer;
+		
+			&:hover
+			{
+				background: #f6e0a4;
+			}
+			
+			.icon_dir
+			{
+				float: left;
+			}
+			
+			.check
+			{
+				width: 24px;
+				float: left;
+				margin: 2px 0px 0px 10px;
+			}
+			
+			.name
+			{
+				margin: 0px 0px 0px 64px;
+			}
+		}
+	}
+	
+	/* Загрузить */
+	.upload
+	{
+		width: 138px;
+		height: 32px;
+		margin: 0px auto 10px auto;
+		position: relative;
+		
+		input[type=file]
+		{
+			z-index: 10;
+			width: 138px;
+			height: 32px;
+			display: block;
+			position: absolute;
+			left: 0px;
+			top: 0px;
+			opacity: 0.0;
+			cursor: pointer;
+		}
+		
+		.std_button
+		{
+			z-index: 9;
+			display: block;
+			position: absolute;
+			left: 0px;
+			top: 0px;
+			margin: 0px;
+		}
+	}
+}

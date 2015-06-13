@@ -1,0 +1,75 @@
+.priv
+{
+	border-collapse: collapse;
+	clear: both;
+	margin: 0px auto;
+	
+	td
+	{
+		border: 1px solid #ccc;
+		padding: 3px 10px;
+	}
+	
+	/* Группы */
+	thead td
+	{
+		vertical-align: top;
+		text-align: center;
+		background-color: #fff;
+		line-height: 1;
+	}
+	
+	tbody
+	{
+		/* Модуль */
+		.module td
+		{
+			font-style: italic;
+			background-color: #e2eeb4;
+			
+			&:nth-child(1)
+			{
+				width: 320px;
+				text-align: left;
+				cursor: pointer;
+				
+				span
+				{
+					width: 10px;
+					display: inline-block;
+				}
+			}
+		}
+		
+		/* Тело */
+		.admin
+		{
+			background-color: #ffffff;
+			display: none;
+			
+			&:nth-child(even)
+			{
+				background-color: #eff0ec;
+			}
+			
+			&:hover
+			{
+				background-color: #f9fac5;
+			}
+			
+			td
+			{
+				text-align: center;
+				
+				&:nth-child(1)
+				{
+					padding-left: 30px;
+					width: 300px;
+					text-align: left;
+				}
+			}
+		}
+		
+		
+	}
+}

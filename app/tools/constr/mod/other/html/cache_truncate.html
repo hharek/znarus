@@ -1,0 +1,32 @@
+<form>
+	<p style="text-align: center;">Укажите тип кэша для очистки.</p>
+	
+	<div style="width: 200px; margin: 0 auto 20px auto;">
+		<input type="hidden" name="db_core" value="0"/>
+		<input type="checkbox" name="db_core" value="1" checked/>
+		Кэш БД (core)
+		<br/>
+		
+		<input type="hidden" name="db" value="0"/>
+		<input type="checkbox" name="db" value="1" checked/>
+		Кэш БД
+		<br/>
+		
+		<input type="hidden" name="route" value="0"/>
+		<input type="checkbox" name="route" value="1" checked/>
+		Кэш маршрутизатора 
+		<br/>
+		
+		<input type="hidden" name="page" value="0"/>
+		<input type="checkbox" name="page" value="1" checked/>
+		Кэш страниц 
+		<br/>
+	</div>
+	
+	<center>
+		<div class="std_button submit">
+			<div class="icon_edit"></div>
+			Очистить
+		</div>
+	</center>
+</form>

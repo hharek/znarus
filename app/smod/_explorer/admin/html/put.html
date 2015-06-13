@@ -1,0 +1,29 @@
+<form>
+	<input type="hidden" name="file" value="<?php echo $_GET['file']; ?>"/>
+	<table class="std_form" align="center">
+		<tr>
+			<td colspan="2" style="text-align: center;">
+				/<?php echo $_GET['file']; ?>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<textarea name="content" style="width: 100%; height: 450px;"><?php echo htmlspecialchars($content); ?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="std_button submit">
+					<div class="icon_edit"></div>
+					Сохранить
+				</div>
+			</td>
+			<td>
+				<a href="#_explorer/ls?path=<?php echo $path; ?>" class="std_button">
+					<div class="icon_back"></div>
+					Назад
+				</a>
+			</td>
+		</tr>
+	</table>
+</form>

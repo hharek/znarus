@@ -1,0 +1,81 @@
+._auth
+{
+	border: 1px solid #c0c0c0;
+	border-radius: 4px;
+	width: 400px;
+	position: absolute;
+	left: 50%;
+	top: 45%;
+	margin: -110px 0px 0px -220px;
+	padding: 20px;
+	background: #eef7cf;
+	overflow: hidden;
+	
+	._logo
+	{
+		width: 58px;
+		height: 64px;
+		border: 1px solid #c0c0c0;
+		position: absolute;
+		margin: 0px;
+	}
+	
+	._field
+	{
+		margin: 0px 0px 0px 120px;
+		
+		input
+		{
+			height: 24px;
+			width: 200px;
+			font-size: 20px;
+			font-style: italic;
+			padding: 8px;
+			display: block;
+			border: 1px solid #c0c0c0;
+			border-radius: 4px;
+			
+			&:nth-child(2)
+			{
+				margin: 10px 0 0 0;
+			}
+		}
+	}
+	
+	._button
+	{
+		width: 200px;
+		margin: 20px auto 0px;
+		border: 1px solid #c0c0c0;
+		border-radius: 4px;
+		height: 32px;
+		padding: 6px 2px 0px 6px;
+		text-align: center;
+		background: #e3e3e3;
+		position: relative;
+		font-size: 20px;
+		cursor: pointer;
+		
+		&:hover
+		{
+			background: #f0f0f0;
+		}
+		
+		._icon
+		{
+			background: url("img/icon.png") no-repeat 0px -96px;
+			width: 24px;
+			height: 24px;
+			position: absolute;
+			top: 7px;
+			left: 5px;
+		}
+	}
+	
+	._restore
+	{
+		margin: 10px 0px 0px 0px;
+		text-align: center;
+		font-size: 14px;
+	}
+}

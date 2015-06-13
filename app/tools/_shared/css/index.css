@@ -1,0 +1,318 @@
+._top 
+{
+	height: 75px;
+	
+	/* Логотип */
+	> ._logo
+	{
+		width: 58px;
+		height: 66px;
+		float: left;
+		border: 1px solid #ccc;
+	}
+	
+	/* Кнопки */
+	> ._buttons
+	{
+		width: 24px;
+		height: 48px;
+		float: right;
+	}
+	
+	> ._center
+	{
+		height: 66px;
+		margin: 0px 64px 0px 62px;
+		position: relative;
+		
+		/* Адмники */
+		> ._admin
+		{
+			min-width: 300px;
+			position: absolute;
+			left: 4px;
+			top: 34px;
+			
+			> ._module, > ._adm
+			{
+				float: left;
+				border: 1px solid #ccc;
+				border-radius: 7px;
+				overflow: hidden;
+				white-space: nowrap;
+				color: #000;
+			}
+			
+			> ._module
+			{
+				background-color: #dde783;
+				text-align: left;
+				min-width: 150px;
+				height: 26px;
+				margin: 0px 0px 0px 0px;
+				padding: 6px 5px 0px 0px;
+				
+				> ._icon
+				{
+					float: left;
+					margin: -2px 5px 2px 2px;
+					width: 24px;
+					height: 24px;
+					
+					> img
+					{
+						width: 24px;
+						height: 24px;
+					}
+				}
+			}
+			
+			> ._adm
+			{
+				background-color: #fbe69e;
+				text-align: center;
+				min-width: 120px;
+				height: 17px;
+				margin: 11px 0px 0px 10px;
+				padding: 2px 5px;
+				font-size: 14px;
+			}
+		}
+	}
+}
+
+/* Путь */
+._path
+{
+	position: relative;
+	left: 0px;
+	top: 0px;
+	height: 25px;
+	overflow: hidden;
+	white-space: nowrap;
+	word-wrap: normal;
+	
+	> ._item
+	{
+		display: inline-block;
+		min-width: 120px;
+		height: 19px;
+		background-color: #f6e8b6;
+		border: 1px solid #ccc;
+		border-radius: 7px;
+		overflow: hidden;
+		padding: 2px 5px;
+		text-align: center;
+		white-space: nowrap;
+		color: #000;
+
+		&:last-child
+		{
+			font-weight: bold;
+			background-color: #f6e39f;
+		}
+	}
+
+	> ._join
+	{
+		display: inline-block;
+		width: 20px;
+		color: #ccc;
+		height: 21px;
+		vertical-align: top;
+		margin: 0px -6px;
+		padding: 2px 0px 0px 0px;
+	}
+}
+
+._panel
+{
+	height: 0px;
+	position: relative;
+	
+	/* Заголовок */
+	._title
+	{
+		position: relative;
+		top: 6px;
+		text-align: center;
+		
+		div
+		{
+			margin: 0px auto;
+			border: 1px solid #ccc;
+			padding: 3px 10px;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 600px;
+			font-style: italic;
+			border-radius: 0px 0px 20px 20px;
+			background: #fff;
+		}
+	}
+	
+	/* Версии */
+	> ._version
+	{
+		position: absolute;
+		top: 12px;
+		right: 6px;
+		z-index: 7;	
+		display: none;
+		
+		> ._list
+		{
+			position: absolute;
+			top: 28px;
+			right: 0px;
+			width: 130px;
+			cursor: pointer;
+			border: 1px dashed #ccc;
+			background: #fff;
+			padding: 4px;
+			display: none;
+			
+			> div
+			{
+				font-size: 14px;
+				text-align: left;
+				
+				&._active, &:hover
+				{
+					background: yellow;
+				}
+			}	
+		}
+		
+		> ._load
+		{
+			display: none;
+			width: 32px;
+			height: 32px;
+			position: absolute;
+			top: -3px;
+			left: -32px;
+		}
+		
+		> .icon_version
+		{
+			cursor: pointer;
+		}
+	}
+	
+	/* Автосохранение */
+	._autosave
+	{
+		position: absolute;
+		top: 38px;
+		right: 5px;
+		z-index: 6;	
+		cursor: pointer;
+		display: none;
+	}
+}
+
+/* Содержание */
+._content
+{
+	min-height: 420px;
+	margin: 6px 0px 0px 0px;
+	border: 1px dashed #ccc;
+	padding: 40px 10px 10px 10px;
+	overflow: hidden;
+	position: relative;
+	
+	/* Иконка удалить */
+	.delete
+	{
+		cursor: pointer;
+		margin: 0px 0px -8px 20px;
+	}
+	
+	/* Исключение админское */
+	.exception_admin
+	{
+		width: 500px;
+		margin: 30px auto 0px auto;
+		border: 1px solid #ccc;
+		border-radius: 10px;
+		padding: 10px 20px 5px 20px;
+		text-align: center;
+		background: #ffe7ae;
+	}
+	
+	/* Ошибка в форме */
+	.error_mess
+	{
+		color: #d90000;
+		font-size: 13px;
+	}
+}
+
+/* Сообщение об удачном выполнении */
+._mess_ok
+{
+	min-width: 300px;
+	position: fixed;
+	right: 0px;
+	top: 0px;
+	padding: 10px 10px 14px 10px;
+	z-index: 8;
+	display: none;
+	
+	> ._primary
+	{
+		border: 1px solid #ccc;
+		border-radius: 10px;
+		background-color: #f8de4c;
+		padding: 4px 0px 8px 5px;
+		
+		> ._icon
+		{
+			float: left;
+			margin: 2px 0px 0px 0px;
+		}
+
+		> ._close
+		{
+			width: 20px;
+			height: 20px;
+			text-align: center;
+			float: right;
+			cursor: pointer;
+			color: #ccc;
+		}
+
+		> ._text
+		{
+			margin: 3px 20px 0px 30px;
+		}
+	}
+}
+
+/* Вкладки */
+._content
+{
+	.tab_button
+	{
+		margin-left: 100px;
+		
+		&:nth-child(1)
+		{
+			margin-left: 0px;
+		}
+		
+		&.active
+		{
+			cursor: default;
+			background: #f0f0f0;
+			border: 1px solid black;
+		}
+	}
+	
+	.tab
+	{
+		display: none;
+	}
+}

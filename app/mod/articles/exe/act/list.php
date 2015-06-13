@@ -1,24 +1,24 @@
 <?php
-$query =
-<<<SQL
-SELECT 
-	"ID",
-	"Date",
-	"Title",
-	"Url",
-	"Anons"
-FROM 
-	"articles"
-ORDER BY
-	"Date" DESC
-SQL;
-$articles = Reg::db()->query_assoc($query, null, "articles");
+/* Все статьи */
+$articles = Articles::get_all();
 
-Reg::title("Статьи");
-Reg::meta_title("Статьи");
-Reg::meta_keywords("статьи, полезные статьи");
-Reg::path
-([
-	"Статьи [/статьи]"
-]);
+/* Мета */
+title("Статьи");
+tags("статьи, полезные статьи");
+path(["Полезные статьи [/статьи]"]);
+
+/* Время последнего изменения */
+if (!empty($articles))
+{
+	$last_modified = $articles[0]['Last_Modified'];
+	foreach ($articles as $val)
+	{	
+		if (strtotime($val['Last_Modified']) > strtotime($last_modified))
+		{
+			$last_modified = $val['Last_Modified'];
+		}
+	}
+	
+	last_modified($last_modified);
+}
 ?>

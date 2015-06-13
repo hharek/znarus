@@ -1,0 +1,114 @@
+<!--Вкладки-->
+<div class="tabs center">
+	<div class="std_button tab_button" tab="home">
+		<div class="icon_html"></div>
+		Главная страница
+	</div>
+	<div class="std_button tab_button" tab="404">
+		<div class="icon_html"></div>
+		Страница 404
+	</div>
+	<div class="std_button tab_button" tab="403">
+		<div class="icon_html"></div>
+		Страница 403
+	</div>
+</div>
+
+<!-- Главная страница -->
+<div class="tab" id="tab_home">
+	<form>
+		<input type="hidden" name="type" value="home"/>
+		<h2 style="text-align: center;">Главная страница</h2>
+		<table class="std_form">
+			<tr>
+				<td>Исполнитель</td>
+				<td>
+					<input type="text" name="Home_Module" value="<?php echo P::get("home_module"); ?>" style="min-width: 70px; width: 70px;"/>
+					<input type="text" name="Home_Exe" value="<?php echo P::get("home_exe"); ?>" style="min-width: 70px; width: 70px;"/>
+				</td>
+			</tr>
+			<tr>
+				<td>Админка</td>
+				<td>
+					<input type="text" name="Home_Admin_Url" value="<?php echo P::get("home_admin_url"); ?>" style="min-width: 160px; width: 160px;"/>
+				</td>
+			</tr>
+		</table>
+		<div class="center">
+			<div class="std_button submit">
+				<div class="icon_edit"></div>
+				Сохранить
+			</div>
+			<div class="std_button" id="route_std_home">
+				<div class="icon_list"></div>
+				По умолчанию
+			</div>
+		</div>
+	</form>
+</div>
+
+<!-- Страница 404 -->
+<div class="tab" id="tab_404">
+	<form>
+		<input type="hidden" name="type" value="404"/>
+		<h2 style="text-align: center;">Страница 404</h2>
+		<table class="std_form">
+			<tr>
+				<td>Исполнитель</td>
+				<td>
+					<input type="text" name="404_Module" value="<?php echo P::get("404_module"); ?>" style="min-width: 70px; width: 70px;"/>
+					<input type="text" name="404_Exe" value="<?php echo P::get("404_exe"); ?>" style="min-width: 70px; width: 70px;"/>
+				</td>
+			</tr>
+			<tr>
+				<td>Админка</td>
+				<td>
+					<input type="text" name="404_Admin_Url" value="<?php echo P::get("404_admin_url"); ?>" style="min-width: 160px; width: 160px;"/>
+				</td>
+			</tr>
+		</table>
+		<div class="center">
+			<div class="std_button submit">
+				<div class="icon_edit"></div>
+				Сохранить
+			</div>
+			<div class="std_button" id="route_std_404">
+				<div class="icon_list"></div>
+				По умолчанию
+			</div>
+		</div>
+	</form>
+</div>
+
+<!-- Страница 403 -->
+<div class="tab" id="tab_403">
+	<form>
+		<input type="hidden" name="type" value="403"/>
+		<h2 style="text-align: center;">Страница 403</h2>
+		<table class="std_form">
+			<tr>
+				<td>Исполнитель</td>
+				<td>
+					<input type="text" name="403_Module" value="<?php echo P::get("403_module"); ?>" style="min-width: 70px; width: 70px;"/>
+					<input type="text" name="403_Exe" value="<?php echo P::get("403_exe"); ?>" style="min-width: 70px; width: 70px;"/>
+				</td>
+			</tr>
+			<tr>
+				<td>Админка</td>
+				<td>
+					<input type="text" name="403_Admin_Url" value="<?php echo P::get("403_admin_url"); ?>" style="min-width: 160px; width: 160px;"/>
+				</td>
+			</tr>
+		</table>
+		<div class="center">
+			<div class="std_button submit">
+				<div class="icon_edit"></div>
+				Сохранить
+			</div>
+			<div class="std_button" id="route_std_403">
+				<div class="icon_list"></div>
+				По умолчанию
+			</div>
+		</div>
+	</form>
+</div>
