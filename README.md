@@ -25,3 +25,5 @@ OPTIONAL:
 Необязательно:
 - Sphinx Search
 - Memcached
+
+Подробнее [тут](http://znarus.ru/)
