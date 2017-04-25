@@ -4,9 +4,9 @@ Smart and fast CMS (Content management system)
 
 REQUIREMENTS:
 - Nginx (fast-cgi php)
-- PHP 5.6 and up
-- PHP-module: pgsql, ftp, zip, mbstring, curl, openssl, db4
-- PostgreSQL 9.3 and up
+- PHP 7
+- PHP-module: pgsql, zip, mbstring, curl, openssl
+- PostgreSQL 9.4 and up
 
 OPTIONAL:
 - Sphinx Search
@@ -18,8 +18,8 @@ OPTIONAL:
 
 Требования:
 - Nginx с fast-cgi php
-- PHP 5.6 и выше
-- PHP-модули: pgsql, ftp, zip, mbstring, curl, openssl, db4
+- PHP 7
+- PHP-модули: pgsql, zip, mbstring, curl, openssl
 - PostgreSQL 9.3 и выше
 
 Необязательно:

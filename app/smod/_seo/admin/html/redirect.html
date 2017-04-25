@@ -1,11 +1,41 @@
-<table class="std_list" style="width: 600px;" align="center">
+<!-- Форма поиска -->
+<table class="std_form" id="search">
+	<tr>
+		<td>Поиск</td>
+		<td>
+			<input type="text" name="from" value="" style="min-width: 260px;"/>
+			<div class="std_button">
+				<div class="icon_view"></div>
+				Найти
+			</div>
+		</td>
+	</tr>
+</table>
+
+<!-- Страницы -->
+<?php if ($page > 1): ?>
+	<div class="center">
+		<?php for ($i = 1; $i <= $page; $i++): ?>
+			<?php if ($i !== $current_page): ?>
+				<a href="#_seo/redirect?from=<?php echo $current_from; ?>&page=<?php echo $i; ?>" class="page">
+					<?php echo $i; ?>
+				</a>
+			<?php else: ?>
+				<span class="page active"><?php echo $i; ?></span>
+			<?php endif; ?>
+		<?php endfor; ?>
+	</div>
+<?php endif; ?>
+
+<!-- Адреса -->
+<table class="std_list">
 	<thead>
 		<tr>
 			<td>Переадресация</td>
 		</tr>
 	</thead>
 	<tbody>
-		<?php foreach ($redirect as $val): ?>
+		<?php foreach ($redirect['redirect'] as $val): ?>
 			<tr url="#_seo/redirect_edit?id=<?php echo $val['ID']; ?>">
 				<td style="text-align: left; padding-left: 20px;">
 					<?php echo $val['From']; ?>
@@ -21,7 +51,24 @@
 		<?php endforeach; ?>
 	</tbody>
 </table>
+
+<!-- Страницы -->
+<?php if ($page > 1): ?>
 <br/>
+	<div class="center">
+		<?php for ($i = 1; $i <= $page; $i++): ?>
+			<?php if ($i !== $current_page): ?>
+				<a href="#_seo/redirect?from=<?php echo $current_from; ?>&page=<?php echo $i; ?>" class="page">
+					<?php echo $i; ?>
+				</a>
+			<?php else: ?>
+				<span class="page active"><?php echo $i; ?></span>
+			<?php endif; ?>
+		<?php endfor; ?>
+	</div>
+<?php endif; ?>
+
+<!-- Кнопка добавить -->
 <center>
 	<a class="std_button" href="#_seo/redirect_add">
 		<div class="icon_add"></div>

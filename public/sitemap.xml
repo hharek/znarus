@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>http://znarus.loc/</loc>
+  </url>
+  <url>
+    <loc>http://znarus.loc/s</loc>
+  </url>
+  <url>
+    <loc>http://znarus.loc/licence</loc>
+    <lastmod>2017-04-24</lastmod>
+  </url>
+  <url>
+    <loc>http://znarus.loc/modules</loc>
+    <lastmod>2017-04-24</lastmod>
+  </url>
+  <url>
+    <loc>http://znarus.loc/about</loc>
+    <lastmod>2017-04-24</lastmod>
+  </url>
+  <url>
+    <loc>http://znarus.loc/constr</loc>
+    <lastmod>2017-04-24</lastmod>
+  </url>
+  <url>
+    <loc>http://znarus.loc/admin</loc>
+    <lastmod>2017-04-24</lastmod>
+  </url>
+  <url>
+    <loc>http://znarus.loc/hosting</loc>
+    <lastmod>2017-04-24</lastmod>
+  </url>
+  <url>
+    <loc>http://znarus.loc/install</loc>
+    <lastmod>2017-04-24</lastmod>
+  </url>
+</urlset>

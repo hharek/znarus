@@ -8,7 +8,7 @@ if (empty($_POST['name']))
 	throw new Exception("Имя папки не задано.");
 }
 
-if (!Chf::string($_POST['name']))
+if (!Type::check("string", ($_POST['name'])))
 {
 	throw new Exception("В имени папки присутствуют недопустимые символы");
 }

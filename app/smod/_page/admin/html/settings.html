@@ -1,0 +1,118 @@
+<form>
+	<h3 style="text-align: center;">Формирование адреса для страниц</h3>
+	<table class="std_form">
+		<tr>
+			<td>Адрес иерархический <br/> (/aaa/bbb/vvv<?php echo URL_END; ?>)</td>
+			<td>
+				<input type="hidden" name="url_hierarchy" value="0"/>
+				<input type="checkbox" name="url_hierarchy" value="1" <?php if (P::get("_page", "url_hierarchy")): ?>checked<?php endif; ?>/>
+			</td>
+		</tr>
+		<tr>
+			<td>Тип формирования адреса</td>
+			<td>
+				<select name="url_auto">
+					<option value="1" <?php if (P::get("_page", "url_auto")): ?>selected<?php endif; ?>>Автоматически</option>
+					<option value="0" <?php if (!P::get("_page", "url_auto")): ?>selected<?php endif; ?>>Вручную</option>
+				</select>
+			</td>
+		</tr>
+		<tr class="url_auto">
+			<td>Префикс адреса страницы</td>
+			<td>
+				<input type="text" name="url_auto_prefix" value="<?php echo P::get("_page", "url_auto_prefix"); ?>" style="width: 100px; min-width: 100px;"/>
+			</td>
+		</tr>
+		<tr class="url_auto">
+			<td>Длина адреса</td>
+			<td>
+				<input type="text" name="url_auto_length" value="<?php echo P::get("_page", "url_auto_length"); ?>" style="width: 40px; min-width: 40px;"/>
+			</td>
+		</tr>
+		<tr class="url_manual">
+			<td>Формировать адрес через транслита имени</td>
+			<td>
+				<input type="hidden" name="url_translit" value="0"/>
+				<input type="checkbox" name="url_translit" value="1" <?php if (P::get("_page", "url_translit")): ?>checked<?php endif; ?>/>
+			</td>
+		</tr>
+		<tr class="url_manual url_translit">
+			<td>Транслитерация с русскими и англ. символами</td>
+			<td>
+				<input type="hidden" name="url_translit_rus" value="0"/>
+				<input type="checkbox" name="url_translit_rus" value="1" <?php if (P::get("_page", "url_translit_rus")): ?>checked<?php endif; ?>/>
+			</td>
+		</tr>
+		<tr class="url_manual url_translit">
+			<td>Делать транслитерацию при редактировании</td>
+			<td>
+				<input type="hidden" name="url_translit_edit" value="0"/>
+				<input type="checkbox" name="url_translit_edit" value="1" <?php if (P::get("_page", "url_translit_edit")): ?>checked<?php endif; ?>/>
+			</td>
+		</tr>
+	</table>
+	<br/>
+	<center>
+		<div class="std_button submit">
+			<div class="icon_edit"></div>
+			Сохранить
+		</div>
+	</center>
+</form>
+
+<script>
+url_hierarchy_select();
+url_auto_show();
+url_translit_show();
+
+$("input[type=checkbox][name=url_hierarchy]").click(url_hierarchy_select);
+$("select[name=url_auto]").change(url_auto_show);
+$("input[type=checkbox][name=url_translit]").click(url_translit_show);
+
+function url_hierarchy_select()
+{
+	if ($("input[type=checkbox][name=url_hierarchy]").is(":checked"))
+	{
+		$("select[name=url_auto]").val("0");
+		$("select[name=url_auto] option[value=1]").prop("disabled", true);
+	}
+	else
+	{
+		$("select[name=url_auto] option[value=1]").prop("disabled", false);
+	}
+	
+	url_auto_show();
+}
+
+function url_auto_show()
+{
+	if ($("select[name=url_auto]").val() === "1")
+	{
+		$(".url_auto").show();
+		$(".url_manual").hide();
+	}
+	else
+	{
+		$(".url_auto").hide();
+		$(".url_manual").show();
+	}
+	
+	url_translit_show();
+}
+
+function url_translit_show()
+{
+	if 
+	(
+		$("input[type=checkbox][name=url_translit]").is(":checked") &&
+		$("select[name=url_auto]").val() === "0"
+	)
+	{
+		$(".url_translit").show();
+	}
+	else
+	{
+		$(".url_translit").hide();
+	}
+}
+</script>

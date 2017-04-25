@@ -1,0 +1,41 @@
+<table class="std_list">
+	<col width="100%"/>
+	<thead>
+		<tr>
+			<td>Наименование</td>
+		</tr>
+	</thead>
+	<tbody>
+		<?php page_html(0, "/", 0); ?>
+	</tbody>
+</table>
+<div class="center">
+	<a href="#_page/add" class="std_button">
+		<div class="icon_add"></div>
+		Добавить
+	</a>
+</div>
+
+<?php
+/**
+ * Отображить <tr> с подчинёнными страницами (рекурсия)
+ */
+function page_html(int $parent, string $url, int $level)
+{
+	$child = _Page::child($parent);
+?>
+
+	<?php foreach ($child as $val): ?>
+		<tr <?php if ($val['Active'] === false): ?>style="color: #7e7e7e;;"<?php endif; ?>>
+			<td url="#_page/edit?id=<?php echo $val['ID']; ?>" style="text-align: left; padding-left: <?php echo 24 + ($level * 24); ?>px;">
+				<?php echo $val['Name']; ?>
+			</td>
+		</tr>
+		
+		<?php page_html($val['ID'], $url . $val['Url'] . "/", $level + 1);	?>
+		
+	<?php endforeach; ?>
+	
+<?php
+}
+?>

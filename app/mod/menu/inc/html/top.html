@@ -1,7 +1,0 @@
-<div class="menu_top">
-	<?php foreach ($item as $val): ?>
-		<a href="<?php echo $val['Url']; ?>"<?php if($val['Url'] === G::url_path() && $val['Url'] !== "/" ): ?> class="active"<?php endif;?>>
-			<?php echo $val['Name']; ?>
-		</a>
-	<?php endforeach; ?>
-</div>

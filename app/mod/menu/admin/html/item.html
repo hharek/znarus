@@ -9,9 +9,9 @@ function item_html($item, $level)
 {
 ?>
 	
-	<?php foreach ($item as $val): ?>
+	<?php foreach ($item as $key => $val): ?>
 
-		<tr>
+		<tr <?php if (!(bool)$val['Active']): ?>style="color: grey;"<?php endif; ?>>
 			<td url="#menu/item_edit?id=<?php echo $val['ID']; ?>" style="text-align: left; padding-left: <?php echo 12 + ($level * 22); ?>px;">
 				<?php echo $val['Name']; ?>
 			</td>
@@ -19,8 +19,13 @@ function item_html($item, $level)
 				<?php echo $val['Url']; ?>
 			</td>
 			<td>
-				<div onclick="_exe('#menu/item_sort', { type: 'up', id: <?php echo $val['ID']; ?>});" class="icon_up up"></div>
-				<div onclick="_exe('#menu/item_sort', { type: 'down', id: <?php echo $val['ID']; ?>});" class="icon_down down"></div>
+				<?php // if ($key !== 0): ?>
+				<div onclick="_exe('#menu/item_order', { order: 'up', id: <?php echo $val['ID']; ?>});" class="icon_up up" data-parent="<?php echo $val['Parent']; ?>"></div>
+				<?php // endif; ?>
+					
+				<?php // if ($key !== count($item) - 1): ?>
+					<div onclick="_exe('#menu/item_order', { order: 'down', id: <?php echo $val['ID']; ?>});" class="icon_down down" data-parent="<?php echo $val['Parent']; ?>"></div>
+				<?php // endif; ?>
 			</td>
 		</tr>
 		

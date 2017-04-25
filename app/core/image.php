@@ -201,11 +201,10 @@ class _Image
 	 * @param string $file_in
 	 * @param int $width
 	 * @param int $height
-	 * @param string $file_out	
 	 * @param string $method (>,<,=)
 	 * @param bool $enlarge
 	 */
-	public static function resize($file_in, $width, $height, $file_out, $method = ">", $enlarge = false)
+	public static function resize($file_in, $width, $height, $method = ">", $enlarge = false)
 	{
 		/* Проверка */
 		$info = self::info($file_in);
@@ -215,17 +214,8 @@ class _Image
 		$width = (int)$width;
 		$height = (int)$height;
 
-		if (empty($file_out))
-		{
-			throw new Exception("Не задано имя исходящего файла");
-		}
-
-		if (!preg_match("#\.(jpg|png|gif)$#isu", $file_out, $match))
-		{
-			throw new Exception("Имя исходящего файла задано неверно. Допускаются расширения jpg, png, gif.");	
-		}
-		$ext = $match[1];
-
+		$file_out = tempnam(sys_get_temp_dir(), "ti_") . "." . $info['type'];
+		
 		/* Метод */
 		if (!in_array($method, [">", "<", "="]))
 		{
@@ -235,6 +225,7 @@ class _Image
 		/* Можно ли увеличивать */
 		$enlarge = (bool) $enlarge;
 
+		
 		/* Увеличивать не надо */
 		if ($enlarge === false and $width > $width_in and $height > $height_in)
 		{
@@ -248,9 +239,9 @@ class _Image
 				}
 			}
 
-			return;
+			return $file_out;
 		}
-
+		
 		/* Уменьшить размер */
 		switch ($method)
 		{
@@ -343,7 +334,7 @@ class _Image
 		}
 
 		/* Исходящий */
-		switch ($ext)
+		switch ($info['type'])
 		{
 			case "jpg":
 			{
@@ -373,6 +364,9 @@ class _Image
 			break;
 		}
 		imagedestroy($im_out);
+		
+		/* Возвращаем имя файла */
+		return $file_out;
 	}
 
 	/**
@@ -855,6 +849,41 @@ class _Image
 		imagedestroy($im_in);
 	}
 	
+	/**
+	 * Загрузить рисунок, перед этим проверить и обработать
+	 * 
+	 * @param string $file
+	 * @param string $dir
+	 * @param int $width
+	 * @param int $height
+	 * @param string $format
+	 * @return string
+	 */
+	public static function upload($file, $dir, $width = null, $height = null, $format = null)
+	{
+		/* Проверка */
+		self::check_size($file, $width, $height);
+		$img_info = _Image::info($file);
+		if ($format !== null and $img_info['type'] !== $format)
+		{
+			throw new Exception("Рисунок должен формата «{$format}»");
+		}
+		
+		$dir = realpath($dir);
+		if ($dir === false)
+		{
+			throw new Exception("Папка «{$dir}» для рисунка указана неверно.");
+		}
+		
+		/* Формируем имя */
+		$img_name = substr(md5(microtime()), 0, 6) . "." . $img_info['type'];
+		
+		/* Загрузить файл */
+		copy($file, $dir . "/" . $img_name);
+		
+		return $img_name;
+	}
+
 	/**
 	 * Проверка значения на соответствие выражению
 	 * 

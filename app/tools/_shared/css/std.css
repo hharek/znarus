@@ -80,6 +80,7 @@ table.std_list
 	width: 90%;
 	margin: 0px auto;
 	clear: both;
+	table-layout: fixed;
 	border-collapse: collapse;
 
 	thead
@@ -111,6 +112,7 @@ table.std_list
 			.up, .down
 			{
 				cursor: pointer;
+				vertical-align: middle;
 			}
 		}
 
@@ -119,6 +121,7 @@ table.std_list
 			text-align: center;
 			border: solid 1px #ccc;
 			vertical-align: middle;
+			height: 28px;
 		}
 	}
 }
@@ -148,5 +151,23 @@ table.std_list
 	{
 		float: left;
 		margin: 0px 5px 0px 0px;
+	}
+}
+
+/* Страницы */
+.page
+{
+	border: 1px solid #ccc;
+	text-align: center;
+	display: inline-block;
+	padding: 2px 4px;
+	color: #000;
+	background: #fff;
+	width: 16px;
+	margin: 0 4px 5px 0;
+	
+	&.active
+	{
+		background: #e6ed6e;
 	}
 }

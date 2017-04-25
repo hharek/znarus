@@ -2,7 +2,7 @@
 /* Операционная система */
 $os = array();
 $os['uname'] = php_uname();
-$os['file_size'] = G::file()->size(DIR_APP) + G::file()->size(DIR_WWW);
+$os['file_size'] = G::file()->size(DIR_APP) + G::file()->size(DIR_PUBLIC);
 $os['file_size_mb'] = round($os['file_size'] / 1048576);
 $os['server_ip'] = $_SERVER['SERVER_ADDR'];
 $os['server_name'] = $_SERVER['SERVER_NAME'];

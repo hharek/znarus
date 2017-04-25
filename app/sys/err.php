@@ -85,9 +85,9 @@ class Err
 		}
 		else
 		{
-			if (!Chf::$type($value))
+			if (!Type::check($type, $value))
 			{
-				self::add("Поле «{$name}» задано неверно. " . Chf::error(), $identified);
+				self::add("Поле «{$name}» задано неверно. " . Type::get_last_error(), $identified);
 			}
 		}
 	}

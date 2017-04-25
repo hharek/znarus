@@ -1,0 +1,27 @@
+<form>
+	<input type="hidden" name="Identified" value="<?php echo $identified; ?>"/>
+	<table class="std_form" align="center">
+		<tr>
+			<td colspan="2" style="text-align: center;">
+				Кусок html-а «<?php echo $identified; ?>»
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2" style="border: 1px solid #ccc; padding: 0px; text-align: left;">
+				<textarea name="Content"><?php echo htmlspecialchars(G::file_app()->get("html/part/" . $identified . ".html")); ?></textarea>
+			</td>
+		</tr>
+	</table>
+	
+	<div class="center">
+		<div class="std_button submit">
+			<div class="icon_edit"></div>
+			Сохранить
+		</div>
+		<a href="<?php echo $back_url; ?>" class="std_button">
+			<div class="icon_back"></div>
+			Назад
+		</a>
+		F11 (на весь экран)
+	</div>
+</form>

@@ -3,7 +3,7 @@
 $sql_from = "";
 if(isset($_GET['from']) and $_GET['from'] !== "")
 {
-	if(!Chf::string($_GET['from']))
+	if(!Type::check("string", ($_GET['from'])))
 	{
 		throw new Exception("Исполнитель указан неверно.");
 	}
@@ -18,7 +18,7 @@ SQL;
 $sql_to = "";
 if(isset($_GET['to']) and $_GET['to'] !== "")
 {
-	if(!Chf::string($_GET['to']))
+	if(!Type::check("string", ($_GET['to'])))
 	{
 		throw new Exception("Заказчик указан неверно.");
 	}

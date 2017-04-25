@@ -1,0 +1,91 @@
+<!-- Форма поиска -->
+<form class="std_form" id="search">
+	<table style="width: 90%; margin: 0 auto;">
+		<col width="70%"/>
+		<col width="30%"/>
+		<tr>
+			<td>
+				<div class="center">
+					Поиск: 
+					<input type="text" name="word" value="<?php echo $word; ?>" style="min-width: 260px;" autofocus/>
+					<input type="hidden" name="order" value="<?php echo $order; ?>" />
+					<div class="std_button">
+						<div class="icon_view"></div>
+						Найти
+					</div>
+				</div>
+			</td>
+			<td style="text-align: right;">
+				<select id="order">
+					<option value="count" <?php if($order === "count"): ?>selected<?php endif; ?>>Сортировка по кол-ву</option>
+					<option value="query" <?php if($order === "query"): ?>selected<?php endif; ?>>Сортировка по алфавиту</option>
+				</select>
+			</td>
+		</tr>
+	</table>
+	
+</form>
+
+<table class="std_list">
+	<col width="80%" />
+	<col width="10%" />
+	<col width="10%" />
+	<thead>
+		<tr>
+			<td>Запрос</td>
+			<td>Кол-во</td>
+			<td>Уд.</td>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($log as $val): ?>
+			<tr>
+				<td style="text-align: left; padding-left: 20px; ">
+					<?php echo $val['Query']; ?>
+				</td>
+				<td>
+					<?php echo $val['Count']; ?>
+				</td>
+				<td>
+					<div 
+						class="icon_delete delete" 
+						url="#_search/log_stats_delete?query=<?php echo $val['Query']; ?>"
+						mess="Вы действительно хотите удалить запись «<?php echo $val['Query']; ?>»?"
+						style="margin: 0; vertical-align: middle;"
+					></div>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+
+<!-- Страницы -->
+<?php if ($page_all > 1): ?>
+	<br/>
+	<div class="center">
+		<?php for ($i = 1; $i <= $page_all; $i++): ?>
+			<a href="#_search/log_stats?word=<?php echo $word; ?>&order=<?php echo $order; ?>&page=<?php echo $i; ?>" class="page <?php if ($page === $i): ?>active<?php endif; ?>"><?php echo $i; ?></a>
+		<?php endfor; ?>
+	</div>
+<?php endif; ?>
+
+
+<script>
+$("#search .std_button").click(function()
+{
+	window.location.hash = "#_search/log_stats?word=" + $("#search input[name=word]").val() + "&order=" + $("#search input[name=order]").val();
+});
+
+$("#search input").keyup(function(e)
+{
+	if(e.keyCode === 13)
+	{
+		window.location.hash = "#_search/log_stats?word=" + $("#search input[name=word]").val() + "&order=" + $("#search input[name=order]").val();
+	}
+});
+
+$("#order").change(function()
+{
+	window.location.hash = "#_search/log_stats?order=" + $(this).val();
+});
+</script>

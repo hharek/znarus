@@ -31,6 +31,13 @@ class _Front
 	 * @var array
 	 */
 	public static $_inc = [];
+	
+	/**
+	 * Подключенные куски html-а
+	 * 
+	 * @var array
+	 */
+	public static $_html_part = [];
 
 	/**
 	 * Тип страницы (home, 404, 403, module)
@@ -156,48 +163,238 @@ class _Front
 	 */
 	public static function redirect()
 	{
-		$redirect_all = _Seo_Redirect::get_all();
-		
-		$url = G::url();
-		foreach ($redirect_all as $redirect)
+		/* Поиск по источника */
+		$redirect = _Seo_Redirect::get_by_from(G::url());
+		if (empty($redirect))
 		{
-			if ($redirect['From'] === $url)
+			return;
+		}
+		
+		/* Сделать переадресацию на другую страницу */
+		if ((bool)$redirect['Location'] === true)
+		{
+			header("HTTP/1.1 301 Moved Permanently");
+			header("Location: " . $redirect['To']);
+			exit();
+		}
+		/* Урл сделать копией другого урла */
+		elseif ((bool)$redirect['Location'] === false)
+		{
+			G::url($redirect['To']);
+			G::url_path(parse_url(G::url(), PHP_URL_PATH));
+			if (G::url_path() !== "/")
 			{
-				$location = (bool)$redirect['Location'];
-
-				/* Сделать редирект на другую страницу */
-				if ($location === true)
-				{
-					$protocol = "http";
-					if (isset($_SERVER['HTTPS']) and $_SERVER['HTTPS'] === "on")
-					{
-						$protocol = "https";
-					}
-
-					header("HTTP/1.1 301 Moved Permanently");
-					header("Location: " . $protocol . "://". $_SERVER['HTTP_HOST'] . $redirect['To']);
-					exit();
-				}
-				/* Урл сделать копией другого урла */
-				elseif ($location === false)
-				{
-					G::url($redirect['To']);
-					G::url_path(parse_url(G::url(), PHP_URL_PATH));
-					if (G::url_path() !== "/")
-					{
-						G::url_path_ar(explode("/", mb_substr(G::url_path(), 1)));
-					}
-					else
-					{
-						G::url_path_ar([]);
-					}
-				}
-				
-				break;
+				G::url_path_ar(explode("/", mb_substr(G::url_path(), 1)));
+			}
+			else
+			{
+				G::url_path_ar([]);
 			}
 		}
 	}
 	
+	/**
+	 * Общий CSS файл
+	 */
+	public static function index_css()
+	{
+		if (INDEX_CSS_ENABLE === true and parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) === INDEX_CSS_URL)
+		{
+			/* Позволяем кэшировать */
+			header_remove("Cache-Control");
+			header_remove("Expires");
+			header_remove("Pragma");
+			
+			/* Папки */
+			$css_index = DIR_VAR . "/index.css";
+			$css_dir = INDEX_CSS_DIR;
+			
+			/* Изменялись ли файлы css */
+			$css_index_modify_time = 0;
+			if (is_file($css_index))
+			{
+				$css_index_modify_time = filemtime($css_index);
+			}
+
+			$css = scandir($css_dir);
+			$css = array_diff($css, ['..', '.']);
+
+			$css_modify = false;
+			foreach ($css as $val)
+			{
+				if (filemtime($css_dir . "/" . $val) > $css_index_modify_time)
+				{
+					$css_modify = true;
+					break;
+				}
+			}
+			
+			/* Кэширование */
+			if ($css_modify === false)
+			{
+				if 
+				(
+					!empty($_SERVER["HTTP_IF_MODIFIED_SINCE"]) and 
+					strtotime($_SERVER["HTTP_IF_MODIFIED_SINCE"]) === $css_index_modify_time
+				)
+				{
+					header("HTTP/1.1 304 Not Modified");
+					header("Last-Modified: " . gmdate(LAST_MODIFIED_FORMAT_DATE, filemtime($css_index)));
+					exit();
+				}
+				
+				if 
+				(
+					!empty($_SERVER["HTTP_IF_NONE_MATCH"]) and
+					$_SERVER["HTTP_IF_NONE_MATCH"] === "\"" . md5(SALT . file_get_contents($css_index)) . "\""
+				)
+				{
+					header("HTTP/1.1 304 Not Modified");
+					header("Last-Modified: " . gmdate(LAST_MODIFIED_FORMAT_DATE, filemtime($css_index)));
+					exit();
+				}
+			}
+
+			/* Сформировать css */
+			if ($css_modify === true)
+			{
+				/* Создать общий css */
+				$css_content = "";
+				foreach ($css as $val)
+				{
+					$css_content .= file_get_contents($css_dir . "/" . $val) . "\n\n";
+				}
+
+				/* Сформировать */
+				if (INDEX_CSS_LESS_ENABLE === true and !empty(trim($css_content)))
+				{
+					$parser = new Less_Parser();
+					$parser->parse($css_content);
+					$css_content = $parser->getCss();
+				}
+
+				file_put_contents($css_index, $css_content);
+			}
+
+			/* Вывод */
+			$css_content = file_get_contents($css_index);
+
+			header("Last-Modified: " . gmdate(LAST_MODIFIED_FORMAT_DATE, filemtime($css_index)));
+			header("Content-Type: text/css; charset=utf-8");
+			header("Etag: \"" . md5(SALT . $css_content) . "\"");
+			
+			/* Заголовки gzip */
+			if (INDEX_CSS_GZIP_ENABLE === true and strpos($_SERVER['HTTP_ACCEPT_ENCODING'], "gzip") !== false)
+			{
+				ini_set("zlib.output_compression", "0");
+				header("Content-Encoding: gzip");
+				$css_content = gzencode($css_content);
+			}
+
+			echo $css_content;
+
+			exit();
+			
+		}
+	}
+	
+	/**
+	 * Общий JS файл
+	 */
+	public static function index_js()
+	{
+		if (INDEX_JS_ENABLE === true and parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) === INDEX_JS_URL)
+		{
+			/* Позволяем кэшировать */
+			header_remove("Cache-Control");
+			header_remove("Expires");
+			header_remove("Pragma");
+			
+			/* Папки */
+			$js_index = DIR_VAR . "/index.js";
+			$js_dir = INDEX_JS_DIR;
+			
+			/* Изменялись ли файлы js */
+			$js_index_modify_time = 0;
+			if (is_file($js_index))
+			{
+				$js_index_modify_time = filemtime($js_index);
+			}
+
+			$js = scandir($js_dir);
+			$js = array_diff($js, ['..', '.']);
+
+			$js_modify = false;
+			foreach ($js as $val)
+			{
+				if (filemtime($js_dir . "/" . $val) > $js_index_modify_time)
+				{
+					$js_modify = true;
+					break;
+				}
+			}
+			
+			/* Кэширование */
+			if ($js_modify === false)
+			{
+				if 
+				(
+					!empty($_SERVER["HTTP_IF_MODIFIED_SINCE"]) and 
+					strtotime($_SERVER["HTTP_IF_MODIFIED_SINCE"]) === $js_index_modify_time
+				)
+				{
+					header("HTTP/1.1 304 Not Modified");
+					header("Last-Modified: " . gmdate(LAST_MODIFIED_FORMAT_DATE, filemtime($js_index)));
+					exit();
+				}
+				
+				if 
+				(
+					!empty($_SERVER["HTTP_IF_NONE_MATCH"]) and
+					$_SERVER["HTTP_IF_NONE_MATCH"] === "\"" . md5(SALT . file_get_contents($js_index)) . "\""
+				)
+				{
+					header("HTTP/1.1 304 Not Modified");
+					header("Last-Modified: " . gmdate(LAST_MODIFIED_FORMAT_DATE, filemtime($js_index)));
+					exit();
+				}
+			}
+
+			/* Сформировать js */
+			if ($js_modify === true)
+			{
+				/* Создать общий js */
+				$js_content = "";
+				foreach ($js as $val)
+				{
+					$js_content .= file_get_contents($js_dir . "/" . $val) . "\n\n";
+				}
+
+				file_put_contents($js_index, $js_content);
+			}
+
+			/* Вывод */
+			$js_content = file_get_contents($js_index);
+
+			header("Last-Modified: " . gmdate(LAST_MODIFIED_FORMAT_DATE, filemtime($js_index)));
+			header("Content-Type: application/javascript; charset=utf-8");
+			header("Etag: \"" . md5(SALT . $js_content) . "\"");
+			
+			/* Заголовки gzip */
+			if (INDEX_JS_GZIP_ENABLE === true and strpos($_SERVER['HTTP_ACCEPT_ENCODING'], "gzip") !== false)
+			{
+				ini_set("zlib.output_compression", "0");
+				header("Content-Encoding: gzip");
+				$js_content = gzencode($js_content);
+			}
+
+			echo $js_content;
+
+			exit();
+			
+		}
+	}
+
 	/**
 	 * Проверяем и форматируем урл
 	 */
@@ -221,7 +418,7 @@ class _Front
 		$url_path = G::url_path_ar();
 		foreach ($url_path as $url_part)
 		{
-			if (Chf::url_part($url_part) === false)
+			if (Type::check("url_part", $url_part) === false)
 			{
 				self::$_url_correct = false;
 				return;
@@ -444,7 +641,9 @@ class _Front
 			self::$etag = md5(G::url_path() . $in_serialize . SALT .  self::$output);
 			
 			/* Создать кэш страницы */
-			_Cache_Front::page_set(G::url_path(), self::$_exe_in_filter, $in_serialize, self::_data());
+			$data = self::_data();
+			
+			_Cache_Front::page_set(G::url_path(), self::$_exe_in_filter, $in_serialize, $data);
 		}
 	}
 
@@ -471,7 +670,6 @@ class _Front
 			if ($if_none_match === self::$etag)
 			{
 				header("HTTP/1.1 304 Not Modified");
-				header("Last-Modified: " . self::$last_modified);
 				exit();
 			}
 		}
@@ -488,7 +686,7 @@ class _Front
 			{
 				/* Проверка номера сессии */
 				$_session_id = $_GET[FRONT_INFO_GET];
-				if (!Chf::identified($_session_id))
+				if (!Type::check("identified", $_session_id))
 				{
 					throw new Exception("Номер сессии указан неверно.");
 				}
@@ -516,7 +714,7 @@ SQL;
 				if 
 				(
 					strtotime($_session['Date']) + ADMIN_SESSION_TIME < time() or
-					$_session['IP'] !== md5($_session['ID'] . SALT . $_SERVER['REMOTE_ADDR']) or 
+//					$_session['IP'] !== md5($_session['ID'] . SALT . $_SERVER['REMOTE_ADDR']) or 
 					$_session['Browser'] !== md5($_session['ID'] . SALT . $_SERVER['HTTP_USER_AGENT'])
 				)
 				{
@@ -671,6 +869,7 @@ SQL;
 				"page_type" => self::$_page_type,
 				"access" => self::$_access,
 				"html" => self::$_html,
+				"html_part" => self::$_html_part,
 				"title" => self::$title,
 				"path" => self::$path,
 				"content" => self::$content,
@@ -692,6 +891,7 @@ SQL;
 			self::$_page_type = $data['page_type'];
 			self::$_access = $data['access'];
 			self::$_html = $data['html'];
+			self::$_html_part = $data['html_part'];
 			self::$title = $data['title'];
 			self::$path = $data['path'];
 			self::$content = $data['content'];

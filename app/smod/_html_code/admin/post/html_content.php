@@ -1,6 +1,9 @@
 <?php
 $html = _Html::get($_GET['id']);
+
 G::file_app()->put("html/{$html['Identified']}.html", $_POST['Content']);
+
+_Cache_Front::delete(["html" => $html['Identified']]);			/* Удалить кэш */
 
 G::version()->set
 (

@@ -64,7 +64,7 @@ class _User_Action
 			{
 				throw new Exception("Почтовый ящик не задан.");
 			}
-			if (!Chf::email($email))
+			if (!Type::check("email", ($email)))
 			{
 				throw new Exception("Почтовый ящик задан неверно.");
 			}
@@ -75,7 +75,6 @@ class _User_Action
 SELECT
 	"ID",
 	"Password",
-	"Salt",
 	"Active"
 FROM
 	"user"
@@ -94,12 +93,11 @@ SQL;
 
 			/* Проверка пароля */
 			_User::check_password($password);
-
-			$password = _User::password_hash($password, $user['Salt']);
-			if ($password !== $user['Password'])
+			if (!password_verify($password, $user['Password']))
 			{
 				throw new Exception("Пароль указан неверно.");
 			}
+			
 
 			/* Создать сессию */
 			_User_Session::add("admin", "user", $user['ID']);
@@ -194,15 +192,14 @@ SQL;
 <<<SQL
 SELECT
 	"ID",
-	"Password",
-	"Salt"
+	"Password"
 FROM
 	"user"
 WHERE
 	"ID" = $1
 SQL;
 		$user = G::db_core()->query($query, $session['User_ID'])->row();
-		if (_User::password_hash($old, $user['Salt']) !== $user['Password'])
+		if (!password_verify($old, $user['Password']))
 		{
 			throw new Exception("Старый пароль указан неверно.");
 		}
@@ -223,7 +220,7 @@ SQL;
 		$user = self::data($in);
 		
 		/* Проверка */
-		if (!Chf::string($hash))
+		if (!Type::check("string", ($hash)))
 		{
 			throw new Exception("Хэш задан неверно.");
 		}

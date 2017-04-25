@@ -80,14 +80,14 @@ class T
 	private static function _get_by_identified($module_identified, $text_identified)
 	{
 		/* Проверка */
-		if (!Chf::identified($module_identified))
+		if (!Type::check("identified", $module_identified))
 		{
-			throw new Exception("Идентификатор у модуля задан неверно. " . Chf::error());
+			throw new Exception("Идентификатор у модуля задан неверно. " . Type::get_last_error());
 		}
 
-		if (!Chf::identified($text_identified))
+		if (!Type::check("identified", $text_identified))
 		{
-			throw new Exception("Идентификатор у текста задан неверно. " . Chf::error());
+			throw new Exception("Идентификатор у текста задан неверно. " . Type::get_last_error());
 		}
 
 		/* Текст */

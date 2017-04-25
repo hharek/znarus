@@ -2,58 +2,54 @@
 /**
  * Основной шаблон
  */
-class _Html
+class _Html extends TM
 {
+	protected static $_name = "Основной шаблон";
+	protected static $_schema = "core";
+	protected static $_table = "html";
+	protected static $_field = 
+	[
+		[
+			"identified" => "ID",
+			"name" => "Порядковый номер",
+			"type" => "id"
+		],
+		[
+			"identified" => "Name",
+			"name" => "Наименование",
+			"type" => "string",
+			"unique" => true
+		],
+		[
+			"identified" => "Identified",
+			"name" => "Идентификатор",
+			"type" => "identified",
+			"unique" => true
+		]
+	];
+	
 	/**
 	 * HTML-код для новых шаблонов
 	 * 
 	 * @var string
 	 */
-	private static $html_code = 
+	private static $_html_code = 
 <<<HTML
 <!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<title><!--_meta_title--></title>
-		<meta name="description" content="<!--_meta_description-->" />
-		<meta name="keywords" content="<!--_meta_keywords-->" />
+		<title><?php echo meta_title(); ?></title>
+		<meta name="description" content="<?php echo meta_description(); ?>" />
+		<meta name="keywords" content="<?php echo meta_keywords(); ?>" />
 	</head>
 	<body>
-		<h1><!--_title--></h1>
-		<!--_content-->
+		<h1><?php echo title(); ?></h1>
+		<?php echo content(); ?>
 	</body>
 </html>
 HTML;
 
-		/**
-	 * Проверка по ID
-	 * 
-	 * @param int $id
-	 */
-	public static function is($id)
-	{
-		if (!Chf::uint($id))
-		{
-			throw new Exception("Номер у шаблона задан неверно. " . Chf::error());
-		}
-
-		$query = 
-<<<SQL
-SELECT 
-	true
-FROM 
-	"html"
-WHERE 
-	"ID" = $1
-SQL;
-		$rec = G::db_core()->query($query, $id)->single();
-		if ($rec === null)
-		{
-			throw new Exception("Шаблона с номером «{$id}» не существует.");
-		}
-	}
-	
 	/**
 	 * Добавить
 	 * 
@@ -70,7 +66,7 @@ SQL;
 		self::_unique($name, $identified);
 
 		/* Файл */
-		G::file_app()->put("html/" . $identified . ".html", self::$html_code);
+		G::file_app()->put("html/" . $identified . ".html", self::$_html_code);
 
 		/* SQL */
 		$data = 
@@ -122,6 +118,7 @@ SQL;
 		
 		/* Удалить кэш */
 		G::cache_db_core()->delete_tag("html");
+		_Cache_Front::delete(["html" => $identified]);
 		
 		/* Переименовать шаблон по умолчанию */
 		if ($old['Identified'] === P::get("html_default"))
@@ -139,7 +136,7 @@ SQL;
 	 * @param int $id
 	 * @return array
 	 */
-	public static function delete($id)
+	public static function remove($id)
 	{
 		/* Проверка */
 		$old = self::get($id);
@@ -182,9 +179,9 @@ SQL;
 	 */
 	public static function is_identified($identified)
 	{
-		if (!Chf::identified($identified))
+		if (!Type::check("identified", $identified))
 		{
-			throw new Exception("Идентификатор у шаблона задан неверно. " . Chf::error());
+			throw new Exception("Идентификатор у шаблона задан неверно. " . Type::get_last_error());
 		}
 		
 		$html_is = G::cache_db_core()->get("html_is_identified_" . $identified);
@@ -208,7 +205,7 @@ SQL;
 	 */
 	public static function exist($identified)
 	{
-		if (!Chf::identified($identified))
+		if (!Type::check("identified", $identified))
 		{
 			return false;
 		}
@@ -226,30 +223,6 @@ SQL;
 		}
 		
 		return true;
-	}
-
-	/**
-	 * Выборка строки по ID
-	 * 
-	 * @param int $id
-	 * @return array
-	 */
-	public static function get($id)
-	{
-		self::is($id);
-
-		$query = 
-<<<SQL
-SELECT
-	"ID",
-	"Name",
-	"Identified"
-FROM 
-	"html"
-WHERE 
-	"ID" = $1
-SQL;
-		return G::db_core()->query($query, $id)->row();
 	}
 
 	/**
@@ -282,7 +255,7 @@ SQL;
 	public static function get_by_identified($identified)
 	{
 		/* Проверка */
-		if (!Chf::identified($identified))
+		if (!Type::check("identified", $identified))
 		{
 			throw new Exception("Идентификатор шаблона задан неверно. ");
 		}

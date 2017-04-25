@@ -76,7 +76,7 @@ if($_js_modify === true)
 
 /* Вывод */
 header("Last-Modified: " . gmdate("D, d M Y H:i:s", filemtime($_js_index)) . " GMT");
-header("Content-Type: application/x-javascript; charset=utf-8");
+header("Content-Type: application/javascript; charset=utf-8");
 readfile($_js_index);
 exit();
 ?>

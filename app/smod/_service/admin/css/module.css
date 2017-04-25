@@ -32,8 +32,17 @@
 		
 		.admin
 		{
-			min-width: 120px;
+			width: 207px;
+			height: 95px;
+			overflow-y: auto;
 			margin: 10px 0px 0px 50px;
+			
+			ul
+			{
+				margin: 0 0 0 20px;
+				padding: 0;
+				list-style: none;
+			}
 		}
 	}	
 }

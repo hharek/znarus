@@ -139,7 +139,7 @@
 		<!-- bin -->
 		<?php if(!empty($bin)): ?>
 			<div id="structure_bin" class="structure_element">
-				<table class="std_list" style="width: 700px;" align="center">
+				<table class="std_list" style="width: 750px;" align="center">
 					<colgroup>
 						<col width="30%"/>
 						<col width="30%"/>
@@ -153,13 +153,17 @@
 					<tbody>
 						<?php foreach ($bin as $val): ?>
 							<tr>
-								<td><?php echo $val['file']; ?></td>
-								<td>
+								<td style="padding-left: 1em; text-align: left;">
+									<?php echo $val['file']; ?>
+								</td>
+								<td style="padding-left: 1em; text-align: left;">
 									<?php if(isset($val['class'])): ?>
 										class <?php echo $val['class']; ?>
 									<?php endif; ?>
 								</td>
-								<td><?php echo $val['name']; ?></td>
+								<td style="padding-left: 1em; text-align: left;">
+									<?php echo $val['name']; ?>
+								</td>
 							</tr>
 						<?php endforeach; ?>
 					</tbody>
@@ -173,9 +177,9 @@
 				<table class="std_list" style="width: 750px;" align="center">
 					<colgroup>
 						<col width="25%" />
-						<col width="30%" />
-						<col width="10%" />
 						<col width="25%" />
+						<col width="10%" />
+						<col width="30%" />
 					</colgroup>
 					<thead>
 						<tr>
@@ -185,19 +189,25 @@
 					<tbody>
 						<?php foreach ($param as $val): ?>
 							<tr url="#param/edit?id=<?php echo $val['ID']; ?>">
-								<td><?php echo $val['Identified']; ?></td>
-								<td><?php echo $val['Name']; ?></td>
-								<td><?php echo $val['Type']; ?></td>
+								<td style="padding-left: 1em; text-align: left;">
+									<?php echo $val['Identified']; ?>
+								</td>
+								
 								<?php if(mb_strlen($val['Value']) > 24): ?>
-									<td title="<?php echo $val['Value']; ?>">
+									<td style="padding-left: 1em; text-align: left;" title="<?php echo $val['Value']; ?>">
 										<?php echo mb_substr($val['Value'], 0, 24); ?>
 									</td>
 								<?php else: ?>
-									<td>
+									<td style="padding-left: 1em; text-align: left;">
 										<?php echo $val['Value']; ?>
 									</td>
 								<?php endif; ?>
-
+								<td><?php echo $val['Type']; ?></td>
+								<td class="name">
+									<div class="box" title="<?php echo $val['Name']; ?>">
+										<?php echo $val['Name']; ?>
+									</div>
+								</td>
 							</tr>
 						<?php endforeach; ?>
 					</tbody>
@@ -214,7 +224,7 @@
 		<!-- admin-->
 		<?php if(!empty($admin)): ?>
 			<div id="structure_admin" class="structure_element">
-				<table class="std_list" style="width: 700px;" align="center">
+				<table class="std_list" style="width: 750px;" align="center">
 					<colgroup>
 						<col width="25%" />
 						<col width="40%" />
@@ -232,8 +242,9 @@
 							url="#admin/edit?id=<?php echo $val['ID']; ?>"
 							<?php if($val['Visible']): ?> style="color: indigo;"<?php endif; ?>
 						>
-								<td><?php echo $val['Identified']; ?></td>
-								<td>
+								<td style="padding-left: 1em; text-align: left;">
+									<?php echo $val['Identified']; ?></td>
+								<td style="padding-left: 1em; text-align: left;">
 									<?php echo $val['Name']; ?>
 									<?php if($val['Allow_All']): ?>(+)<?php endif; ?>
 								</td>
@@ -274,8 +285,12 @@
 					<tbody>
 						<?php foreach ($exe as $key => $val): ?>
 							<tr<?php if($val['Active'] === "0"): ?> style="color: #a0a0a0;"<?php endif; ?>>
-								<td url="#exe/edit?id=<?php echo $val['ID']; ?>"><?php echo $val['Identified']; ?></td>
-								<td url="#exe/edit?id=<?php echo $val['ID']; ?>"><?php echo $val['Name']; ?></td>
+								<td url="#exe/edit?id=<?php echo $val['ID']; ?>" style="padding-left: 1em; text-align: left;">
+									<?php echo $val['Identified']; ?>
+								</td>
+								<td url="#exe/edit?id=<?php echo $val['ID']; ?>" style="padding-left: 1em; text-align: left;">
+									<?php echo $val['Name']; ?>
+								</td>
 							</tr>
 						<?php endforeach; ?>
 					</tbody>
@@ -337,7 +352,7 @@
 					</thead>
 					<tbody>
 						<?php foreach ($ajax as $key=>$val): ?>
-						<tr url="#ajax/edit?id=<?php echo $val['ID']; ?>" <?php if($val['Token'] === "1"): ?> style="color: indigo;"<?php endif; ?>>
+						<tr url="#ajax/edit?id=<?php echo $val['ID']; ?>"<?php if($val['Active'] === "0"): ?> style="color: #a0a0a0;"<?php endif; ?>>
 								<td>
 									<?php echo $val['Identified']; ?>
 								</td>

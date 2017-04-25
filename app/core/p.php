@@ -104,9 +104,9 @@ class P
 			{
 				if (mb_strlen($value) !== 0)
 				{
-					if (!Chf::string($value))
+					if (!Type::check("string", ($value)))
 					{
-						throw new Exception("Значение параметра задан неверно. " . Chf::error());
+						throw new Exception("Значение параметра задан неверно. " . Type::get_last_error());
 					}
 				}
 			}
@@ -114,18 +114,18 @@ class P
 
 			case "int":
 			{
-				if (!Chf::int($value))
+				if (!Type::check("int", $value))
 				{
-					throw new Exception("Значение параметра задан неверно. " . Chf::error());
+					throw new Exception("Значение параметра задан неверно. " . Type::get_last_error());
 				}
 			}
 			break;
 
 			case "bool":
 			{
-				if (!Chf::bool($value))
+				if (!Type::check("boolean", $value))
 				{
-					throw new Exception("Значение параметра задан неверно. " . Chf::error());
+					throw new Exception("Значение параметра задан неверно. " . Type::get_last_error());
 				}
 			}
 			break;
@@ -156,14 +156,14 @@ class P
 	private static function _get_by_identified($module_identified, $param_identified)
 	{
 		/* Проверка */
-		if (!Chf::identified($module_identified))
+		if (!Type::check("identified", $module_identified))
 		{
-			throw new Exception("Идентификатор модуля задан неверно. " . Chf::error());
+			throw new Exception("Идентификатор модуля задан неверно. " . Type::get_last_error());
 		}
 		
-		if (!Chf::identified($param_identified))
+		if (!Type::check("identified", $param_identified))
 		{
-			throw new Exception("Идентификатор параметра задан неверно. " . Chf::error());
+			throw new Exception("Идентификатор параметра задан неверно. " . Type::get_last_error());
 		}
 
 		/* Значение */

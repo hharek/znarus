@@ -11,9 +11,9 @@ class _User
 	 */
 	public static function is($id)
 	{
-		if (!Chf::uint($id))
+		if (!Type::check("uint", $id))
 		{
-			throw new Exception("Номер у пользователя задан неверно. " . Chf::error());
+			throw new Exception("Номер у пользователя задан неверно. " . Type::get_last_error());
 		}
 
 		$query = 
@@ -58,9 +58,6 @@ SQL;
 			Err::exception();
 		}
 		
-		/* Соль */
-		$salt = self::password_salt_random();
-
 		/* Уникальность */
 		self::_unique($name, $email);
 
@@ -70,15 +67,14 @@ SQL;
 			"Name" => $name,
 			"Email" => $email,
 			"Group_ID" => $group_id,
-			"Active" => (int)$active,
-			"Salt" => $salt
+			"Active" => (int)$active
 		];
 		$id = G::db_core()->insert("user", $data, "ID");
 		
 		/* SQL - назначить пароль */
 		$data = 
 		[
-			"Password" => self::password_hash($password, $salt)
+			"Password" => password_hash($password, PASSWORD_BCRYPT, ["cost" => PASSWORD_BCRYPT_COST])
 		];
 		G::db_core()->update("user", $data, ["ID" => $id]);
 
@@ -139,34 +135,6 @@ SQL;
 	}
 
 	/**
-	 * Получить хэш пароля
-	 * 
-	 * @param string $password
-	 * @param string salt
-	 * @return string
-	 */
-	public static function password_hash($password, $salt)
-	{
-		/* Соль */
-		$salt = $salt . SALT;										/* Соль соединяем с общей солью, чтобы у пользователей с одинаковыми паролями были разные хэши */
-		$salt = md5($salt);												/* Оставляем только символы a-z 0-9 */
-		$salt = substr($salt, 0, 22);									/* В bcrypt используются только первые 22 символа */
-		
-		/* Опции хэша */
-		$options = 
-		[
-			"cost" => PASSWORD_BCRYPT_COST,						/* Цена хэша bcrypt */
-			"salt" => $salt
-		];
-		
-		/* Получить хэш */
-		$hash = password_hash($password, PASSWORD_BCRYPT, $options);	/* Получаем хэш bcrypt */
-		$hash = md5($hash);												/* Делаем в 32 символа и прячим соль */
-
-		return $hash;
-	}
-
-	/**
 	 * Назначить пароль
 	 * 
 	 * @param int $id
@@ -178,14 +146,10 @@ SQL;
 		self::is($id);
 		self::check_password($password);
 		
-		/* Соль */
-		$salt = self::password_salt_random();
-		
 		/* SQL */
 		$data = 
 		[
-			"Password" => self::password_hash($password, $salt),
-			"Salt" => $salt,
+			"Password" => password_hash($password, PASSWORD_BCRYPT, ["cost" => PASSWORD_BCRYPT_COST]),
 			"Password_Change_Date" => "now()",
 			"Password_Change_Code" => null
 		];
@@ -287,7 +251,7 @@ SQL;
 		{
 			throw new Exception("Почтовый ящик не указан. ");
 		}
-		if (!Chf::email($email))
+		if (!Type::check("email", ($email)))
 		{
 			throw new Exception("Почтовый ящик задан неверно. ");
 		}
@@ -347,7 +311,7 @@ SQL;
 			return;
 		}
 		
-		if (!Chf::identified($code))
+		if (!Type::check("identified", $code))
 		{
 			return;
 		}
@@ -412,9 +376,9 @@ SQL;
 			throw new Exception("Не задан пароль.");
 		}
 		
-		if (!Chf::string($password))
+		if (!Type::check("string", ($password)))
 		{
-			throw new Exception("Пароль задан неверно. " . Chf::error());
+			throw new Exception("Пароль задан неверно. " . Type::get_last_error());
 		}
 		
 		if (mb_strlen($password) < PASSWORD_LENGTH_MIN)
@@ -426,18 +390,6 @@ SQL;
 		{
 			throw new Exception("Пароль не должен быть больше " . PASSWORD_LENGTH_MAX . " символов.");
 		}
-	}
-	
-	/**
-	 * Получить соль для пароля пользователя
-	 * 
-	 * @return string
-	 */
-	public static function password_salt_random()
-	{
-		$str = md5(microtime(true) . mt_rand(0, 100000));
-		$str = substr($str, 0, 4);
-		return $str;
 	}
 	
 	/**

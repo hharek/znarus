@@ -11,9 +11,9 @@ class _Exe
 	 */
 	public static function is($id)
 	{
-		if (!Chf::uint($id))
+		if (!Type::check("uint", $id))
 		{
-			throw new Exception("Номер у исполнителя задан неверно. " . Chf::error());
+			throw new Exception("Номер у исполнителя задан неверно. " . Type::get_last_error());
 		}
 
 		$query = 
@@ -254,11 +254,11 @@ SQL;
 	public static function get_by_identified($module_identified, $identified)
 	{
 		/* Проверка */
-		if (!Chf::identified($module_identified))
+		if (!Type::check("identified", $module_identified))
 		{
 			throw new Exception("Идентификатор модуля задан неверно.");
 		}
-		if (!Chf::identified($identified))
+		if (!Type::check("identified", $identified))
 		{
 			throw new Exception("Идентификатор исполнителя задан неверно.");
 		}

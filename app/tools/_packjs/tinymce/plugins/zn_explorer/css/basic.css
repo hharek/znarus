@@ -1,0 +1,55 @@
+/* Базовые правила */
+body
+{
+	font-family: "Trebuchet MS";
+	font-size: 16px;
+	background-color: #f5ffe4;
+	margin: 0px;
+	padding: 0px;
+}
+
+a
+{
+	text-decoration: none;
+	color: blue;
+}
+
+div.clear
+{
+	clear:both;
+}
+
+/* Загрузчик */
+._loader
+{
+	width: 220px;
+	height: 19px;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	margin-left: -110px;
+	margin-top: -10px;
+	z-index: 11;
+	display: none;
+}
+
+/* Перекрытие */
+._overlay
+{
+	width: 100%;
+	height: 100%;
+	z-index: 10;
+	background-color: #ccc;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	opacity: 0.3;
+	display: none;
+}
+
+/* Див по центру */
+div.center
+{
+	margin: 0 auto;
+	text-align: center;
+}

@@ -47,12 +47,40 @@ class _Version
 	private $_file_dir;
 
 	/**
-	 * Ресурс dba
+	 * Файл dba
 	 * 
-	 * @var resource
+	 * @var string
 	 */
-	private $_dba;
-
+	private $_dba_file;
+	
+	/**
+	 * Тип dba файла (qdbm, db4).
+	 * 
+	 * @var string
+	 */
+	private $_dba_type = "qdbm";
+	
+	/**
+	 * Размер файла в мегобайтах после чего происходит оптимизация
+	 * 
+	 * @var int
+	 */
+	private $_dba_file_size_optimize = 100;
+	
+	/**
+	 * Сжимать данные (http://php.net/zlib)
+	 * 
+	 * @var boolean
+	 */
+	private $_compress_enable = true;
+	
+	/**
+	 * Уровень сжатия от 0 до 9, -1 по умолчанию у zlib
+	 * 
+	 * @var int 
+	 */
+	private $_compress_level = -1;
+	
 	/**
 	 * Конструктор
 	 * 
@@ -60,10 +88,10 @@ class _Version
 	 * @param string $type (file|dba)
 	 * @param mixed $param
 	 */
-	public function __construct($salt, $type, $param)
+	public function __construct($salt, $type, $param, $compress = true)
 	{
 		/* Соль */
-		$this->_salt = (string)$salt;
+		$this->_salt = trim((string)$salt);
 		
 		/* Тип */
 		if (!in_array($type, ["file", "dba"]))
@@ -92,15 +120,43 @@ class _Version
 		/* Ресурс dba */
 		elseif ($type === "dba")
 		{
-			$dba = $param;
-			
-			if(get_resource_type($dba) !== "dba")
+			/* Разбираем параметры */
+			if (is_string($param))
 			{
-				throw new Exception("Параметры заданые неверно. Не является ресурсом «dba»");
+				$param = (array)$param;
 			}
 
-			$this->_dba = $dba;
+			$dba_file = $param[0];
+
+			$dba_type = $this->_dba_type;
+			if (isset($param[1]))
+			{
+				$dba_type = $param[1];
+			}
+
+			/* Проверяем тип */
+			if (!in_array($dba_type, ["qdbm","db4"]))
+			{
+				throw new Exception("Тип dba файла указан неверно. Доступно: qdbm, db4");
+			}
+			$this->_dba_type = $dba_type;
+
+			/* Проверяем файл dba */
+			if (!is_file($dba_file))
+			{
+				if (($dba = dba_open($dba_file, "c", $this->_dba_type)) === false)
+				{
+					throw new Exception("Файл dba указан неверно.");
+				}
+				dba_close($dba);
+			}
+
+			$this->_dba_file = $dba_file;
 		}
+		
+		/* Сжатие */
+		$compress = (bool)$compress;
+		$this->_compress_enable = $compress;
 	}
 
 	/**
@@ -133,7 +189,7 @@ class _Version
 			return;
 		}
 		
-		return array_reverse(unserialize($result));
+		return array_reverse(json_decode($result, true));
 	}
 	
 	/**
@@ -158,7 +214,7 @@ class _Version
 			return;
 		}
 		
-		return unserialize($result);
+		return json_decode($result, true);
 	}
 	
 	/**
@@ -174,7 +230,7 @@ class _Version
 		if ($date_all !== null)
 		{
 			/* Если данные не изменились */
-			if ($this->_hash_get($this->_key($identified, end($date_all))) === serialize($data))
+			if ($this->_hash_get($this->_key($identified, end($date_all))) === json_encode($data))
 			{
 				return;
 			}
@@ -199,8 +255,8 @@ class _Version
 		}
 		
 		/* Назначить данные */
-		$this->_hash_set($this->_key($identified), serialize($date_all));
-		$this->_hash_set($this->_key($identified, $date), serialize($data));
+		$this->_hash_set($this->_key($identified), json_encode($date_all));
+		$this->_hash_set($this->_key($identified, $date), json_encode($data));
 	}
 
 	/**
@@ -236,14 +292,26 @@ class _Version
 	 */
 	private function _key($identified, $date = null)
 	{
+		$key = "";
+		
+		/* Ключ для хранение всех дат версий */
 		if ($date === null)
 		{
-			return md5($this->_prefix . $identified . $this->_salt);
+			$key = $this->_prefix . "_" . $identified;
 		}
+		/* Ключ для хранения данных */
 		elseif ($date !== null)
 		{
-			return md5($this->_prefix . $identified . date($this->_date_format, strtotime($date)) . $this->_salt);
+			$key = $this->_prefix . "_" . $identified . "_" . date($this->_date_format, strtotime($date));
 		}
+		
+		/* Хэшируем если указана соль */
+		if (!empty($this->_salt))
+		{
+			$key = md5($key . $this->_salt);
+		}
+		
+		return $key;
 	}
 	
 	/**
@@ -278,7 +346,11 @@ class _Version
 			/* Тип «dba» */
 			case "dba":
 			{
-				return dba_exists($key, $this->_dba);
+				$_dba = dba_open($this->_dba_file, "r", $this->_dba_type);
+				$result = dba_exists($key, $_dba);
+				dba_close($_dba);
+				
+				return $result;
 			}
 			break;
 		}
@@ -297,32 +369,37 @@ class _Version
 			/* Тип «file» */
 			case "file":
 			{
-				if (is_file($this->_file_dir . "/" . $key))
-				{
-					return file_get_contents($this->_file_dir . "/" . $key);
-				}
-				else
+				if (!is_file($this->_file_dir . "/" . $key))
 				{
 					return;
 				}
+				
+				$result = file_get_contents($this->_file_dir . "/" . $key);
 			}
 			break;
 		
 			/* Тип «dba» */
 			case "dba":
 			{
-				$result = dba_fetch($key, $this->_dba);
-				if ($result !== false)
-				{
-					return $result;
-				}
-				else
+				$_dba = dba_open($this->_dba_file, "r", $this->_dba_type);
+				$result = dba_fetch($key, $_dba);
+				dba_close($_dba);
+				
+				if ($result === false)
 				{
 					return;
 				}
 			}
 			break;
 		}
+		
+		/* Распоковать строку */
+		if ($this->_compress_enable === true)
+		{
+			$result = gzdecode($result);
+		}
+		
+		return $result;
 	}
 	
 	/**
@@ -333,6 +410,12 @@ class _Version
 	 */
 	private function _hash_set($key, $value)
 	{
+		/* Сжимать данные */
+		if ($this->_compress_enable === true)
+		{
+			$value = gzencode($value, $this->_compress_level);
+		}
+		
 		switch ($this->_type)
 		{
 			/* Тип «file» */
@@ -345,7 +428,11 @@ class _Version
 			/* Тип «dba» */
 			case "dba":
 			{
-				dba_replace($key, $value, $this->_dba);
+				$this->_dba_file_optimize();
+				
+				$_dba = dba_open($this->_dba_file, "w", $this->_dba_type);
+				dba_replace($key, $value, $_dba);
+				dba_close($_dba);
 			}
 			break;
 		}
@@ -373,9 +460,24 @@ class _Version
 			/* Тип «dba» */
 			case "dba":
 			{
-				dba_delete($key, $this->_dba);
+				$_dba = dba_open($this->_dba_file, "w", $this->_dba_type);
+				dba_delete($key, $_dba);
+				dba_close($_dba);
 			}
 			break;
+		}
+	}
+	
+	/**
+	 * Оптимизация dba файла
+	 */
+	private function _dba_file_optimize()
+	{
+		if (filesize($this->_dba_file) > ($this->_dba_file_size_optimize * 1048576))
+		{
+			$_dba = dba_open($this->_dba_file, "w", $this->_dba_type);
+			dba_optimize($_dba);
+			dba_close($_dba);
 		}
 	}
 }

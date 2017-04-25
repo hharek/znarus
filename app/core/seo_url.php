@@ -11,9 +11,9 @@ class _Seo_Url
 	 */
 	public static function is($id)
 	{
-		if (!Chf::uint($id))
+		if (!Type::check("uint", $id))
 		{
-			throw new Exception("Номер у урла задан неверно. " . Chf::error());
+			throw new Exception("Номер у урла задан неверно. " . Type::get_last_error());
 		}
 
 		$query = 
@@ -152,17 +152,25 @@ SQL;
 	/**
 	 * Выборка всех по урлу
 	 * 
-	 * @param string $url
+	 * @param string $word
+	 * @param int $page
 	 * @return array
 	 */
-	public static function find_by_url($url = "")
+	public static function find(string $word = "", int $page = 1)
 	{
-		$url = trim((string)$url);
-		if ($url !== "" and !Chf::url($url))
+		$word = _Search::delete_bad_symbol($word);
+		$sql_where = "";
+		if (!empty($word))
 		{
-			throw new Exception("Урл задан неверно. " . Chf::error());
+			$sql_where = 
+<<<SQL
+WHERE 
+	"Url" ILIKE '%{$word}%'
+SQL;
 		}
-		$url = mb_strtolower($url);
+		
+		$limit = 20;
+		$offset = ($page - 1) * $limit;
 		
 		$query = 
 <<<SQL
@@ -174,12 +182,30 @@ SELECT
 	"Description"
 FROM 
 	"seo_url"
-WHERE 
-	"Url" LIKE $1
+{$sql_where}
 ORDER BY
 	"Url" ASC
+OFFSET {$offset}
+LIMIT {$limit}
 SQL;
-		return G::db_core()->query($query, "%" . $url . "%")->assoc();
+		$row = G::db_core()->query($query)->assoc();
+		
+		/* Кол-во */
+		$query = 
+<<<SQL
+SELECT
+	COUNT(*)
+FROM
+	"seo_url"
+{$sql_where}
+SQL;
+		$count = (int)G::db_core()->query($query)->single();
+		
+		return 
+		[
+			"row" => $row,
+			"count" => $count
+		];
 	}
 	
 	/**
@@ -191,9 +217,9 @@ SQL;
 	public static function get_by_url($url)
 	{
 		/* Проверка */
-		if (!Chf::url($url))
+		if (!Type::check("url", $url))
 		{
-			throw new Exception("Урл задан неверно. " . Chf::error());
+			throw new Exception("Урл задан неверно. " . Type::get_last_error());
 		}
 		
 		/* Урл */

@@ -1,0 +1,71 @@
+.icon_home
+{
+	background: url("../img/icon.png") no-repeat 0px 0px;
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+}
+
+.icon_list
+{
+	background: url("../img/icon.png") no-repeat -24px 0px;
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+}
+
+.icon_rename
+{
+	background: url("../img/icon.png") no-repeat -48px 0px;
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+}
+
+.icon_delete
+{
+	background: url("../img/icon.png") no-repeat 0px -24px;
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+}
+
+.icon_download
+{
+	background: url("../img/icon.png") no-repeat -24px -24px;
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+}
+
+.icon_add
+{
+	background: url("../img/icon.png") no-repeat -48px -24px;
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+}
+
+.icon_dir
+{
+	background: url("../img/icon.png") no-repeat 0px -48px;
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+}
+
+.icon_back
+{
+	background: url("../img/icon.png") no-repeat -24px -48px;
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+}
+
+.icon_show
+{
+	background: url("../img/icon.png") no-repeat -48px -48px;
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+}

@@ -163,6 +163,11 @@ class G
 	private static function cache_page(){}
 	
 	/**
+	 * @return _Cache
+	 */
+	private static function cache_ajax(){}
+	
+	/**
 	 * @return _Version
 	 */
 	private static function version(){}

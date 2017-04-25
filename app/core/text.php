@@ -11,9 +11,9 @@ class _Text
 	 */
 	public static function is($id)
 	{
-		if (!Chf::uint($id))
+		if (!Type::check("uint", $id))
 		{
-			throw new Exception("Номер у текста задан неверно. " . Chf::error());
+			throw new Exception("Номер у текста задан неверно. " . Type::get_last_error());
 		}
 
 		$query = 

@@ -13,8 +13,7 @@ $(document).on("_exe_success_content", function(e, data, hash, method)
 		_sort("down", this);
 	});
 	
-	$("#_content .std_list").find("tbody").find(".up:first").hide();
-	$("#_content .std_list").find("tbody").find(".down:last").hide();
+	_sort_btn_reload();
 });
 
 /**
@@ -47,6 +46,28 @@ function _sort(sort, obj)
 	
 	/* Скрыть и показать кнопки */
 	$(tr).parents(".std_list tbody").find(".up,.down").show();
-	$(tr).parents(".std_list tbody").find(".down:last").hide();
-	$(tr).parents(".std_list tbody").find(".up:first").hide();
+	_sort_btn_reload();
+}
+
+function _sort_btn_reload ()
+{
+	$("#_content .std_list").find("tbody").find(".up, .down").each(function()
+	{
+		var parent = 0;
+		if ($(this).data("parent") !== undefined)
+		{
+			parent = $(this).data("parent");
+		}
+		
+		var selector = ":first";
+		if ($(this).hasClass("down"))
+		{
+			selector = ":last";
+		}
+		
+		if ($(this).is("[data-parent=" + parent + "]" + selector))
+		{
+			$(this).hide();
+		}
+	});
 }

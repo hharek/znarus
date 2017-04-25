@@ -48,11 +48,13 @@ $(function()
 			{
 				if (data.error === undefined)
 				{
-					if (data.visit_last !== "")
-					{
-						window.location.hash = data.visit_last;
-						window.location.reload(true);
-					}
+//					if (data.visit_last !== "")
+//					{
+//						window.location.hash = data.visit_last;
+//						window.location.reload(true);
+//					}
+
+					window.location.reload(true);
 				}
 				else if (data.error !== undefined)
 				{

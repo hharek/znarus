@@ -7,8 +7,9 @@ var _Confirm =
 	 * @param {String} mess
 	 * @param {String} url
 	 * @param {String} type
+	 * @param {Function} func
 	 */
-	show: function(mess, url, type)
+	show: function(mess, url, type, func)
 	{
 		/* Тип по умолчанию */
 		if(type === undefined)
@@ -44,6 +45,11 @@ var _Confirm =
 		{
 			_exe(url, new FormData(this));
 			_Confirm.hide();
+			
+			if (func !== undefined)
+			{
+				func();
+			}
 			
 			return false;
 		});

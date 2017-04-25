@@ -1,0 +1,159 @@
+.wrap
+{
+	min-height: 100%;
+	display: flex;
+    flex-direction: column;
+}
+
+header
+{
+	background: #f6e8b6;
+	overflow: hidden;
+	/*border: 1px solid #8a8a8a;*/
+	/*border-top: 1px solid #8a8a8a;*/
+	border-bottom: 1px solid #8a8a8a;
+	
+	.head
+	{
+		width: 93%;
+		margin: 0 auto;
+		display: flex;
+		justify-content: space-between;
+		
+		.left
+		{
+			
+			line-height: 2;
+			margin-right: 1em;
+			font-weight: bold;
+			
+			h1
+			{
+				text-transform: uppercase;
+				vertical-align: middle;
+				font-size: 1.5em;
+
+				a
+				{
+					color: #000;
+					text-decoration: none;
+				}
+			}
+		}
+		
+		.search
+		{
+			display: none;
+			line-height: 2.8;
+			
+			input
+			{
+				color: black;
+				display: inline-block;
+				vertical-align: middle;
+				line-height: 2.4em;
+				font-size: 1em;
+				padding: 0.3em 0.5em;
+				height: 2em;
+				box-sizing: border-box;
+				border: 1px solid #8a8a8a;
+				border-radius: 0.3em;
+			}
+			
+			span
+			{
+				color: #000;
+				display: inline-block;
+				vertical-align: middle;
+				font-size: 1.7em;
+				margin: 0 0 0 0.2em;
+				cursor: pointer;
+			}
+			
+			.tablet
+			({
+				display: block;
+			});
+		}
+		
+		.menu
+		{
+			
+			line-height: 2.8;
+			
+			.title, .icon
+			{
+				display: inline-block;
+				font-size: 1em;
+				color: #000;
+				text-transform: uppercase;
+				vertical-align: middle;
+				cursor: pointer;
+			}
+			
+			.icon
+			{
+				font-size: 2em;
+				margin: 0 0 0 0.2em;
+			}
+			
+			.tablet
+			({
+				display: none;
+			});
+		}
+		
+		.tablet
+		({
+/*			display: none;*/
+		});
+	}
+	
+	nav
+	{
+		display: none;
+		position: absolute;
+		right: 0;
+		top: 3.1em;
+		min-width: 10em;
+		box-shadow: 0 0 1em #ccc;
+		padding: 0 0.3em;
+		z-index: 11;
+		background: #fff;
+
+		a
+		{
+			display: block;
+			background: none;
+			border: none;
+			color: #000;
+			border-bottom: 1px solid #ccc;
+			border-radius: 0;
+			margin: 0;
+			text-shadow: none;
+			font-weight: normal;
+			text-decoration: none;
+			padding: 0.4em 0.3em;
+
+			&:last-child
+			{
+				border-bottom: none;
+			}
+
+			&:hover
+			{
+				background: cornsilk;
+			}
+			
+			.fa
+			{
+				width: 1.2em;
+			}
+		}
+		
+		.tablet
+		({
+			/*display: none;*/
+		});
+	}
+}

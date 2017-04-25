@@ -1,5 +1,5 @@
 <?php
-if(G::url_path() === "/карта-сайта")
+if(G::url_path() === "/sitemap")
 {
 	return "sitemap";
 }

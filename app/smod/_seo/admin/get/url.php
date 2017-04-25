@@ -1,11 +1,21 @@
 <?php
-$current_url = "";
-if (!empty($_GET['url']))
+$word = "";
+if (!empty($_GET['word']))
 {
-	$current_url = $_GET['url'];
+	$word = $_GET['word'];
 }
 
-$url = _Seo_Url::find_by_url($current_url);
+$page = 1;
+if (!empty($_GET['page']))
+{
+	$page = (int)$_GET['page'];
+}
+
+$find = _Seo_Url::find($word, $page);
+$url = $find['row'];
+$count = $find['count'];
+
+$page_all = (int) ceil($count / 20);
 
 title("Адреса для продвижения");
 path (["Адреса для продвижения"]);

@@ -1,21 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 	<head>
 		<meta charset="utf-8" />
 		<title><?php echo meta_title(); ?></title>
 		<meta name="description" content="<?php echo meta_description(); ?>" />
 		<meta name="keywords" content="<?php echo meta_keywords(); ?>" />
-		<link rel="stylesheet" href="/index.css" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="/index.css" />
+		<script src="/index.js"></script>
 	</head>
 	<body>
-		
-		<?php echo inc("menu", "top"); ?>
-		
-		<div class="clear"></div>
-		
-		<h1><?php echo title(); ?></h1>
-		
-		<?php echo content(); ?>
-		
+		<div class="wrap">
+			<header>
+				<div class="head">
+					<div class="left">
+						<h1><a href="/">CMS Znarus</a></h1>
+					</div>
+					
+					<div class="menu" id="menu_btn">
+						<div class="title">Меню</div>
+						<div class="icon fa fa-bars"></div>
+					</div>
+					<div class="search">
+						<form action="/search">
+							<input type="text" name="query" placeholder="Поиск" value="<?php if (!empty($_GET['query'])) { echo $_GET['query']; } ?>"/>
+							<span class="fa fa-search"></span>
+						</form>
+					</div>
+				</div>
+				<nav id="menu">
+					<?php echo inc("menu", "left_mob"); ?>
+				</nav>
+			</header>
+
+			<div class="mid">
+				<nav>
+					<div class="title">Меню</div>
+					<?php echo inc("menu", "left"); ?>
+				</nav>
+				<main>
+					<h1><?php echo title(); ?></h1>
+					<div class="content">
+						<?php echo content(); ?>
+					</div>
+				</main>
+			</div>
+			
+			<footer>
+				<div class="foot">
+					<a href="mailto:master@znarus.ru"><span class="fa fa-envelope-o"></span>master@znarus.ru</a>&nbsp;&nbsp;
+					<a href="https://github.com/hharek/znarus"><span class="fa fa-github"></span>znarus</a>&nbsp;&nbsp;
+					<span class="fa fa-copyright"></span>hharek, 2017
+				</div>
+			</footer>
+		</div>
 	</body>
 </html>

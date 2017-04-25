@@ -3,10 +3,9 @@ $ajax = _Ajax::add
 (
 	$_POST['Identified'], 
 	$_POST['Name'], 
+	$_POST['Data_Type'],
 	$_POST['Get'], 
 	$_POST['Post'], 
-	$_POST['Data_Type'], 
-	$_POST['Token'], 
 	$_GET['module_id']
 );
 

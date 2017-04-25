@@ -39,7 +39,7 @@ function path($path = null)
 	}
 	else
 	{
-		_Front::$path = [];
+		_Front::$path = []; $match = [];
 		foreach ($path as $val)
 		{
 			if (preg_match("#([^\[]*)\[(.*)\]#isu", $val, $match))
@@ -140,6 +140,24 @@ function inc($_module_identified, $_identified)
 	return $content;
 }
 
+/**
+ * Загрузить кусок html-а
+ * 
+ * @param string $_identified
+ * @return string
+ */
+function html_part($_identified)
+{
+	ob_start();
+	require DIR_APP . "/html/part/" . $_identified . ".html";
+	$content = ob_get_contents();
+	ob_end_clean();
+	
+	_Front::$_html_part[] = $_identified;
+	
+	return $content;
+}
+
 /*----------------------------------- Кэш ----------------------------------------*/
 /**
  * Назначить структуру http запроса или переменные, участвующие в определении маршрута при одинаковом урле
@@ -195,22 +213,22 @@ function exe_in_filter($get, $post = null, $cookie = null, $session = null)
 	/* Проверка */
 	if ($get !== null and !is_array($get))
 	{
-		throw new Exception("Cache Route In. Переменные GET заданы неверно.");
+		throw new Exception("Cache Exe In. Переменные GET заданы неверно.");
 	}
 	
 	if ($post !== null and !is_array($post) and $post !== "isset")
 	{
-		throw new Exception("Cache Route In. Переменные POST заданы неверно.");
+		throw new Exception("Cache Exe In. Переменные POST заданы неверно.");
 	}
 	
 	if ($cookie !== null and !is_array($cookie))
 	{
-		throw new Exception("Cache Route In. Переменные COOKIE заданы неверно.");
+		throw new Exception("Cache Exe In. Переменные COOKIE заданы неверно.");
 	}
 	
 	if ($session !== null and !is_array($session))
 	{
-		throw new Exception("Cache Route In. Переменные SESSION заданы неверно.");
+		throw new Exception("Cache Exe In. Переменные SESSION заданы неверно.");
 	}
 	
 	/* Назначить */

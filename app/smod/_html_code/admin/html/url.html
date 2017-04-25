@@ -29,13 +29,46 @@
 				<?php echo $html['Name']; ?>
 			</td>
 		</tr>
+		
+	</tbody>
+</table>
+
+<!-- Куски шаблона -->
+<table class="std_list" align="center" style="width: 700px; margin: 20px auto 0px auto;">
+	<col width="100%"/>
+	<thead>
+		<tr>
+			<td>Куски шаблона</td>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($html_part as $val): ?>
+			<tr url="#_html_code/html_part_content?identified=<?php echo $val; ?>&from=url&url=<?php echo $url; ?>">
+				<td style="text-align: left; padding-left: 20px;">
+					<?php echo $val; ?>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+
+<!-- Inc -->
+<table class="std_list" align="center" style="width: 700px; margin: 20px auto 0px auto;">
+	<col width="40%"/>
+	<col width="60%"/>
+	<thead>
+		<tr>
+			<td colspan="2">Инк</td>
+		</tr>
+	</thead>
+	<tbody>
 		<?php foreach ($inc as $val): ?>
 			<tr url="#_html_code/inc_content?id=<?php echo $val['ID']; ?>&from=url&url=<?php echo $url; ?>">
-				<td style="text-align: left; padding-left: 50px;">
-					- <?php echo $val['Module_Identified']; ?>_<?php echo $val['Identified']; ?>
+				<td style="text-align: left; padding-left: 20px;">
+					<?php echo $val['Module_Identified']; ?>_<?php echo $val['Identified']; ?>
 				</td>
-				<td style="text-align: left; padding-left: 50px;">
-					- <?php echo $val['Module_Name']; ?> / <?php echo $val['Name']; ?>
+				<td style="text-align: left; padding-left: 20px;">
+					<?php echo $val['Module_Name']; ?> / <?php echo $val['Name']; ?>
 				</td>
 			</tr>
 		<?php endforeach; ?>

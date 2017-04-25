@@ -1,0 +1,202 @@
+<center>
+	<div class="std_button tab_button active" tab="data">
+		<div class="icon_edit"></div>
+		Данные
+	</div>
+	
+	<div class="std_button tab_button" tab="meta">
+		<div class="icon_more"></div>
+		Мета
+	</div>
+	
+	<div class="std_button tab_button" tab="view">
+		<div class="icon_view"></div>
+		Перейти на страницу
+	</div>
+	
+</center>
+<br/>
+
+<!-- Данные -->
+<div id="tab_data" class="tab">
+	<form autosave version>
+		<table class="std_form">
+			<tr>
+				<td>Наименование</td>
+				<td>
+					<input type="text" name="Name" value="<?php echo htmlspecialchars($page['Name']); ?>"/>
+				</td>
+			</tr>
+			<?php if (!P::get("_page", "url_auto")): ?>
+				<tr>
+					<td>Адрес</td>
+					<td>
+						<input type="text" name="Url" value="<?php echo htmlspecialchars($page['Url']); ?>"/>
+					</td>
+				</tr>
+			<?php endif; ?>
+			<tr>
+				<td colspan="2">
+					<textarea name="Content"><?php echo htmlspecialchars($page['Content']); ?></textarea>
+				</td>
+			</tr>
+			<?php if (P::get("_page", "admin_parent_show")): ?>
+				<tr>
+					<td>Корень</td>
+					<td>
+						<select name="Parent">
+							<option value=""></option>
+							<?php parent_html(0, 0, (int)$page['Parent']); ?>
+						</select>
+					</td>
+				</tr>
+			<?php endif; ?>
+			<?php if (P::get("_page", "admin_html_show")): ?>
+				<tr>
+					<td>Шаблон</td>
+					<td>
+						<select name="Html_ID">
+							<option value=""></option>
+							<?php foreach ($html as $h): ?>
+								<option value="<?php echo $h['ID']; ?>" <?php if((int)$h['ID'] === (int)$page['Html_ID']): ?>selected<?php endif; ?>>
+									<?php echo $h['Name']; ?>
+								</option>
+							<?php endforeach; ?>
+						</select>
+					</td>
+				</tr>
+			<?php endif; ?>
+			<tr>
+				<td>Тэги</td>
+				<td>
+					<textarea name="Tags"><?php echo htmlspecialchars($page['Tags']); ?></textarea>
+				</td>
+			</tr>
+			<tr>
+				<td>Активность</td>
+				<td>
+					<input type="hidden" name="Active" value="0"/>
+					<input type="checkbox" name="Active" value="1" <?php if ((bool)$page['Active']): ?>checked<?php endif; ?>/>
+				</td>
+			</tr>
+		</table>
+		<br/>
+		<center>
+			<div class="std_button submit">
+				<div class="icon_edit"></div>
+				Сохранить
+			</div>
+			&nbsp;
+			<div 
+				class="icon_basket delete" 
+				url="#_page/delete?id=<?php echo $page['ID']; ?>" 
+				mess="Вы действительно хотите удалить страницу «<?php echo $page['Name'];?>»?">
+			</div>
+		</center>
+	</form>
+</div>
+
+<!-- Мета -->
+<div id="tab_meta" class="tab">
+	<form action="#_page/meta?id=<?php echo $page['ID']; ?>">
+		<table class="std_form">
+			<tr>
+				<td>Тэг title</td>
+				<td>
+					<input type="text" name="Meta_Title" value="<?php echo htmlspecialchars($page['Meta_Title']); ?>"/>
+				</td>
+			</tr>
+			<tr>
+				<td>Тэг meta name=description</td>
+				<td>
+					<textarea name="Meta_Description"><?php echo htmlspecialchars($page['Meta_Description']); ?></textarea>
+				</td>
+			</tr>
+			<tr>
+				<td>Тэг meta name=keywords</td>
+				<td>
+					<textarea name="Meta_Keywords"><?php echo htmlspecialchars($page['Meta_Keywords']); ?></textarea>
+				</td>
+			</tr>
+		</table>
+		<br/>
+		<center>
+			<div class="std_button submit">
+				<div class="icon_edit"></div>
+				Сохранить
+			</div>
+		</center>
+	</form>
+</div>
+
+<!-- Перейти на страницу -->
+<div id="tab_view" class="tab">
+	<table class="std_form">
+		<tr>
+			<td>Перейти на страницу</td>
+			<td>
+				<a target="blank" href="<?php echo $full_url . URL_END; ?>" class="icon_view"></a>
+			</td>
+		</tr>
+		<tr>
+			<td>Адрес страницы</td>
+			<td>
+				<input type="text" id="url" value="<?php echo $url . URL_END; ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Полный адрес страницы</td>
+			<td>
+				<input type="text" id="url_full" value="<?php echo $full_url . URL_END; ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Перейти на неактивную страницу</td>
+			<td>
+				<a target="blank" href="<?php echo $full_url . URL_END; ?>?show" class="icon_view"></a>
+			</td>
+		</tr>
+	</table>
+</div>
+
+<?php
+/**
+ * Показать поле «Корень»
+ * 
+ * @param int $parent
+ * @param int $level
+ * @param int $current
+ */
+function parent_html(int $parent, int $level, int $current = 0)
+{
+	$child = _Page::child($parent);
+?>
+
+	<?php foreach ($child as $val): ?>
+
+		<option value="<?php echo $val['ID']; ?>"<?php if($val['ID'] == $current): ?> selected="selected"<?php endif; ?>>
+			<?php echo str_repeat("&nbsp;", $level * 4) . $val['Name']; ?>
+		</option>
+
+		<?php parent_html($val['ID'], $level + 1, $current); ?>
+
+	<?php endforeach; ?>
+
+<?php
+}
+?>
+
+<?php if (P::get("_page", "url_translit_edit")): ?>
+	<script>
+		<?php if (!P::get("_page", "url_auto") and P::get("_page", "url_translit")): ?>
+		$("input[name=Name]").on("keyup change", function()
+		{
+			<?php if (P::get("_page", "url_translit_rus")): ?>
+				$("input[name=Url]").val(translit_rus($(this).val()));
+			<?php else: ?>
+				$("input[name=Url]").val(translit($(this).val()));
+			<?php endif; ?>
+		});
+		<?php endif; ?>
+	</script>
+<?php endif; ?>

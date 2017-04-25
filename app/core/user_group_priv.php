@@ -61,7 +61,7 @@ SQL;
 			FROM
 				"user_group_priv" as "gp"
 			WHERE
-				"gp"."Group_ID" = '1'
+				"gp"."Group_ID" = '{$group_id}'
 		) 
 		OR
 		"a"."Allow_All" = true

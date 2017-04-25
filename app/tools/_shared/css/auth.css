@@ -1,6 +1,11 @@
+/*body
+{
+	background: none;
+}*/
+
 ._auth
 {
-	border: 1px solid #c0c0c0;
+	border: 1px solid #9b9898;
 	border-radius: 4px;
 	width: 400px;
 	position: absolute;
@@ -8,14 +13,15 @@
 	top: 45%;
 	margin: -110px 0px 0px -220px;
 	padding: 20px;
-	background: #eef7cf;
+	background: #eaeaea;
 	overflow: hidden;
+	box-shadow: 0 0 10px 4px #cecece;
 	
 	._logo
 	{
 		width: 58px;
 		height: 64px;
-		border: 1px solid #c0c0c0;
+		border: 1px solid #909090;
 		position: absolute;
 		margin: 0px;
 	}
@@ -29,11 +35,11 @@
 			height: 24px;
 			width: 200px;
 			font-size: 20px;
-			font-style: italic;
-			padding: 8px;
+			padding: 8px 10px;
 			display: block;
-			border: 1px solid #c0c0c0;
+			border: 1px solid #969696;
 			border-radius: 4px;
+			box-shadow: inset 2px 2px 6px #ebebeb;
 			
 			&:nth-child(2)
 			{
@@ -46,12 +52,12 @@
 	{
 		width: 200px;
 		margin: 20px auto 0px;
-		border: 1px solid #c0c0c0;
+		border: 1px solid #9fa758;
 		border-radius: 4px;
 		height: 32px;
 		padding: 6px 2px 0px 6px;
 		text-align: center;
-		background: #e3e3e3;
+		background: #dde783;
 		position: relative;
 		font-size: 20px;
 		cursor: pointer;
@@ -77,5 +83,10 @@
 		margin: 10px 0px 0px 0px;
 		text-align: center;
 		font-size: 14px;
+		
+		a
+		{
+			color: #6e6e6e;
+		}
 	}
 }

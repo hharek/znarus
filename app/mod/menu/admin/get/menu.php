@@ -1,5 +1,5 @@
 <?php
-$menu = Menu::get_all();
+$menu = Menu::selectl();
 
 title("Правка меню");
 path(["Правка меню"]);

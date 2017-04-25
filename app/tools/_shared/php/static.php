@@ -1,6 +1,6 @@
 <?php
 /* Настройки */
-$_static_ext_allow = ["css", "jpg", "png", "gif", "js", "woff", "ttf"];		/* Разрешённые расширения для статических файлов */
+$_static_ext_allow = ["css", "jpg", "png", "gif", "js", "woff", "ttf", "html"];		/* Разрешённые расширения для статических файлов */
 $_shared_css = ["/index.css", "/auth.css", "/restore.css"];			/* Общие файлы CSS */
 $_shared_js =  ["/index.js",  "/auth.js",  "/restore.js"];			/* Общие файлы JS */
 
@@ -10,6 +10,13 @@ $_static_explode = explode(".", G::url_path());
 if ($_static_explode > 1)
 {
 	$_static_ext = end($_static_explode);
+}
+
+/* PHP-файлы */
+if ($_static_ext === "php")
+{
+	require DIR_TOOLS . "/_packjs/" . substr(G::url_path(), 8);
+	exit();
 }
 
 /* Статические файлы */
@@ -59,7 +66,7 @@ if (in_array($_static_ext, $_static_ext_allow))
 	/* Статические файлы */
 	else
 	{
-		$_static_file = DIR_TOOLS . "/_shared" . G::url_path();								/* Путь к статическому файлу */
+		$_static_file = DIR_TOOLS . "/_shared" . G::url_path();										/* Путь к статическому файлу */
 		if (G::url_path_ar()[0] === "packjs" and isset($_SESSION['_tools_session_check']))
 		{
 			$_static_file = DIR_TOOLS . "/_packjs/" . substr(G::url_path(), 8);

@@ -37,7 +37,7 @@ try
 	}
 	
 	/* Проверка урла */
-	if (!Chf::identified(G::url_path_ar()[1]) or !Chf::identified(G::url_path_ar()[2]))
+	if (!Type::check("identified", G::url_path_ar()[1]) or !Type::check("identified", G::url_path_ar()[2]))
 	{
 		throw new Exception("Урл задан неверно.");
 	}
@@ -131,6 +131,11 @@ try
 	catch (Exception_Form $e)
 	{
 		$_data['error_form'] = Err::get();
+	}
+	/* Ошибка в форме. Новая версия */
+	catch (Exception_Many $e)
+	{
+		$_data['error_form'] = $e->get_err();
 	}
 	/* Ошибка */
 	catch (Exception $e)

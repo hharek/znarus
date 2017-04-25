@@ -19,11 +19,17 @@
 				<input type="checkbox" name="Location" value="1" <?php if ((bool)$redirect['Location'] === true): ?>checked="checked"<?php endif; ?>/>
 			</td>
 		</tr>
+		<tr>
+			<td>Тэги</td>
+			<td>
+				<input type="text" name="Tags" value="<?php echo htmlspecialchars($redirect['Tags']); ?>"/>
+			</td>
+		</tr>
 	</table>
 	<div class="center">
 		<div class="std_button submit">
 			<div class="icon_edit"></div>
-			Изменить
+			Сохранить
 		</div>
 		<a class="std_button" href="#_seo/redirect">
 			<div class="icon_back"></div>

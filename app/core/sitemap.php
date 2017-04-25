@@ -23,7 +23,7 @@ class _Sitemap
 	 * 
 	 * @var string
 	 */
-	private static $_sitemap_xml_path = DIR_WWW . "/sitemap.xml";
+	private static $_sitemap_xml_path = DIR_PUBLIC . "/sitemap.xml";
 	
 	/**
 	 * Путь к файлу sitemap.xsd
@@ -49,10 +49,10 @@ class _Sitemap
 	/**
 	 * Сформировать sitemap.xml
 	 */
-	public static function xml()
+	public static function xml($create = true)
 	{
 		/* Определить протокол */
-		if (isset($_SERVER['HTTPS']) and $_SERVER['HTTPS'] === "on")
+		if (HTTPS_ENABLE === true)
 		{
 			self::$_protocol = "https";
 		}
@@ -90,7 +90,14 @@ XML;
 		$dom_xml->schemaValidate(self::$_sitemap_xsd);
 		
 		/* Сохранить в файл sitemap.xml */
-		G::file()->put(self::$_sitemap_xml_path, $dom_xml->saveXML());
+		if ($create)
+		{
+			G::file()->put(self::$_sitemap_xml_path, $dom_xml->saveXML());
+		}
+		else
+		{
+			return $dom_xml->saveXML();
+		}
 	}
 	
 	/**
@@ -125,6 +132,10 @@ XML;
 	{
 		/* Сведения по странице */
 		$page = call_user_func($function, $param);
+		if (empty($page))
+		{
+			return;
+		}
 		
 		/* XML по странице */
 		$xml = "";

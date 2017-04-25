@@ -5,6 +5,8 @@ require __DIR__ . "/../init.php";
 require "function.php";
 
 _Front::redirect();
+_Front::index_css();
+_Front::index_js();
 _Front::url_check();
 _Front::route();
 _Front::cache_page_get();

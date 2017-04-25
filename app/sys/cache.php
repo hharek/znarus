@@ -12,7 +12,7 @@ class _Cache
 	private $_enable = true;
 
 	/**
-	 * Тип хранилища кэша (off|file|memcache|dba|mixed)
+	 * Тип хранилища кэша (off|memcache|file|dba)
 	 * 
 	 * @var string
 	 */
@@ -33,6 +33,13 @@ class _Cache
 	private $_salt = "";
 	
 	/**
+	 * Указатель на файл с ключами
+	 * 
+	 * @var resource
+	 */
+	private $_key_log_handle;
+	
+	/**
 	 * Папка с кэшом (если тип file)
 	 * 
 	 * @var string
@@ -40,35 +47,35 @@ class _Cache
 	private $_file_dir;
 	
 	/**
-	 * Объект memcache
+	 * Объект Memcache или Memcached
 	 * 
-	 * @var Memcache
+	 * @var Memcache | Memcached
 	 */
 	private $_memcache_obj;
-
-	/**
-	 * Ресурс dba
-	 * 
-	 * @var resource
-	 */
-	private $_dba;
 	
 	/**
-	 * Максимальный размер строки в байтах для хранения в memcache (20 килобит = 20480) если тип «mixed»
+	 * Путь к dba файлу
 	 * 
-	 * @var int
+	 * @var string
 	 */
-	private $_mixed_memcache_size = 20480;
+	private $_dba_file;
+
+	/**
+	 * Тип dba файла (qdbm, db4).
+	 * 
+	 * @var string
+	 */
+	private $_dba_type = "qdbm";
 
 	/**
 	 * Конструктор
 	 * 
 	 * @param string $name
 	 * @param string $salt
-	 * @param string $type (off|file|memcache|dba|mixed)
+	 * @param string $type (off|memcache|file|dba)
 	 * @param mixed $param
 	 */
-	public function __construct ($name = "my", $salt = "", $type = "off", $param = null)
+	public function __construct ($name = "my", $salt = "", $key_log_file = "key.log", $type = "off", $param = null)
 	{
 		/* Наименование */
 		$this->_check_str($name, "Наименование кэша");
@@ -77,10 +84,16 @@ class _Cache
 		/* Соль */
 		$this->_salt = trim((string) $salt);
 		
-		/* Тип */
-		if (!in_array($type, ["off", "file", "memcache", "dba", "mixed"]))
+		/* Файл с ключами */
+		if ($type !== "off")
 		{
-			throw new Exception("Тип кэширования задан неверно. Допустимые значения (off, file, memcache, dba, mixed).");
+			$this->_key_log_handle = fopen($key_log_file, "a+");
+		}
+		
+		/* Тип */
+		if (!in_array($type, ["off", "memcache", "file", "dba"]))
+		{
+			throw new Exception("Тип кэширования задан неверно. Допустимые значения (off, memcache, file, dba).");
 		}
 		$this->_type = $type;
 		
@@ -94,31 +107,37 @@ class _Cache
 		{
 			case "file":
 			{
-				$this->_file_dir($param);
+				$this->_file_dir_check($param);
+				$this->_file_dir = realpath($param);
 			}
 			break;
 		
 			case "memcache":
 			{
-				$this->_memcache_obj($param);
+				$this->_memcache_obj_check($param);
+				$this->_memcache_obj = $param;
 			}
 			break;
 		
 			case "dba":
 			{
-				$this->_dba($param);
-			}
-			break;
-		
-			case "mixed":
-			{
-				$this->_memcache_obj($param[0]);
-				$this->_dba($param[1]);
+				$this->_dba_param($param);
 			}
 			break;
 		}
 	}
 	
+	/**
+	 * Деструктор
+	 */
+	public function __destruct()
+	{
+		if ($this->_type !== "off" and $this->_enable === true)
+		{
+			fclose($this->_key_log_handle);
+		}
+	}
+
 	/**
 	 * Включить кэширование
 	 */
@@ -160,7 +179,7 @@ class _Cache
 		{
 			return;
 		}
-		$cache = unserialize($cache);
+		$cache = json_decode($cache, true);
 		
 		/* Время хранения истекло */
 		if ($cache['date'] < time())
@@ -221,10 +240,16 @@ class _Cache
 			"tag" => $tag,
 			"date" => $expire
 		];
-		$value = serialize($value);
+		$value = json_encode($value);
 		
 		/* Добавить кэш */
 		$this->_hash_set($this->_key_cache($identified), $value);
+		
+		/* Добавить наименование кэша в файл ключей */
+		if ($this->_type !== "off" and $this->_enable === true)
+		{
+			fwrite($this->_key_log_handle, "cache_" . $identified . "\n");
+		}
 		
 		/* Добавить тэги */
 		if (!empty($tag))
@@ -232,6 +257,12 @@ class _Cache
 			foreach ($tag as $tag_identified)
 			{
 				$this->_add_to_tag($tag_identified, $identified);
+				
+				/* Добавить наименование тэга в файл ключей */
+				if ($this->_type !== "off" and $this->_enable === true)
+				{
+					fwrite($this->_key_log_handle, "tag_" . $tag_identified . "\n");
+				}
 			}
 		}
 	}
@@ -249,7 +280,7 @@ class _Cache
 		{
 			return;
 		}
-		$cache = unserialize($cache);
+		$cache = json_decode($cache, true);
 		
 		/* Удалить кэш из тэгов */
 		foreach ($cache['tag'] as $tag_identified)
@@ -264,22 +295,30 @@ class _Cache
 	/**
 	 * Удалить тэг
 	 * 
-	 * @param string $identified
+	 * @param mixed $tags
 	 */
-	public function delete_tag ($identified)
+	public function delete_tag ($tags)
 	{
-		/* Данные по тэгу */
-		$tag = $this->_hash_get($this->_key_tag($identified));
-		if ($tag === null)
+		if (is_string($tags))
 		{
-			return;
+			$tags = [$tags];
 		}
-		$tag = unserialize($tag);
 		
-		/* Удалить кэши связанные с тэгом */
-		foreach ($tag['cache'] as $cache_identified)
+		foreach ($tags as $tag_identified)
 		{
-			$this->delete($cache_identified);
+			/* Данные по тэгу */
+			$tag = $this->_hash_get($this->_key_tag($tag_identified));
+			if ($tag === null)
+			{
+				break;
+			}
+			$tag = json_decode($tag, true);
+
+			/* Удалить кэши связанные с тэгом */
+			foreach ($tag['cache'] as $cache_identified)
+			{
+				$this->delete($cache_identified);
+			}
 		}
 	}
 	
@@ -295,7 +334,7 @@ class _Cache
 		{
 			return;
 		}
-		$cache = unserialize($cache);
+		$cache = json_decode($cache, true);
 		
 		return $cache['tag'];
 	}
@@ -306,24 +345,30 @@ class _Cache
 	public function truncate()
 	{
 		/* Режим «off» */
-		if ($this->_type === "off")
+		if ($this->_type === "off" or $this->_enable === false)
 		{
 			return;
 		}
 		
+		/* Все ключи */
+		$key_all = $this->get_key_all();
+		
 		/* Удалить тэги */
-		$tag_all = $this->get_key_all("tag");
+		$tag_all = $key_all['tag'];
 		foreach ($tag_all as $val)
 		{
 			$this->_hash_delete($this->_key_tag($val));
 		}
 		
 		/* Удалить кэши */
-		$cache_all = $this->get_key_all("cache");
+		$cache_all = $key_all['cache'];
 		foreach ($cache_all as $val)
 		{
 			$this->_hash_delete($this->_key_cache($val));
 		}
+		
+		/* Очистить файл с ключами */
+		ftruncate($this->_key_log_handle, 0);
 	}
 	
 	/**
@@ -345,9 +390,10 @@ class _Cache
 		$info = "";
 		
 		/* Все кэши и тэги */
-		$cache_all = $this->get_key_all("cache"); 
+		$key_all = $this->get_key_all();
+		$cache_all = $key_all['cache']; 
 		asort($cache_all);
-		$tag_all = $this->get_key_all("tag");
+		$tag_all = $key_all['tag'];
 		asort($tag_all);
 		
 		/* Расчитать размер */
@@ -379,7 +425,7 @@ class _Cache
 				$cache_tag = $this->_hash_get($this->_key_tag($tag_identified));
 				if ($cache_tag !== null)
 				{
-					$cache_tag = unserialize($cache_tag)['cache'];
+					$cache_tag = json_decode($cache_tag, true)['cache'];
 					foreach ($cache_tag as $cache_identified)
 					{
 						$info .= "\t- {$cache_identified}\n";
@@ -395,7 +441,7 @@ class _Cache
 			$cache = $this->_hash_get($this->_key_cache($cache_identified));
 			if ($cache !== null)
 			{
-				$cache = unserialize($cache);
+				$cache = json_decode($cache, true);
 				if (empty($cache['tag']))
 				{
 					$cache_tag_no[] = $cache_identified;
@@ -423,133 +469,71 @@ class _Cache
 	/**
 	 * Получить все ключи
 	 * 
-	 * @param string $type
 	 * @return array
 	 */
-	public function get_key_all($type)
+	public function get_key_all()
 	{
 		/* Если отключен */
-		if ($this->_type === "off")
+		if ($this->_type === "off" or $this->_enable === false)
 		{
-			return [];
+			return 
+			[
+				"cache" => [],
+				"tag" => []
+			];
 		}
 		
-		/* Проверка */
-		if (!in_array($type, ["cache","tag"]))
-		{
-			throw new Exception("Необходимо указать «cache» или «tag».");
-		}
+		/* Кэши и тэги */
+		$cache = []; $tag = [];
 		
-		/* Префикс */
-		$prefix = ""; 
-		if ($this->_salt !== "")
+		/* Чтение из файла */
+		fseek($this->_key_log_handle, 0);
+		while (($key = fgets($this->_key_log_handle)) !== false) 
 		{
-			$prefix = md5($this->_name . $this->_salt) . "_" . md5($type . $this->_salt);
-		}
-		else
-		{
-			$prefix = $this->_name . "_" . $type . "_";
-		}
-		
-		/* Все ключи в хранилище */
-		$key_all_storage = $this->get_key_all_storage();
-		$key_all = [];
-		foreach ($key_all_storage as $key)
-		{
-			if (substr($key, 0, strlen($prefix)) === $prefix)
+			$key = trim($key);
+			
+			/* Кэш */
+			if (substr($key, 0, 6) === "cache_")
 			{
-				$key_all[] = unserialize($this->_hash_get($key))['identified'];
+				$identified = substr($key, 6);
+				if (!in_array($identified, $cache) and self::_hash_is($this->_key_cache($identified)))
+				{
+					$cache[] = $identified;
+				}
+			}
+			/* Тэг */
+			elseif (substr($key, 0, 4) === "tag_")
+			{
+				$identified = substr($key, 4);
+				if (!in_array($identified, $tag) and self::_hash_is($this->_key_tag($identified)))
+				{
+					$tag[] = $identified;
+				}
 			}
 		}
+	
+		/* Очистить и создать новый файл с ключами */
+		ftruncate($this->_key_log_handle, 0);
+		fseek($this->_key_log_handle, 0);
 		
-		return $key_all;
+		foreach ($cache as $v)
+		{
+			fwrite($this->_key_log_handle, "cache_" . $v . "\n");
+		}
+		
+		foreach ($tag as $v)
+		{
+			fwrite($this->_key_log_handle, "tag_" . $v . "\n");
+		}
+	
+		/* Возвращаем кэшы и тэгами */
+		return 
+		[
+			"cache" => $cache,
+			"tag" => $tag
+		];
 	}
 	
-	/**
-	 * Показать все ключи хранилища по типу
-	 * 
-	 * @return array
-	 */
-	public function get_key_all_storage($type = null)
-	{
-		/* Тип хранилища */
-		if ($type === null)
-		{
-			$type = $this->_type;
-		}
-		
-		/* Все ключи */
-		switch ($type)
-		{
-			case "off":
-			{
-			    throw new Exception("Невозможно получить ключи хранилища для типа «off».");
-			}
-			break;
-			
-			case "file":
-			{
-				$scandir = scandir($this->_file_dir);
-				$scandir = array_diff($scandir, [".", ".."]);
-				
-				return $scandir;
-			}
-			break;
-			
-			case "memcache":
-			{
-				$server_slabs = $this->_memcache_obj->getextendedstats("slabs");
-
-				$item_all = [];
-				foreach ($server_slabs as $server => $slabs)
-				{
-					foreach ($slabs as $slab_id => $data)
-					{
-						$cachedump = $this->_memcache_obj->getextendedstats("cachedump", (int)$slab_id);
-
-						foreach ($cachedump as $val)
-						{
-							if (!is_array($val))
-							{
-								continue;
-							}
-
-							foreach ($val as  $item_key => $item_val)
-							{
-								$item_all[] = $item_key;
-							}
-						}
-					}
-				}
-				
-				return $item_all;
-			}
-			break;
-			
-			case "dba":
-			{
-				$key_all = [];
-				
-				$key = dba_firstkey($this->_dba); 
-				while ($key !== false)
-				{
-					$key_all[] = $key;
-					
-					$key = dba_nextkey($this->_dba);
-				}
-				
-				return $key_all;
-			}
-			break;	
-			
-			case "mixed":
-			{
-				return array_merge(self::get_key_all_storage("memcache"), self::get_key_all_storage("dba")) ;
-			}
-			break;
-		}
-	}
-
 	/**
 	 * Проверка строки на недопустимые символы
 	 * 
@@ -623,13 +607,6 @@ class _Cache
 		
 		switch ($this->_type)
 		{
-			/* Тип «file» */
-			case "file":
-			{
-				return is_file($this->_file_dir . "/" . $key);
-			}
-			break;
-		
 			/* Тип «memcache» */
 			case "memcache":
 			{
@@ -645,29 +622,21 @@ class _Cache
 			}
 			break;
 			
-			/* Тип «dba» */
-			case "dba":
+			/* Тип «file» */
+			case "file":
 			{
-				return dba_exists($key, $this->_dba);
+				return is_file($this->_file_dir . "/" . $key);
 			}
 			break;
 		
-			/* Тип «mixed» */
-			case "mixed":
+			/* Тип «dba» */
+			case "dba":
 			{
-				$result = $this->_memcache_obj->get($key);
-				if ($result !== false)
-				{
-					return true;
-				}
+				$_dba = dba_open($this->_dba_file, "r", $this->_dba_type);
+				$result = dba_exists($key, $_dba);
+				dba_close($_dba);
 				
-				$result = dba_exists($key, $this->_dba);
-				if ($result !== false)
-				{
-					return true;
-				}
-				
-				return false;
+				return $result;
 			}
 			break;
 		}
@@ -689,20 +658,6 @@ class _Cache
 		
 		switch ($this->_type)
 		{
-			/* Тип «file» */
-			case "file":
-			{
-				if (is_file($this->_file_dir . "/" . $key))
-				{
-					return file_get_contents($this->_file_dir . "/" . $key);
-				}
-				else
-				{
-					return;
-				}
-			}
-			break;
-			
 			/* Тип «memcache» */
 			case "memcache":
 			{
@@ -718,13 +673,12 @@ class _Cache
 			}
 			break;
 			
-			/* Тип «dba» */
-			case "dba":
+			/* Тип «file» */
+			case "file":
 			{
-				$result = dba_fetch($key, $this->_dba);
-				if ($result !== false)
+				if (is_file($this->_file_dir . "/" . $key))
 				{
-					return $result;
+					return file_get_contents($this->_file_dir . "/" . $key);
 				}
 				else
 				{
@@ -733,22 +687,21 @@ class _Cache
 			}
 			break;
 			
-			/* Тип «mixed» */
-			case "mixed":
+			/* Тип «dba» */
+			case "dba":
 			{
-				$result = $this->_memcache_obj->get($key);
+				$_dba = dba_open($this->_dba_file, "r", $this->_dba_type);
+				$result = dba_fetch($key, $_dba);
+				dba_close($_dba);
+				
 				if ($result !== false)
 				{
 					return $result;
 				}
-				
-				$result = dba_fetch($key, $this->_dba);
-				if ($result !== false)
+				else
 				{
-					return $result;
+					return;
 				}
-				
-				return;
 			}
 			break;
 		}
@@ -770,13 +723,6 @@ class _Cache
 		
 		switch ($this->_type)
 		{
-			/* Тип «file» */
-			case "file":
-			{
-				file_put_contents($this->_file_dir . "/" . $key, $value);
-			}
-			break;
-		
 			/* Тип «memcache» */
 			case "memcache":
 			{
@@ -784,42 +730,19 @@ class _Cache
 			}
 			break;
 		
-			/* Тип «dba» */
-			case "dba":
+			/* Тип «file» */
+			case "file":
 			{
-				dba_replace($key, $value, $this->_dba);
+				file_put_contents($this->_file_dir . "/" . $key, $value);
 			}
 			break;
 		
-			/* Тип «mixed» */
-			case "mixed":
+			/* Тип «dba» */
+			case "dba":
 			{
-				/* Если строка маленькая */
-				if (strlen($value) < $this->_mixed_memcache_size)
-				{
-					/* Удаляем из dba, если строки уменьшился */
-					$result = dba_exists($key, $this->_dba);
-					if ($result !== false)
-					{
-						dba_delete($key, $this->_dba);
-					}
-					
-					/* Размещаем в memcache */
-					$this->_memcache_obj->set($key, $value);
-				}
-				/* Если строка большая */
-				elseif (strlen($value) >= $this->_mixed_memcache_size)
-				{
-					/* Удаляем из memcache, если строка увеличилась */
-					$result = $this->_memcache_obj->get($key);
-					if ($result !== false)
-					{
-						$this->_memcache_obj->delete($key);
-					}
-					
-					/* Размещаем в dba */
-					dba_replace($key, $value, $this->_dba);
-				}
+				$_dba = dba_open($this->_dba_file, "w", $this->_dba_type);
+				dba_replace($key, $value, $_dba);
+				dba_close($_dba);
 			}
 			break;
 		}
@@ -840,6 +763,13 @@ class _Cache
 		
 		switch ($this->_type)
 		{
+			/* Тип «memcache» */
+			case "memcache":
+			{
+				$this->_memcache_obj->delete($key);
+			}
+			break;
+		
 			/* Тип «file» */
 			case "file":
 			{
@@ -849,26 +779,13 @@ class _Cache
 				}
 			}
 			break;
-			
-			/* Тип «memcache» */
-			case "memcache":
-			{
-				$this->_memcache_obj->delete($key);
-			}
-			break;
 		
 			/* Тип «dba» */
 			case "dba":
 			{
-				dba_delete($key, $this->_dba);
-			}
-			break;
-		
-			/* Тип «mixed» */
-			case "mixed":
-			{
-				$this->_memcache_obj->delete($key);
-				dba_delete($key, $this->_dba);
+				$_dba = dba_open($this->_dba_file, "w", $this->_dba_type);
+				dba_delete($key, $_dba);
+				dba_close($_dba);
 			}
 			break;
 		}
@@ -901,7 +818,7 @@ class _Cache
 		
 		if ($this->_hash_is($this->_key_tag($tag_identified)) === true)
 		{
-			$tag['cache'] = unserialize($this->_hash_get($this->_key_tag($tag_identified)))['cache'];
+			$tag['cache'] = json_decode($this->_hash_get($this->_key_tag($tag_identified)), true)['cache'];
 		}
 		
 		if (!in_array($cache_identified, $tag['cache']))
@@ -909,7 +826,7 @@ class _Cache
 			$tag['cache'][] = $cache_identified;
 		}
 		
-		$this->_hash_set($this->_key_tag($tag_identified), serialize($tag));
+		$this->_hash_set($this->_key_tag($tag_identified), json_encode($tag));
 	}
 
 	/**
@@ -925,13 +842,13 @@ class _Cache
 			return;
 		}
 		
-		$tag = unserialize($this->_hash_get($this->_key_tag($tag_identified)));
+		$tag = json_decode($this->_hash_get($this->_key_tag($tag_identified)), true);
 		
 		$tag['cache'] = array_diff($tag['cache'], [$cache_identified]);
 		
 		if (!empty($tag['cache']))
 		{
-			$this->_hash_set($this->_key_tag($tag_identified), serialize($tag));
+			$this->_hash_set($this->_key_tag($tag_identified), json_encode($tag));
 		}
 		else
 		{
@@ -939,14 +856,12 @@ class _Cache
 		}
 	}
 
-	
-
 	/**
 	 * Назначить папку для кэша (если тип file)
 	 * 
 	 * @param string $dir
 	 */
-	private function _file_dir ($dir)
+	private function _file_dir_check ($dir)
 	{
 		if (empty($dir))
 		{
@@ -957,8 +872,6 @@ class _Cache
 		{
 			throw new Exception("Параметры заданые неверно. Папки «{$dir}» не существует.");
 		}
-		
-		$this->_file_dir = realpath($dir);
 	}
 	
 	/**
@@ -966,29 +879,53 @@ class _Cache
 	 * 
 	 * @param object $memcache_obj
 	 */
-	private function _memcache_obj ($memcache_obj)
+	private function _memcache_obj_check ($memcache_obj)
 	{
-		if (get_class($memcache_obj) !== "Memcache")
+		if (!in_array(get_class($memcache_obj), ["Memcache", "Memcached"]))
 		{
-			throw new Exception("Параметры заданые неверно. Не является объектом класса «Memcache»");
+			throw new Exception("Параметры заданые неверно. Не является объектом класса «Memcache» или «Memcached».");
 		}
-		
-		$this->_memcache_obj = $memcache_obj;
 	}
 	
 	/**
-	 * Назначить ресурс dba
+	 * Проверям и назначаем параметры
 	 * 
-	 * @param resource $dba
+	 * @param mixed $param
 	 */
-	private function _dba($dba)
+	private function _dba_param ($param)
 	{
-		if(get_resource_type($dba) !== "dba")
+		/* Разбираем параметры */
+		if (is_string($param))
 		{
-			throw new Exception("Параметры заданые неверно. Не является ресурсом «dba»");
+			$param = (array)$param;
 		}
 		
-		$this->_dba = $dba;
+		$dba_file = $param[0];
+		
+		$dba_type = $this->_dba_type;
+		if (isset($param[1]))
+		{
+			$dba_type = $param[1];
+		}
+		
+		/* Проверяем тип */
+		if (!in_array($dba_type, ["qdbm","db4"]))
+		{
+			throw new Exception("Тип dba файла указан неверно. Доступно: qdbm, db4");
+		}
+		$this->_dba_type = $dba_type;
+
+		/* Проверяем файл dba */
+		if (!is_file($dba_file))
+		{
+			if (($dba = dba_open($dba_file, "c", $this->_dba_type)) === false)
+			{
+				throw new Exception("Файл dba указан неверно.");
+			}
+			dba_close($dba);
+		}
+
+		$this->_dba_file = $dba_file;
 	}
 }
 ?>

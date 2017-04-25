@@ -1,5 +1,5 @@
 <?php
-$item = Menu_Item::delete($_GET['id']);
+$item = Menu_Item::remove($_GET['id']);
 $menu = Menu::get($item['Menu_ID']);
 
 mess_ok("Пункт «{$item['Name']}» из меню «{$menu['Name']}» удалён.");

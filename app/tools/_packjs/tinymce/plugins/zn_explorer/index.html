@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>ZN_Explorer. Проводник</title>
+		<link rel="stylesheet" href="css/basic.css"/>
+		<link rel="stylesheet" href="css/okno.css"/>
+		<link rel="stylesheet" href="css/icon.css"/>
+		<link rel="stylesheet" href="css/index.css"/>
+		<script src="js/jquery-2.1.4.min.js"></script>
+		<script src="js/okno.js"></script>
+		<script src="js/action.js"></script>
+		<script src="js/index.js"></script>
+	</head>
+	<body>
+		<div class="explorer">
+	
+			<!-- Панель управления -->
+			<div class="panel">
+				<div class="check_all">
+					<input id="file_check_all" type="checkbox" value="all"/>
+				</div>
+				<div class="icon_add act_add upload" title="Закачать">
+					<form id="upload">
+						<input name="url" value="" type="hidden">
+						<input name="type" value="all" type="hidden">
+						<input name="file[]" multiple="multiple" required="required" type="file" title="Закачать">
+						<input style="display:none;" type="submit">
+					</form>
+				</div>
+				<div class="icon_dir act_mkdir" title="Создать папку"></div>
+				<div class="icon_rename act_rename" title="Переименовать"></div>
+				<div class="icon_delete act_rm" title="Удалить"></div>
+				<a href="#" target="_blank" class="icon_show act_show" title="Посмотреть"></a>
+			</div>
+
+			<!-- Урл папки -->
+			<div class="path" id="url_dir"></div>
+
+			<!-- Файлы -->
+			<div class="list">
+				<form id="file"></form>
+			</div>
+		</div>
+		
+		<!-- -------------------------- Окна ----------------------------- -->
+		<!-- Окно подтверждения -->
+		<div id="_confirm" class="_okno">
+			<form>
+				<div class="_str"></div>
+				<div class="_down">
+					<div class="_confirm_ok std_button">
+						<div class="icon_active"></div>
+						Да
+					</div>
+					<div class="_confirm_back std_button">
+						<div class="icon_back"></div>
+						Отмена
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<!-- Окно предупреждения -->
+		<div id="_alert" class="_okno">
+			<div class="_str"></div>
+			<div class="_down">
+				<div class="_alert_back std_button">
+					<div class="icon_back"></div>
+					Назад
+				</div>
+			</div>
+		</div>
+
+		<!-- Окно с текстовым полем -->
+		<div id="_prompt" class="_okno">
+			<form>
+				<input name="type" type="hidden" value="all"/>
+				<input name="url" type="hidden" value=""/>
+				<div class="_str"></div>
+				<div class="_input">
+					<input type="text" value="" />
+				</div>
+				<div class="_down">
+					<div class="_prompt_ok std_button">
+						<div class="icon_active"></div>
+						Изменить
+					</div>
+					<div class="_prompt_back std_button">
+						<div class="icon_back"></div>
+						Отмена
+					</div>
+				</div>
+			</form>
+		</div>
+		
+		<!-- Загрузка -->
+		<div id="_loader" class="_loader">
+			<img src="img/loader.gif" width="220" height="19"/>
+		</div>
+		
+		<!-- Перекрытие -->
+		<div id="_overlay" class="_overlay"></div>
+		
+	</body>
+</html>

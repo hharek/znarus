@@ -11,9 +11,9 @@ class _Admin
 	 */
 	public static function is($id)
 	{
-		if (!Chf::uint($id))
+		if (!Type::check("uint", $id))
 		{
-			throw new Exception("Номер у админки задан неверно. " . Chf::error());
+			throw new Exception("Номер у админки задан неверно. " . Type::get_last_error());
 		}
 
 		$query = 
@@ -55,12 +55,12 @@ SQL;
 		/* Файлы */
 		if ($get === true)
 		{
-			self::file_add($identified, "get", $module_id);
+			self::_file_add($identified, "get", $module_id);
 		}
 
 		if ($post === true)
 		{
-			self::file_add($identified, "post", $module_id);
+			self::_file_add($identified, "post", $module_id);
 		}
 
 		/* SQL */
@@ -105,35 +105,35 @@ SQL;
 		/* Файлы GET */
 		if ((bool)$old['Get'] === false and $get === true)
 		{
-			self::file_add($identified, "get", $old['Module_ID']);
+			self::_file_add($identified, "get", $old['Module_ID']);
 		}
 		elseif ((bool)$old['Get'] === true and $get === true)
 		{
 			if ($old['Identified'] !== $identified)
 			{
-				self::file_edit($old['Identified'], $identified, "get", $old['Module_ID']);
+				self::_file_edit($old['Identified'], $identified, "get", $old['Module_ID']);
 			}
 		}
 		elseif ((bool)$old['Get'] === true and $get === false)
 		{
-			self::file_delete($old['Identified'], "get", $old['Module_ID']);
+			self::_file_delete($old['Identified'], "get", $old['Module_ID']);
 		}
 
 		/* Файлы POST */
 		if ((bool)$old['Post'] === false and $post === true)
 		{
-			self::file_add($identified, "post", $old['Module_ID']);
+			self::_file_add($identified, "post", $old['Module_ID']);
 		}
 		elseif ((bool)$old['Post'] === true and $post === true)
 		{
 			if ($old['Identified'] !== $identified)
 			{
-				self::file_edit($old['Identified'], $identified, "post", $old['Module_ID']);
+				self::_file_edit($old['Identified'], $identified, "post", $old['Module_ID']);
 			}
 		}
 		elseif ((bool)$old['Post'] === true and $post === false)
 		{
-			self::file_delete($old['Identified'], "post", $old['Module_ID']);
+			self::_file_delete($old['Identified'], "post", $old['Module_ID']);
 		}
 
 		/* SQL */
@@ -167,12 +167,12 @@ SQL;
 		/* Файлы */
 		if ((bool)$old['Get'] === true)
 		{
-			self::file_delete($old['Identified'], "get", $old['Module_ID']);
+			self::_file_delete($old['Identified'], "get", $old['Module_ID']);
 		}
 
 		if ((bool)$old['Post'] === true)
 		{
-			self::file_delete($old['Identified'], "post", $old['Module_ID']);
+			self::_file_delete($old['Identified'], "post", $old['Module_ID']);
 		}
 
 		/* Удалить */
@@ -342,7 +342,7 @@ SQL;
 	 * @param string $type
 	 * @param int $module_id
 	 */
-	private static function file_add($identified, $type, $module_id)
+	private static function _file_add($identified, $type, $module_id)
 	{
 		$module = _Module::get($module_id);
 		$path_admin = "{$module['Type']}/{$module['Identified']}/admin";
@@ -391,7 +391,7 @@ SQL;
 	 * @param string $type
 	 * @param int $module_id
 	 */
-	private static function file_edit($identified_old, $identified_new, $type, $module_id)
+	private static function _file_edit($identified_old, $identified_new, $type, $module_id)
 	{
 		$module = _Module::get($module_id);
 		$path_admin = "{$module['Type']}/{$module['Identified']}/admin";
@@ -427,7 +427,7 @@ SQL;
 	 * @param type $type
 	 * @param type $module_id
 	 */
-	private static function file_delete($identified, $type, $module_id)
+	private static function _file_delete($identified, $type, $module_id)
 	{
 		$module = _Module::get($module_id);
 		$path_admin = "{$module['Type']}/{$module['Identified']}/admin";

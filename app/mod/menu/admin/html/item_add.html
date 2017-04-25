@@ -23,8 +23,8 @@ function parent_html($item, $level, $current)
 }
 ?>
 
-
 <form>
+	<input type="hidden"  name="Menu_ID" value="<?php echo $menu['ID']; ?>"/>
 	<table class="std_form">
 		<tr>
 			<td>Наименование</td>
@@ -39,10 +39,16 @@ function parent_html($item, $level, $current)
 			</td>
 		</tr>
 		<tr>
+			<td>Иконка</td>
+			<td>
+				<input type="text" name="Icon" />
+			</td>
+		</tr>
+		<tr>
 			<td>Корень</td>
 			<td>
 				<select name="Parent">
-					<option value="0"></option>
+					<option value=""></option>
 					<?php parent_html($item_all, 0, 0); ?>
 				</select>
 			</td>

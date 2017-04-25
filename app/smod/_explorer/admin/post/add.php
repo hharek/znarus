@@ -5,7 +5,7 @@ G::file()->chroot_enable();
 Err::check_field($_POST['file'], "string", false, "file", "Имя файла");
 Err::exception();
 
-if (!empty($_POST['path']) and ! Chf::path($_POST['path']))
+if (!empty($_POST['path']) and ! Type::check("path", $_POST['path']))
 {
 	throw new Exception("Путь задан неверно.");
 }

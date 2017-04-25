@@ -1,0 +1,7 @@
+<ul>
+	<?php foreach ($item as $i): ?>
+		<li>
+			<a href="<?php echo $i['Url']; ?>"><span class="fa fa-<?php echo $i['Icon']; ?>"></span><?php echo $i['Name']; ?></a>
+		</li>
+	<?php endforeach; ?>
+</ul>

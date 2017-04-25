@@ -4,7 +4,7 @@ title("Поиск");
 meta_title("Поиск по сайту");
 meta_description("Здесь вы можете воспользоваться поиском чтобы найти необходимую информацию.");
 tags("поиск по сайту, найти, поиск");
-path(["Поиск [/поиск]"]);
+path(["Поиск [/s]"]);
 
 /* Текущая страница */
 $page = 1;
@@ -28,7 +28,9 @@ try
 	
 	/* Правильный запрос */
 	$query = _Search::$query;
+	$query = trim($query);
 	
+	/* Заголовок */
 	title("Поиск по слову «{$query}»");
 	meta_title("Поиск по слову «{$query}»");
 } 
@@ -43,5 +45,4 @@ if (!empty($result))
 {
 	$page_all = ceil((int)$result['count'] / (int)P::get("_search", "limit"));
 }
-
 ?>

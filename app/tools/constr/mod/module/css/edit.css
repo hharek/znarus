@@ -38,3 +38,20 @@
 		}
 	}
 }
+
+#structure_param
+{
+	.name
+	{
+		overflow: hidden;
+		padding: 1px 1em;
+	}
+	
+	.box
+	{
+		white-space: nowrap;
+		text-align: left;
+		overflow: hidden;
+	}
+	
+}

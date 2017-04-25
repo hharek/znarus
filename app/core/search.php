@@ -98,7 +98,7 @@ XML;
 	public static function find($query, $page = 1)
 	{
 		/* Проверка */
-		$query = self::_delete_bad_symbol($query);
+		$query = self::delete_bad_symbol($query);
 		if (empty($query))
 		{
 			throw new Exception("Укажите слово для поиска.");
@@ -115,11 +115,11 @@ XML;
 		if (!empty($match[0]))
 		{
 			$query = str_replace($match[0], "", $query);
-			$query = self::_delete_bad_symbol($query, false);
+			$query = self::delete_bad_symbol($query, false);
 			
 			foreach ($match[0] as $val)
 			{
-				$tags_ar[] = self::_delete_bad_symbol($val, false);
+				$tags_ar[] = self::delete_bad_symbol($val, false);
 			}
 		}
 		
@@ -165,6 +165,12 @@ XML;
 			$result = self::_find_sphinx($word_ar, $tags_id_ar, $page);
 		}
 		
+		/* Логирование */
+		if ($page === 1)
+		{
+			self::_log($query);
+		}
+		
 		return $result;
 	}
 	
@@ -179,7 +185,7 @@ XML;
 		{
 			return
 			[
-				"url" => "/поиск",
+				"url" => "/s" . URL_END,
 				"title" => "Поиск по сайту",
 				"content" => "Здесь вы можете воспользоваться поиском чтобы найти необходимую информацию.",
 				"tags" => "поиск по сайту, найти, поиск"
@@ -187,6 +193,33 @@ XML;
 		}
 	}
 
+	/**
+	 * Удалить ненужные символы с запроса
+	 * 
+	 * @param string $str
+	 * @return string
+	 */
+	public static function delete_bad_symbol($str, $tags_allow = true)
+	{
+		$str = mb_strtolower($str);
+		$reg = "#[^0-9a-zа-яё\-\_\. ]#isu";
+		if ($tags_allow === true)
+		{
+			$reg = "#[^0-9a-zа-яё\-\_\.\[\] ]#isu";
+		}
+		$str = preg_replace($reg, "", $str);
+		
+		while (strpos($str, "  ") !== false)
+		{
+			$str = str_replace("  ", " ", $str);
+		}
+		$str = trim($str);
+		$str = html_entity_decode($str, ENT_QUOTES, "UTF-8");
+		$str = mb_substr($str, 0, 250);
+		
+		return $str;
+	}
+	
 	/**
 	 * Добавить страницу в индкес
 	 * 
@@ -491,30 +524,18 @@ XML;
 	}
 	
 	/**
-	 * Удалить ненужные символы с запроса
+	 * Логирование запроса
 	 * 
-	 * @param string $str
-	 * @return string
+	 * @param string $query
 	 */
-	private static function _delete_bad_symbol($str, $tags_allow = true)
+	private static function _log($query)
 	{
-		$str = mb_strtolower($str);
-		$reg = "#[^0-9a-zа-яё\-\_\. ]#isu";
-		if ($tags_allow === true)
-		{
-			$reg = "#[^0-9a-zа-яё\-\_\.\[\] ]#isu";
-		}
-		$str = preg_replace($reg, "", $str);
-		
-		while (strpos($str, "  ") !== false)
-		{
-			$str = str_replace("  ", " ", $str);
-		}
-		$str = trim($str);
-		$str = html_entity_decode($str, ENT_QUOTES, "UTF-8");
-		$str = mb_substr($str, 0, 250);
-		
-		return $str;
+		$data = 
+		[
+			"Query" => $query,
+			"IP" => $_SERVER['REMOTE_ADDR']
+		];
+		G::db_core()->insert("search_log", $data);
 	}
 }
 ?>

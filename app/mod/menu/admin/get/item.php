@@ -1,6 +1,6 @@
 <?php
 /* Меню */
-$menu_all = Menu::get_all();
+$menu_all = Menu::selectl();
 
 /* Текущее меню */
 $menu = [];

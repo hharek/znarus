@@ -38,12 +38,14 @@ curl_setopt($ch, CURLOPT_URL, $url_full);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
-$data = json_decode(curl_exec($ch), true);
+$data = curl_exec($ch);
+$data = json_decode($data, true);
 curl_close($ch);
 
 /* Данные */
 $html = $data['html'];
 $inc = $data['inc'];
+$html_part = $data['html_part'];
 $module_exe = $data['module_exe'];
 $exe = $data['exe'];
 

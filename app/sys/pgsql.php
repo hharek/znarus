@@ -4,15 +4,15 @@
  * 
  * @category	Databases
  * @author		Sergeev Denis <hharek@yandex.ru>
- * @copyright	2011 Sergeev Denis
+ * @copyright	2011 - 2016 Sergeev Denis
  * @license		https://github.com/hharek/zn_pgsql/wiki/MIT-License MIT License
- * @version		1.0
+ * @version		2.0
  * @link		https://github.com/hharek/zn_pgsql/
  */
 class _PgSQL
 {
 	/**
-	 * Дескриптор подключения
+	 * Ресурс подключения
 	 * 
 	 * @var resource
 	 */
@@ -89,9 +89,9 @@ class _PgSQL
 	private $_connection_allow = true;
 	
 	/**
-	 * Объект ZN_PgSQL_Result
+	 * Объект результат
 	 * 
-	 * @var object
+	 * @var ZN_PgSQL_Result
 	 */
 	private $_result;
 	
@@ -108,6 +108,13 @@ class _PgSQL
 	 * @var string
 	 */
 	private $_log_file;
+	
+	/**
+	 * Список строк с наименованиями текущих схем объектов. Служит для линкования при клонировании
+	 * 
+	 * @var array
+	 */
+	private static $_schema_current_list;
 
 	/**
 	 * Конструктор
@@ -123,14 +130,14 @@ class _PgSQL
 	 */
 	public function __construct
 	(
-		$host, 
-		$user, 
-		$pass, 
-		$db_name, 
-		$schema = "public", 
-		$port = 5432, 
-		$persistent = false, 
-		$ssl = "disable"
+		string $host, 
+		string $user, 
+		string $pass, 
+		string $db_name, 
+		string $schema = "public", 
+		int $port = 5432, 
+		bool $persistent = false, 
+		string $ssl = "disable"
 	)
 	{
 		/* Проверка */
@@ -154,13 +161,10 @@ class _PgSQL
 			throw new Exception("Схема задана неверно.");
 		}
 
-		$port = (int) $port;
-		if ($port == 0)
+		if ($port === 0)
 		{
 			throw new Exception("Порт задан неверно.");
 		}
-
-		$persistent = (bool) $persistent;
 
 		if (!in_array($ssl, ["disable", "prefer", "require"]))
 		{
@@ -176,14 +180,12 @@ class _PgSQL
 		$this->_port = $port;
 		$this->_persistent = $persistent;
 		$this->_ssl = $ssl;
-
-		/* Возможность клонировать не создавая нового соединения */
-		$this->_db_conn = &$this->_db_conn;
 		
-		/* При клонировании сохранять обозначение текущей схемы */
-		$this->_schema_current = &$this->_schema_current;
+		/* У клонов _schema_current должна ссылаться на одну строку */
+		self::$_schema_current_list[] = "public";
+		$this->_schema_current = &self::$_schema_current_list[max(self::$_schema_current_list)];
 	}
-
+	
 	/**
 	 * Деструктор
 	 */
@@ -199,7 +201,7 @@ class _PgSQL
 	 * @param array $args
 	 * @return ZN_PgSQL_Result
 	 */
-	public function __call($func, $args)
+	public function __call (string $func, array $args) : ZN_PgSQL_Result
 	{
 		/* Создать запрос для функции */
 		$args_number_str = "";
@@ -210,7 +212,7 @@ class _PgSQL
 			{
 				$args_number_ar[] = $i;
 			}
-			$args_number_str = "$". implode(", $", $args_number_ar);
+			$args_number_str = '$' . implode(', $', $args_number_ar);
 		}
 		
 		$query = 
@@ -221,11 +223,13 @@ SQL;
 		/* Выполнить запрос */
 		return $this->query($query, $args);
 	}
-
+	
 	/**
 	 * Соединение
+	 * 
+	 * @return boolean
 	 */
-	public function connect()
+	public function connect() : bool
 	{
 		if (!$this->is_connect())
 		{
@@ -233,11 +237,11 @@ SQL;
 
 			if ($this->_persistent)
 			{
-				$this->_db_conn = @pg_pconnect($str_connect);
+				$this->_db_conn = pg_pconnect($str_connect);
 			}
 			else
 			{
-				$this->_db_conn = @pg_connect($str_connect);
+				$this->_db_conn = pg_connect($str_connect);
 			}
 
 			if (!$this->_db_conn)
@@ -253,7 +257,7 @@ SQL;
 			$result = pg_query($this->_db_conn, $query);
 			if ($result === false)
 			{
-				throw new Exception("Схема указана неверно. ".pg_last_error($this->_db_conn));
+				throw new Exception("Схема указана неверно. " . pg_last_error($this->_db_conn));
 			}
 			pg_free_result($result);
 
@@ -261,12 +265,16 @@ SQL;
 		}
 		
 		$this->_connection_allow = true;
+		
+		return true;
 	}
 
 	/**
 	 * Закрыть соединение
+	 * 
+	 * @return boolean
 	 */
-	public function close()
+	public function close() : bool
 	{
 		if ($this->is_connect())
 		{
@@ -274,12 +282,16 @@ SQL;
 		}
 		
 		$this->_connection_allow = false;
+		
+		return true;
 	}
 
 	/**
 	 * Пересоединение
+	 * 
+	 * @return boolean
 	 */
-	public function reconnect()
+	public function reconnect() : bool
 	{
 		if (!$this->_connection_allow)
 		{
@@ -287,17 +299,22 @@ SQL;
 		}
 		
 		$this->connect();
+		$this->_schema_current = "public";
 
 		if (!pg_connection_reset($this->_db_conn))
 		{
 			throw new Exception("Пересоединение не удалось.");
 		}
+		
+		return true;
 	}
 
 	/**
 	 * Проверить соединение
+	 * 
+	 * @return boolean
 	 */
-	public function is_connect()
+	public function is_connect() : bool
 	{
 		if (!is_resource($this->_db_conn))
 		{
@@ -321,19 +338,13 @@ SQL;
 	 * Показать текущую схему или назначить новую
 	 * 
 	 * @param string $schema
-	 * @return string | null
+	 * @return string
 	 */
-	public function schema($schema = null)
+	public function schema (string $schema = "") : string
 	{
-		/* Показать схему */
-		if ($schema === null)
-		{
-			return $this->_schema;
-		}
 		/* Назначить схему */
-		else
+		if (!empty($schema))
 		{
-			$schema = (string) $schema;
 			$schema = trim($schema);
 
 			if (empty($schema))
@@ -343,6 +354,9 @@ SQL;
 
 			$this->_schema = $schema;
 		}
+		
+		/* Вернуть имя схемы */
+		return $this->_schema;
 	}
 	
 	/**
@@ -352,12 +366,12 @@ SQL;
 	 * @param string|array $params
 	 * @return ZN_PgSQL_Result
 	 */
-	public function query($query, $params = null)
+	public function query (string $query, $params = null) : ZN_PgSQL_Result
 	{
 		/* Проверка */
 		$this->_check_query($query);
 		
-		if (!is_null($params))
+		if ($params !== null)
 		{
 			if (!is_scalar($params) and !is_array($params))
 			{
@@ -397,7 +411,7 @@ SQL;
 		/* Ошибка */
 		if ($result === false)
 		{
-			throw new Exception("Ошибка в запросе. ".pg_last_error($this->_db_conn));
+			throw new Exception("Ошибка в запросе. " . pg_last_error($this->_db_conn));
 		}
 
 		/* Создаём объект для результатов */
@@ -417,8 +431,9 @@ SQL;
 	 * Множественный запрос
 	 * 
 	 * @param string $query
+	 * @return boolean
 	 */
-	public function multi_query($query)
+	public function multi_query (string $query) : bool
 	{
 		/* Проверка (32 Мб) */
 		$this->_check_query($query, 33554432);
@@ -434,9 +449,11 @@ SQL;
 		$result = pg_query($this->_db_conn, $query);
 		if ($result === false)
 		{
-			throw new Exception("Ошибка в запросе. ".pg_last_error($this->_db_conn));
+			throw new Exception("Ошибка в запросе. " . pg_last_error($this->_db_conn));
 		}
 		pg_free_result($result);
+		
+		return true;
 	}
 	
 	/**
@@ -445,7 +462,7 @@ SQL;
 	 * @param string $str
 	 * @return string
 	 */
-	public function escape($str)
+	public function escape (string $str) : string 
 	{
 		if (!$this->is_connect())
 		{
@@ -463,9 +480,9 @@ SQL;
 	 * @param string $table
 	 * @param array $data
 	 * @param string $return
-	 * @return null|string
+	 * @return string
 	 */
-	public function insert($table, $data, $return = null)
+	public function insert (string $table, array $data, string $return = null) : string
 	{
 		/* Проверка */
 		if (!is_string($table))
@@ -494,8 +511,8 @@ SQL;
 			$i++;
 		}
 		
-		$sql_stolb = "\"".implode("\", \"", $stolb)."\"";
-		$sql_values = "\$".implode(", \$", $param_int);
+		$sql_stolb = '"' . implode('", "', $stolb) . '"';
+		$sql_values = '$' . implode(', $', $param_int);
 		
 		/* Запрос */
 		$query = 
@@ -516,6 +533,8 @@ SQL;
 		{
 			$this->query($query, $param);
 		}
+		
+		return "";
 	}
 	
 	/**
@@ -524,8 +543,9 @@ SQL;
 	 * @param string $table
 	 * @param array $data
 	 * @param array $where
+	 * @return boolean
 	 */
-	public function update($table, $data, $where)
+	public function update (string $table, array $data, array $where) : bool
 	{
 		/* Проверка */
 		if (!is_string($table))
@@ -585,6 +605,8 @@ SET
 WHERE {$sql_where}
 SQL;
 		$this->query($query, $param);
+		
+		return true;
 	}
 	
 	/**
@@ -592,8 +614,9 @@ SQL;
 	 * 
 	 * @param string $table
 	 * @param array $where
+	 * @return boolean
 	 */
-	public function delete($table, $where)
+	public function delete (string $table, array $where) : bool
 	{
 		/* Проверка */
 		if (!is_string($table))
@@ -634,12 +657,17 @@ FROM "{$table}"
 WHERE {$sql_where}
 SQL;
 		$this->query($query, $param);
+		
+		return true;
 	}
 
 	/**
 	 * Включить отчёт
+	 * 
+	 * @param string $file
+	 * @return boolean
 	 */
-	public function log_enable($file = null)
+	public function log_enable(string $file = null) : bool
 	{
 		if ($file === null and $this->_log_file === null)
 		{
@@ -670,14 +698,30 @@ SQL;
 		}
 		
 		$this->_log = true;
+		
+		return true;
 	}
 	
 	/**
 	 * Отключить отчёт
+	 * 
+	 * @return boolean
 	 */
-	public function log_disable()
+	public function log_disable() : bool
 	{
 		$this->_log = false;
+		return true;
+	}
+	
+	/**
+	 * Вернуть ресурс подключения
+	 * 
+	 * @return resource
+	 */
+	public function get_db_conn()
+	{
+		$this->connect();
+		return $this->_db_conn;
 	}
 
 	/**
@@ -685,11 +729,10 @@ SQL;
 	 * 
 	 * @param string $query
 	 * @param int $max_length
+	 * @return boolean
 	 */
-	private function _check_query($query, $max_length = 1048576)
+	private function _check_query (string $query, int $max_length = 1048576) : bool
 	{
-		$query = (string) $query;
-
 		/* Пустая строка */
 		$query = trim($query);
 		if (empty($query))
@@ -718,6 +761,8 @@ SQL;
 		{
 			throw new Exception("Запрос задан неверно. Очень большая строка.");
 		}
+		
+		return true;
 	}
 	
 	/**
@@ -725,13 +770,14 @@ SQL;
 	 * 
 	 * @param string $query
 	 * @param array $params
+	 * @return boolean
 	 */
-	private function _log($query, $params)
+	private function _log(string $query, array $params) : bool
 	{
 		/* Отчёт отключён */
 		if ($this->_log !== true)
 		{
-			return;
+			return false;
 		}
 		
 		/* Подготовить запрос */
@@ -747,6 +793,8 @@ SQL;
 		
 		/* Записать запрос */
 		file_put_contents($this->_log_file, $query, FILE_APPEND);
+		
+		return true;
 	}
 }
 
@@ -778,7 +826,7 @@ class ZN_PgSQL_Result
 	 * 
 	 * @return array
 	 */
-	public function assoc()
+	public function assoc() : array
 	{
 		$data = pg_fetch_all($this->_pgsql_result);
 		$this->_free_result();
@@ -798,7 +846,7 @@ class ZN_PgSQL_Result
 	 * 
 	 * @return array
 	 */
-	public function column()
+	public function column() : array
 	{
 		$data = pg_fetch_all_columns($this->_pgsql_result);
 		$this->_free_result();
@@ -818,7 +866,7 @@ class ZN_PgSQL_Result
 	 * 
 	 * @return array
 	 */
-	public function row()
+	public function row() : array
 	{
 		$data = pg_fetch_assoc($this->_pgsql_result);
 		$this->_free_result();
@@ -849,7 +897,6 @@ class ZN_PgSQL_Result
 		{
 			return null;
 		}
-		
 	}
 	
 	/**
@@ -864,11 +911,15 @@ class ZN_PgSQL_Result
 	
 	/**
 	 * Очистить результат запроса
+	 * 
+	 * @return boolean
 	 */
-	private function _free_result()
+	private function _free_result() : bool
 	{
 		pg_free_result($this->_pgsql_result);
 		$this->_pgsql_result = null;
+		
+		return true;
 	}
 }
 ?>

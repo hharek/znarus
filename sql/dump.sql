@@ -11,10 +11,8 @@ SET client_min_messages = warning;
 
 SET search_path = public, pg_catalog;
 
-ALTER TABLE ONLY public.page DROP CONSTRAINT "page_FK_Parent";
-ALTER TABLE ONLY public.page DROP CONSTRAINT "page_FK_Html_ID";
 ALTER TABLE ONLY public.menu_item DROP CONSTRAINT "menu_item_FK_Parent";
-ALTER TABLE ONLY public.menu_item DROP CONSTRAINT "menu_FK_Menu_ID";
+ALTER TABLE ONLY public.menu_item DROP CONSTRAINT "menu_item_FK_Menu_ID";
 SET search_path = core, pg_catalog;
 
 ALTER TABLE ONLY core.user_session DROP CONSTRAINT "user_session_FK_User_ID";
@@ -28,6 +26,8 @@ ALTER TABLE ONLY core.search_index_tags DROP CONSTRAINT "search_index_tags_FK_Ta
 ALTER TABLE ONLY core.search_index_tags DROP CONSTRAINT "search_index_tags_FK_Index_ID";
 ALTER TABLE ONLY core.proc DROP CONSTRAINT "proc_FK_Module_ID";
 ALTER TABLE ONLY core.param DROP CONSTRAINT "param_FK_Module_ID";
+ALTER TABLE ONLY core.page DROP CONSTRAINT "page_FK_Parent";
+ALTER TABLE ONLY core.page DROP CONSTRAINT "page_FK_Html_ID";
 ALTER TABLE ONLY core.packjs_depend DROP CONSTRAINT "packjs_depend_FK_Packjs_ID";
 ALTER TABLE ONLY core.packjs_depend DROP CONSTRAINT "packjs_depend_FK_Depend_ID";
 ALTER TABLE ONLY core.inc DROP CONSTRAINT "inc_FK_Module_ID";
@@ -35,24 +35,23 @@ ALTER TABLE ONLY core.exe DROP CONSTRAINT "exe_FK_Module_ID";
 ALTER TABLE ONLY core.ajax DROP CONSTRAINT "ajax_FK_Module_ID";
 ALTER TABLE ONLY core.admin DROP CONSTRAINT "admin_FK_Module_ID";
 DROP TRIGGER search_index_upd ON core.search_index;
+SET search_path = public, pg_catalog;
+
+DROP INDEX public."menu_item_UN1_NULL";
+DROP INDEX public."menu_item_UN1";
+DROP INDEX public."menu_UN_1";
+SET search_path = core, pg_catalog;
+
 DROP INDEX core."search_index_FTS";
+DROP INDEX core."page_UN2_NULL";
+DROP INDEX core."page_UN2";
+DROP INDEX core."page_UN1_NULL";
+DROP INDEX core."page_UN1";
 DROP INDEX core."exe_UN_Identified";
 SET search_path = public, pg_catalog;
 
-ALTER TABLE ONLY public.page DROP CONSTRAINT "page_UN_Url";
-ALTER TABLE ONLY public.page DROP CONSTRAINT "page_UN_Name";
-ALTER TABLE ONLY public.page DROP CONSTRAINT "page_PK";
-ALTER TABLE ONLY public.news DROP CONSTRAINT "news_UN_Url";
-ALTER TABLE ONLY public.news DROP CONSTRAINT "news_UN_Title";
-ALTER TABLE ONLY public.news DROP CONSTRAINT "news_PK";
-ALTER TABLE ONLY public.menu_item DROP CONSTRAINT "menu_item_UN_Name";
 ALTER TABLE ONLY public.menu_item DROP CONSTRAINT "menu_item_PK";
-ALTER TABLE ONLY public.menu DROP CONSTRAINT "menu_UN_Name";
 ALTER TABLE ONLY public.menu DROP CONSTRAINT "menu_PK";
-ALTER TABLE ONLY public.faq DROP CONSTRAINT "faq_PK";
-ALTER TABLE ONLY public.articles DROP CONSTRAINT "articles_UN_Url";
-ALTER TABLE ONLY public.articles DROP CONSTRAINT "articles_UN_Title";
-ALTER TABLE ONLY public.articles DROP CONSTRAINT "articles_PK";
 SET search_path = core, pg_catalog;
 
 ALTER TABLE ONLY core.user_session DROP CONSTRAINT "user_session_PK";
@@ -72,6 +71,7 @@ ALTER TABLE ONLY core.seo_redirect DROP CONSTRAINT "seo_redirect_UN_From";
 ALTER TABLE ONLY core.seo_redirect DROP CONSTRAINT "seo_redirect_PK";
 ALTER TABLE ONLY core.search_tags DROP CONSTRAINT "search_tags_UN_Name";
 ALTER TABLE ONLY core.search_tags DROP CONSTRAINT "search_tags_PK";
+ALTER TABLE ONLY core.search_log DROP CONSTRAINT "search_log_PK";
 ALTER TABLE ONLY core.search_index_tags DROP CONSTRAINT "search_index_tags_PK";
 ALTER TABLE ONLY core.search_index DROP CONSTRAINT "search_index_UN_Url";
 ALTER TABLE ONLY core.search_index DROP CONSTRAINT "search_index_PK";
@@ -81,6 +81,7 @@ ALTER TABLE ONLY core.proc DROP CONSTRAINT "proc_PK";
 ALTER TABLE ONLY core.param DROP CONSTRAINT "param_UN_Name";
 ALTER TABLE ONLY core.param DROP CONSTRAINT "param_UN_Identified";
 ALTER TABLE ONLY core.param DROP CONSTRAINT "param_PK";
+ALTER TABLE ONLY core.page DROP CONSTRAINT "page_PK";
 ALTER TABLE ONLY core.packjs_depend DROP CONSTRAINT "packjs_depend_PK";
 ALTER TABLE ONLY core.packjs DROP CONSTRAINT "packjs_UN_Name";
 ALTER TABLE ONLY core.packjs DROP CONSTRAINT "packjs_UN_Identified";
@@ -108,14 +109,9 @@ SET search_path = core, pg_catalog;
 
 SET search_path = public, pg_catalog;
 
-ALTER TABLE public.page ALTER COLUMN "ID" DROP DEFAULT;
-ALTER TABLE public.news ALTER COLUMN "ID" DROP DEFAULT;
-ALTER TABLE public.menu_item ALTER COLUMN "Sort" DROP DEFAULT;
+ALTER TABLE public.menu_item ALTER COLUMN "Order" DROP DEFAULT;
 ALTER TABLE public.menu_item ALTER COLUMN "ID" DROP DEFAULT;
 ALTER TABLE public.menu ALTER COLUMN "ID" DROP DEFAULT;
-ALTER TABLE public.faq ALTER COLUMN "Sort" DROP DEFAULT;
-ALTER TABLE public.faq ALTER COLUMN "ID" DROP DEFAULT;
-ALTER TABLE public.articles ALTER COLUMN "ID" DROP DEFAULT;
 SET search_path = core, pg_catalog;
 
 ALTER TABLE core.user_group ALTER COLUMN "ID" DROP DEFAULT;
@@ -125,10 +121,12 @@ ALTER TABLE core.task ALTER COLUMN "ID" DROP DEFAULT;
 ALTER TABLE core.seo_url ALTER COLUMN "ID" DROP DEFAULT;
 ALTER TABLE core.seo_redirect ALTER COLUMN "ID" DROP DEFAULT;
 ALTER TABLE core.search_tags ALTER COLUMN "ID" DROP DEFAULT;
+ALTER TABLE core.search_log ALTER COLUMN "ID" DROP DEFAULT;
 ALTER TABLE core.search_index ALTER COLUMN "ID" DROP DEFAULT;
 ALTER TABLE core.proc ALTER COLUMN "Order" DROP DEFAULT;
 ALTER TABLE core.proc ALTER COLUMN "ID" DROP DEFAULT;
 ALTER TABLE core.param ALTER COLUMN "ID" DROP DEFAULT;
+ALTER TABLE core.page ALTER COLUMN "ID" DROP DEFAULT;
 ALTER TABLE core.packjs ALTER COLUMN "ID" DROP DEFAULT;
 ALTER TABLE core.module ALTER COLUMN "ID" DROP DEFAULT;
 ALTER TABLE core.inc ALTER COLUMN "ID" DROP DEFAULT;
@@ -139,18 +137,10 @@ ALTER TABLE core.admin ALTER COLUMN "Sort" DROP DEFAULT;
 ALTER TABLE core.admin ALTER COLUMN "ID" DROP DEFAULT;
 SET search_path = public, pg_catalog;
 
-DROP SEQUENCE public.page_seq;
-DROP TABLE public.page;
-DROP SEQUENCE public.news_seq;
-DROP TABLE public.news;
 DROP SEQUENCE public.menu_seq;
 DROP SEQUENCE public.menu_item_seq;
 DROP TABLE public.menu_item;
 DROP TABLE public.menu;
-DROP SEQUENCE public.faq_seq;
-DROP TABLE public.faq;
-DROP SEQUENCE public.articles_seq;
-DROP TABLE public.articles;
 SET search_path = core, pg_catalog;
 
 DROP TABLE core.user_session;
@@ -169,6 +159,8 @@ DROP SEQUENCE core.seo_redirect_seq;
 DROP TABLE core.seo_redirect;
 DROP SEQUENCE core.search_tags_seq;
 DROP TABLE core.search_tags;
+DROP SEQUENCE core.search_log_seq;
+DROP TABLE core.search_log;
 DROP TABLE core.search_index_tags;
 DROP SEQUENCE core.search_index_seq;
 DROP TABLE core.search_index;
@@ -176,6 +168,8 @@ DROP SEQUENCE core.proc_seq;
 DROP TABLE core.proc;
 DROP SEQUENCE core.param_seq;
 DROP TABLE core.param;
+DROP SEQUENCE core.page_seq;
+DROP TABLE core.page;
 DROP SEQUENCE core.packjs_seq;
 DROP TABLE core.packjs_depend;
 DROP TABLE core.packjs;
@@ -191,29 +185,10 @@ DROP SEQUENCE core.ajax_seq;
 DROP TABLE core.ajax;
 DROP SEQUENCE core.admin_seq;
 DROP TABLE core.admin;
-SET search_path = public, pg_catalog;
-
-DROP FUNCTION public.page_is(id integer);
-DROP FUNCTION public.page_html_by_id(id integer);
-DROP FUNCTION public.page_get(id integer);
-DROP FUNCTION public.page_all();
-DROP FUNCTION public.news_url_all();
-DROP FUNCTION public.news_is(id integer);
-DROP FUNCTION public.news_get(id integer);
-DROP FUNCTION public.news_all();
-DROP FUNCTION public.menu_item_is(id integer);
-DROP FUNCTION public.menu_item_by_parent(menu_id integer, parent integer);
-DROP FUNCTION public.menu_is(id integer);
-DROP FUNCTION public.faq_all();
-DROP FUNCTION public.articles_url_all();
-DROP FUNCTION public.articles_is(id integer);
-DROP FUNCTION public.articles_get(id integer);
-DROP FUNCTION public.articles_all();
-SET search_path = core, pg_catalog;
-
 DROP FUNCTION core.text_get(module_identified character varying, identified character varying);
 DROP FUNCTION core.show_index("table" character varying);
 DROP FUNCTION core.seo_url_by_url(url character varying);
+DROP FUNCTION core.seo_redirect_get_by_from("from" pg_catalog.text);
 DROP FUNCTION core.seo_redirect_all();
 DROP FUNCTION core.search_tags_get_by_name(name character varying);
 DROP FUNCTION core.search_tags_add(name character varying);
@@ -229,6 +204,7 @@ DROP FUNCTION core.inc_by_identified(module_identified character varying, identi
 DROP FUNCTION core.html_is_identified(identified character varying);
 DROP FUNCTION core.html_by_identified(identified character varying);
 DROP FUNCTION core.exe_by_identified(module_identified character varying, identified character varying);
+DROP FUNCTION core.ajax_by_identified(module_identified character varying, ajax_identified character varying);
 DROP TYPE core.task_status;
 DROP TYPE core.param_type;
 DROP TYPE core.module_access;
@@ -278,18 +254,11 @@ SET search_path = core, pg_catalog;
 --
 
 CREATE TYPE ajax_data_type AS ENUM (
+    'json',
     'html',
     'text',
-    'json',
-    'json_std'
+    'json_page'
 );
-
-
---
--- Name: TYPE ajax_data_type; Type: COMMENT; Schema: core; Owner: -
---
-
-COMMENT ON TYPE ajax_data_type IS 'Аякс. Тип возвращаемых данных';
 
 
 --
@@ -347,29 +316,100 @@ COMMENT ON TYPE task_status IS 'Статус задачи (задание соз
 
 
 --
+-- Name: ajax_by_identified(character varying, character varying); Type: FUNCTION; Schema: core; Owner: -
+--
+
+CREATE FUNCTION ajax_by_identified(module_identified character varying, ajax_identified character varying) RETURNS TABLE("ID" integer, "Name" character varying, "Identified" character varying, "Data_Type" ajax_data_type, "Get" integer, "Post" integer, "Cache" integer, "Module_ID" integer, "Module_Identified" character varying)
+    LANGUAGE plpgsql
+    AS $_$
+
+BEGIN
+
+	RETURN QUERY SELECT
+
+		"a"."ID",
+
+		"a"."Name",
+
+		"a"."Identified",
+
+		"a"."Data_Type",
+
+		"a"."Get"::int,
+
+		"a"."Post"::int,
+
+		"a"."Cache"::int,
+
+		"m"."ID" as "Module_ID",
+
+		"m"."Identified" as "Module_Identified"
+
+	FROM
+
+		"ajax" as "a",
+
+		"module" as "m"
+
+	WHERE
+
+		"a"."Identified" = $2 AND
+
+		"a"."Active" = true AND
+
+		"a"."Module_ID" = "m"."ID" AND
+
+		"m"."Identified" = $1 AND
+
+		"m"."Active" = true;
+
+END;
+
+$_$;
+
+
+--
 -- Name: exe_by_identified(character varying, character varying); Type: FUNCTION; Schema: core; Owner: -
 --
 
 CREATE FUNCTION exe_by_identified(module_identified character varying, identified character varying) RETURNS TABLE("ID" integer, "Name" character varying, "Identified" character varying, "Module_ID" integer, "Cache_Route" integer, "Cache_Page" integer, "Active" integer)
     LANGUAGE plpgsql
     AS $_$
+
 BEGIN
+
 	RETURN QUERY SELECT
+
 		"e"."ID",
+
 		"e"."Name",
+
 		"e"."Identified",
+
 		"e"."Module_ID",
+
 		"e"."Cache_Route"::int,
+
 		"e"."Cache_Page"::int,
+
 		"e"."Active"::int
+
 	FROM
+
 		"exe" as "e",
+
 		"module" as "m"
+
 	WHERE
+
 		"e"."Identified" = $2 AND
+
 		"e"."Module_ID" = "m"."ID" AND
+
 		"m"."Identified" = $1;
+
 END;
+
 $_$;
 
 
@@ -380,16 +420,27 @@ $_$;
 CREATE FUNCTION html_by_identified(identified character varying) RETURNS TABLE("ID" integer, "Name" character varying, "Identified" character varying)
     LANGUAGE plpgsql
     AS $_$
+
 BEGIN
+
 	RETURN QUERY SELECT
+
 		"h"."ID",
+
 		"h"."Name",
+
 		"h"."Identified"
+
 	FROM
+
 		"html" as "h"
+
 	WHERE
+
 		"h"."Identified" = $1;
+
 END;
+
 $_$;
 
 
@@ -400,20 +451,33 @@ $_$;
 CREATE FUNCTION html_is_identified(identified character varying) RETURNS integer
     LANGUAGE plpgsql
     AS $_$
+
 DECLARE html_exists int;
+
 BEGIN
+
 	SELECT INTO html_exists EXISTS
+
 	(
+
 		SELECT
+
 			true
+
 		FROM
+
 			"html"
+
 		WHERE
+
 			"Identified" = $1
+
 	)::int;
 
 	RETURN html_exists;
+
 END;
+
 $_$;
 
 
@@ -424,23 +488,41 @@ $_$;
 CREATE FUNCTION inc_by_identified(module_identified character varying, identified character varying) RETURNS TABLE("ID" integer, "Name" character varying, "Identified" character varying, "Active" integer, "Module_ID" integer, "Module_Identified" character varying, "Module_Name" character varying)
     LANGUAGE plpgsql
     AS $_$
+
 BEGIN
+
 	RETURN QUERY SELECT
+
 		"i"."ID",
+
 		"i"."Name",
+
 		"i"."Identified",
+
 		"i"."Active"::int,
+
 		"m"."ID" as "Module_ID",
+
 		"m"."Identified" as "Module_Identified",
+
 		"m"."Name" as "Module_Name"
+
 	FROM
+
 		"inc" as "i",
+
 		"module" as "m"
+
 	WHERE
+
 		"i"."Identified" = $2 AND
+
 		"i"."Module_ID" = "m"."ID" AND
+
 		"m"."Identified" = $1;
+
 END;
+
 $_$;
 
 
@@ -451,18 +533,31 @@ $_$;
 CREATE FUNCTION module_by_identified(identified character varying) RETURNS TABLE("ID" integer, "Name" character varying, "Identified" character varying, "Access" module_access, "Active" integer)
     LANGUAGE plpgsql
     AS $_$
+
 BEGIN
+
 	RETURN QUERY SELECT
+
 		"m"."ID",
+
 		"m"."Name",
+
 		"m"."Identified",
+
 		"m"."Access",
+
 		"m"."Active"::int
+
 	FROM
+
 		"module" as "m"
+
 	WHERE
+
 		"m"."Identified" = $1;
+
 END;
+
 $_$;
 
 
@@ -473,39 +568,73 @@ $_$;
 CREATE FUNCTION module_by_type(type character varying, only_active integer DEFAULT 0, access character varying DEFAULT 'all'::character varying) RETURNS TABLE("ID" integer, "Name" character varying, "Identified" character varying, "Description" pg_catalog.text, "Version" character varying, "Active" integer, "Type" character varying, "Access" character varying)
     LANGUAGE plpgsql
     AS $_$
+
 BEGIN
+
 	RETURN QUERY SELECT
+
 		"m"."ID",
+
 		"m"."Name", 
+
 		"m"."Identified", 
+
 		"m"."Description", 
+
 		"m"."Version", 
+
 		"m"."Active"::int,
+
 		CASE LEFT("m"."Identified", 1)
+
 			WHEN '_' THEN 'smod'::varchar
+
 			ELSE 'mod'::varchar
+
 		END as "Type",
+
 		"m"."Access"::varchar
+
 	FROM 
+
 		"module" as "m"
+
 	WHERE 
+
 		(
+
 			($1 = 'all') OR
+
 			($1 = 'smod' AND LEFT ("m"."Identified", 1) = '_') OR
+
 			($1 = 'mod' AND LEFT ("m"."Identified", 1) != '_')
+
 		) AND
+
 		(
+
 			($2 = 1 AND "m"."Active" = true) OR
+
 			($2 = 0)
+
 		) AND
+
 		(
+
 			($3 = 'all') OR
+
 			("m"."Access"::varchar = $3)
+
 		)
+
 	ORDER BY 
+
 		"Type" DESC,
+
 		"m"."Identified" ASC;
+
 END;
+
 $_$;
 
 
@@ -516,22 +645,39 @@ $_$;
 CREATE FUNCTION module_page_info() RETURNS TABLE("ID" integer, "Name" character varying, "Identified" character varying, "Type" character varying, "Page_Info_Function" character varying)
     LANGUAGE plpgsql
     AS $$
+
 BEGIN
+
 	RETURN QUERY SELECT
+
 		"m"."ID",
+
 		"m"."Name",
+
 		"m"."Identified",
+
 		CASE LEFT("m"."Identified", 1)
+
 			WHEN '_' THEN 'smod'::varchar
+
 			ELSE 'mod'::varchar
+
 		END as "Type",
+
 		"m"."Page_Info_Function"
+
 	FROM
+
 		"module" as "m"
+
 	WHERE
+
 		"m"."Active" = true AND
+
 		"m"."Page_Info_Function" IS NOT NULL;
+
 END;
+
 $$;
 
 
@@ -542,34 +688,63 @@ $$;
 CREATE FUNCTION param_get(module_identified character varying, identified character varying) RETURNS TABLE("ID" integer, "Name" character varying, "Identified" character varying, "Type" param_type, "Value" character varying)
     LANGUAGE plpgsql
     AS $_$
+
 BEGIN
+
 	RETURN QUERY SELECT 
+
 		"p"."ID", 
+
 		"p"."Name", 
+
 		"p"."Identified", 
+
 		"p"."Type", 
+
 		"p"."Value"
+
 	FROM 
+
 		"param" as "p"
+
 	WHERE 
+
 		"p"."Identified" = $2 AND
+
 		(
+
 			(
+
 				$1 != 'sys' AND
+
 				"p"."Module_ID" IN 
+
 				(
+
 					SELECT 
+
 						"m"."ID"
+
 					FROM
+
 						"module" as "m"
+
 					WHERE
+
 						"m"."Identified" = $1
+
 				)
+
 			) OR
+
 			$1 = 'sys' AND
+
 			"p"."Module_ID" IS NULL
+
 		);
+
 END;
+
 $_$;
 
 
@@ -580,32 +755,59 @@ $_$;
 CREATE FUNCTION proc_all(only_active integer) RETURNS TABLE("ID" integer, "Identified" character varying, "Name" character varying, "Active" integer, "Module_ID" integer, "Module_Identified" character varying, "Module_Name" character varying, "Module_Active" integer)
     LANGUAGE plpgsql
     AS $_$
+
 BEGIN
+
 	RETURN QUERY SELECT 
+
 		"p"."ID",
+
 		"p"."Identified",
+
 		"p"."Name",
+
 		"p"."Active"::int,
+
 		"m"."ID" as "Module_ID",
+
 		"m"."Identified" as "Module_Identified", 
+
 		"m"."Name" as "Module_Name",
+
 		"m"."Active"::int
+
 	FROM 
+
 		"proc" as "p",
+
 		"module" as "m"
+
 	WHERE
+
 		(
+
 			($1 = 1 AND "p"."Active" = true) OR
+
 			($1 = 0)
+
 		) AND
+
 		"p"."Module_ID" = "m"."ID" AND
+
 		(
+
 			($1 = 1 AND "m"."Active" = true) OR
+
 			($1 = 0)
+
 		)
+
 	ORDER BY
+
 		"p"."Order" ASC;
+
 END;
+
 $_$;
 
 
@@ -616,40 +818,75 @@ $_$;
 CREATE FUNCTION search_index_find(word character varying, tags_id character varying, "offset" integer, "limit" integer) RETURNS TABLE("ID" integer, "Url" character varying, "Title" character varying, "Content" pg_catalog.text, "Tags" character varying)
     LANGUAGE plpgsql
     AS $_$
+
 BEGIN
+
 	RETURN QUERY SELECT
+
 		"i"."ID",
+
 		"i"."Url",
+
 		"i"."Title",
+
 		"i"."Content",
+
 		"i"."Tags"
+
 	FROM
+
 		"search_index" as "i"
+
 	WHERE
+
 		(
+
 			TRIM($2) = '' OR
+
 			(
+
 				TRIM($2) != '' AND
+
 				"i"."ID" IN 
+
 				(
+
 					SELECT 
+
 						"si"."Index_ID"
+
 					FROM
+
 						"search_index_tags" as "si"
+
 					WHERE
+
 						"si"."Tags_ID" = ANY ($2::int[])
+
 				)
+
 			)
+
 		) 
+
 		AND
+
 		(
+
 			TRIM($1) = '' OR
+
 			TRIM($1) != '' AND
+
 			"i"."FTS" @@ to_tsquery('russian', $1)
+
 		)
+
 	OFFSET $3
+
 	LIMIT $4;
+
 END;
+
 $_$;
 
 
@@ -660,37 +897,67 @@ $_$;
 CREATE FUNCTION search_index_find_count(word character varying, tags_id character varying) RETURNS integer
     LANGUAGE plpgsql
     AS $_$
+
 DECLARE count int;
+
 BEGIN
+
 	SELECT INTO count
+
 		COUNT(*)
+
 	FROM
+
 		"search_index" as "i"
+
 	WHERE
+
 	(
+
 		TRIM($2) = '' OR
+
 		(
+
 			TRIM($2) != '' AND
+
 			"i"."ID" IN 
+
 			(
+
 				SELECT 
+
 					"si"."Index_ID"
+
 				FROM
+
 					"search_index_tags" as "si"
+
 				WHERE
+
 					"si"."Tags_ID" = ANY ($2::int[])
+
 			)
+
 		)
+
 	) 
+
 	AND
+
 	(
+
 		TRIM($1) = '' OR
+
 		TRIM($1) != '' AND
+
 		"i"."FTS" @@ to_tsquery('russian', $1)
+
 	);
 
 	RETURN count;
+
 END;
+
 $_$;
 
 
@@ -701,14 +968,23 @@ $_$;
 CREATE FUNCTION search_index_upd_trigger() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
+
 begin
+
 	new."FTS" := 
+
 		setweight(coalesce(to_tsvector('russian', new."Url"), ''), 'A') || ' ' || 
+
 		setweight(coalesce(to_tsvector('russian', new."Title"), ''), 'C') || ' ' ||
+
 		setweight(coalesce(to_tsvector('russian', new."Content"), ''), 'D') || ' ' ||
+
 		setweight(coalesce(to_tsvector('russian', new."Tags"), ''), 'B');
+
 	return new;
+
 end
+
 $$;
 
 
@@ -719,42 +995,73 @@ $$;
 CREATE FUNCTION search_tags_add(name character varying) RETURNS integer
     LANGUAGE plpgsql
     AS $_$
+
 DECLARE tags_isset bool;
+
 DECLARE tags_id int;
+
 BEGIN
+
 	tags_isset := EXISTS
+
 	(
+
 		SELECT 
+
 			true
+
 		FROM
+
 			"search_tags"
+
 		WHERE
+
 			"Name" = $1
+
 	);
 
 	IF tags_isset = false
+
 	THEN
+
 		INSERT INTO "search_tags" ("Name") 
+
 		VALUES ($1) 
+
 		RETURNING "ID" INTO tags_id;
+
 	ELSE
+
 		UPDATE	
+
 			"search_tags"
+
 		SET 
+
 			"Count" = "Count" + 1
+
 		WHERE
+
 			"Name" = $1;
-	
+
 		SELECT INTO tags_id 
+
 			"ID"
+
 		FROM
+
 			"search_tags"
+
 		WHERE
+
 			"Name" = $1;
+
 	END IF;
 
 	RETURN tags_id;
+
 END;
+
 $_$;
 
 
@@ -765,16 +1072,27 @@ $_$;
 CREATE FUNCTION search_tags_get_by_name(name character varying) RETURNS TABLE("ID" integer, "Name" character varying, "Count" integer)
     LANGUAGE plpgsql
     AS $_$
+
 BEGIN
+
 	RETURN QUERY SELECT
+
 		"t"."ID",
+
 		"t"."Name",
+
 		"t"."Count"
+
 	FROM
+
 		"search_tags" as "t"
+
 	WHERE
+
 		"t"."Name" = $1;
+
 END;
+
 $_$;
 
 
@@ -782,21 +1100,66 @@ $_$;
 -- Name: seo_redirect_all(); Type: FUNCTION; Schema: core; Owner: -
 --
 
-CREATE FUNCTION seo_redirect_all() RETURNS TABLE("ID" integer, "From" character varying, "To" character varying, "Location" integer)
+CREATE FUNCTION seo_redirect_all() RETURNS TABLE("ID" integer, "From" pg_catalog.text, "To" pg_catalog.text, "Location" integer)
     LANGUAGE plpgsql
     AS $$
+
 BEGIN
+
 	RETURN QUERY SELECT
+
 		"r"."ID",
+
 		"r"."From",
+
 		"r"."To",
+
 		"r"."Location"::int
+
 	FROM
+
 		"seo_redirect" as "r"
+
 	ORDER BY
+
 		"r"."From" ASC;
+
 END;
+
 $$;
+
+
+--
+-- Name: seo_redirect_get_by_from(pg_catalog.text); Type: FUNCTION; Schema: core; Owner: -
+--
+
+CREATE FUNCTION seo_redirect_get_by_from("from" pg_catalog.text) RETURNS TABLE("ID" integer, "From" pg_catalog.text, "To" pg_catalog.text, "Location" integer)
+    LANGUAGE plpgsql
+    AS $_$
+
+BEGIN
+
+	RETURN QUERY SELECT
+
+		"r"."ID",
+
+		"r"."From",
+
+		"r"."To",
+
+		"r"."Location"::int
+
+	FROM
+
+		"seo_redirect" as "r"
+
+	WHERE
+
+		"r"."From" = $1;
+
+END;
+
+$_$;
 
 
 --
@@ -806,18 +1169,31 @@ $$;
 CREATE FUNCTION seo_url_by_url(url character varying) RETURNS TABLE("ID" integer, "Url" character varying, "Title" character varying, "Keywords" pg_catalog.text, "Description" pg_catalog.text)
     LANGUAGE plpgsql
     AS $_$
+
 BEGIN
+
 	RETURN QUERY SELECT
+
 		"u"."ID",
+
 		"u"."Url",
+
 		"u"."Title",
+
 		"u"."Keywords",
+
 		"u"."Description"
+
 	FROM
+
 		"seo_url" as "u"
+
 	WHERE
+
 		"u"."Url" ILIKE $1;
+
 END;
+
 $_$;
 
 
@@ -828,14 +1204,23 @@ $_$;
 CREATE FUNCTION show_index("table" character varying) RETURNS TABLE(pg_get_indexdef pg_catalog.text)
     LANGUAGE plpgsql
     AS $_$
+
 BEGIN
+
 	RETURN QUERY SELECT 
+
 		pg_get_indexdef(indexrelid)::text
+
 	FROM 
+
 		pg_index 
+
 	WHERE 
+
 		indrelid = $1::regclass;
+
 END;
+
 $_$;
 
 
@@ -846,400 +1231,67 @@ $_$;
 CREATE FUNCTION text_get(module_identified character varying, identified character varying) RETURNS TABLE("ID" integer, "Name" character varying, "Identified" character varying, "Value" pg_catalog.text)
     LANGUAGE plpgsql
     AS $_$
+
 BEGIN
+
 	RETURN QUERY SELECT 
+
 		"t"."ID", 
+
 		"t"."Name", 
+
 		"t"."Identified", 
+
 		"t"."Value"
+
 	FROM 
+
 		"text" as "t"
+
 	WHERE 
+
 		"t"."Identified" = $2 AND
+
 		(
+
 			(
+
 				$1 != 'sys' AND
+
 				"t"."Module_ID" IN 
+
 				(
+
 					SELECT 
+
 						"m"."ID"
+
 					FROM
+
 						"module" as "m"
+
 					WHERE
+
 						"m"."Identified" = $1
+
 				)
+
 			) OR
+
 			(
+
 				$1 = 'sys' AND
+
 				"t"."Module_ID" IS NULL
+
 			)
+
 		);
+
 END;
+
 $_$;
 
-
-SET search_path = public, pg_catalog;
-
---
--- Name: articles_all(); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION articles_all() RETURNS TABLE("ID" integer, "Date" date, "Title" character varying, "Url" character varying, "Anons" text, "Last_Modified" timestamp without time zone)
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-	RETURN QUERY SELECT 
-		"a"."ID",
-		"a"."Date",
-		"a"."Title",
-		"a"."Url",
-		"a"."Anons",
-		"a"."Last_Modified"
-	FROM 
-		"articles" as "a"
-	ORDER BY
-		"a"."Date" DESC;
-END;
-$$;
-
-
---
--- Name: articles_get(integer); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION articles_get(id integer) RETURNS TABLE("ID" integer, "Date" date, "Title" character varying, "Url" character varying, "Anons" text, "Content" text, "Tags" character varying, "Last_Modified" timestamp without time zone)
-    LANGUAGE plpgsql
-    AS $_$
-BEGIN
-	RETURN QUERY SELECT 
-		"a"."ID", 
-		"a"."Date", 
-		"a"."Title", 
-		"a"."Url", 
-		"a"."Anons", 
-		"a"."Content",
-		"a"."Tags",
-		"a"."Last_Modified"
-	FROM 
-		"articles" as "a"
-	WHERE
-		"a"."ID" = $1;
-END;
-$_$;
-
-
---
--- Name: articles_is(integer); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION articles_is(id integer) RETURNS integer
-    LANGUAGE plpgsql
-    AS $_$
-BEGIN
-	RETURN EXISTS
-	(
-		SELECT 
-			true
-		FROM
-			"articles"
-		WHERE
-			"ID" = $1
-	)::int;
-END;
-$_$;
-
-
---
--- Name: articles_url_all(); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION articles_url_all() RETURNS TABLE("ID" integer, "Url" character varying)
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-	RETURN QUERY SELECT 
-		"a"."ID",
-		"a"."Url"
-	FROM 
-		"articles" as "a"
-	ORDER BY
-		"a"."Url" DESC;
-END;
-$$;
-
-
---
--- Name: faq_all(); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION faq_all() RETURNS TABLE("ID" integer, "Question" text, "Answer" text, "Sort" integer)
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-	RETURN QUERY SELECT 
-		"f"."ID", 
-		"f"."Question",
-		"f"."Answer",
-		"f"."Sort"
-	FROM 
-		"faq" as "f"
-	ORDER BY
-		"f"."Sort" ASC;
-END;
-$$;
-
-
---
--- Name: menu_is(integer); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION menu_is(id integer) RETURNS integer
-    LANGUAGE plpgsql
-    AS $_$
-BEGIN
-	RETURN EXISTS
-	(
-		SELECT 
-			true
-		FROM
-			"menu"
-		WHERE
-			"ID" = $1
-	)::int;
-END;
-$_$;
-
-
---
--- Name: menu_item_by_parent(integer, integer); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION menu_item_by_parent(menu_id integer, parent integer) RETURNS TABLE("ID" integer, "Name" character varying, "Url" character varying)
-    LANGUAGE plpgsql
-    AS $_$
-BEGIN
-	RETURN QUERY SELECT
-		"mi"."ID",
-		"mi"."Name",
-		"mi"."Url"
-	FROM 
-		"menu_item" as "mi"
-	WHERE
-		COALESCE("mi"."Menu_ID", 0) = $1 AND
-		COALESCE("mi"."Parent", 0) = $2
-	ORDER BY 
-		"mi"."Sort" ASC;
-END;
-$_$;
-
-
---
--- Name: menu_item_is(integer); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION menu_item_is(id integer) RETURNS integer
-    LANGUAGE plpgsql
-    AS $_$
-BEGIN
-	RETURN EXISTS
-	(
-		SELECT 
-			true
-		FROM
-			"menu_item"
-		WHERE
-			"ID" = $1
-	)::int;
-END;
-$_$;
-
-
---
--- Name: news_all(); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION news_all() RETURNS TABLE("ID" integer, "Date" date, "Title" character varying, "Url" character varying, "Anons" text, "Last_Modified" timestamp without time zone)
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-	RETURN QUERY SELECT 
-		"n"."ID",
-		"n"."Date",
-		"n"."Title",
-		"n"."Url",
-		"n"."Anons",
-		"n"."Last_Modified"
-	FROM 
-		"news" as "n"
-	ORDER BY
-		"n"."Date" DESC;
-END;
-$$;
-
-
---
--- Name: news_get(integer); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION news_get(id integer) RETURNS TABLE("ID" integer, "Date" date, "Title" character varying, "Url" character varying, "Anons" text, "Content" text, "Tags" character varying, "Last_Modified" timestamp without time zone)
-    LANGUAGE plpgsql
-    AS $_$
-BEGIN
-	RETURN QUERY SELECT 
-		"n"."ID", 
-		"n"."Date", 
-		"n"."Title", 
-		"n"."Url", 
-		"n"."Anons", 
-		"n"."Content",
-		"n"."Tags",
-		"n"."Last_Modified"
-	FROM 
-		"news" as "n"
-	WHERE
-		"n"."ID" = $1;
-END;
-$_$;
-
-
---
--- Name: news_is(integer); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION news_is(id integer) RETURNS integer
-    LANGUAGE plpgsql
-    AS $_$
-BEGIN
-	RETURN EXISTS
-	(
-		SELECT 
-			true
-		FROM
-			"news"
-		WHERE
-			"ID" = $1
-	)::int;
-END;
-$_$;
-
-
---
--- Name: news_url_all(); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION news_url_all() RETURNS TABLE("ID" integer, "Url" character varying)
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-	RETURN QUERY SELECT 
-		"n"."ID",
-		"n"."Url"
-	FROM 
-		"news" as "n"
-	ORDER BY
-		"n"."Url" DESC;
-END;
-$$;
-
-
---
--- Name: page_all(); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION page_all() RETURNS TABLE("ID" integer, "Name" character varying, "Url" character varying, "Parent" integer)
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-	RETURN QUERY SELECT 
-		"p"."ID", 
-		"p"."Name", 
-		"p"."Url",
-		COALESCE("p"."Parent", 0) as "Parent"
-	FROM 
-		"page" as "p"
-	ORDER BY 
-		"p"."Name" ASC,
-		"p"."Parent" ASC;
-END;
-$$;
-
-
---
--- Name: FUNCTION page_all(); Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON FUNCTION page_all() IS 'Все страницы';
-
-
---
--- Name: page_get(integer); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION page_get(id integer) RETURNS TABLE("ID" integer, "Name" character varying, "Url" character varying, "Content" text, "Tags" character varying, "Parent" integer, "Html_ID" integer, "Last_Modified" timestamp without time zone)
-    LANGUAGE plpgsql
-    AS $_$
-BEGIN
-	RETURN QUERY SELECT
-		"p"."ID", 
-		"p"."Name",
-		"p"."Url",
-		"p"."Content",
-		"p"."Tags",
-		COALESCE("p"."Parent", 0) as "Parent",
-		COALESCE("p"."Html_ID", 0) as "Html_ID",
-		"p"."Last_Modified"
-	FROM 
-		"page" as "p"
-	WHERE 
-		"p"."ID" = $1;
-END;
-$_$;
-
-
---
--- Name: page_html_by_id(integer); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION page_html_by_id(id integer) RETURNS TABLE("ID" integer, "Name" character varying, "Identified" character varying)
-    LANGUAGE plpgsql
-    AS $_$
-BEGIN
-	RETURN QUERY SELECT
-		"h"."ID",
-		"h"."Name",
-		"h"."Identified"
-	FROM
-		"page" as "p",
-		"core"."html" as "h"
-	WHERE
-		"p"."ID" = $1 AND
-		"p"."Html_ID" = "h"."ID";
-END;
-$_$;
-
-
---
--- Name: page_is(integer); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION page_is(id integer) RETURNS integer
-    LANGUAGE plpgsql
-    AS $_$
-BEGIN
-	RETURN EXISTS
-	(
-		SELECT 
-			true
-		FROM
-			"page"
-		WHERE
-			"ID" = $1
-	)::int;
-END;
-$_$;
-
-
-SET search_path = core, pg_catalog;
 
 SET default_tablespace = '';
 
@@ -1367,11 +1419,12 @@ CREATE TABLE ajax (
     "ID" integer NOT NULL,
     "Name" character varying(255) NOT NULL,
     "Identified" character varying(127) NOT NULL,
-    "Data_Type" ajax_data_type DEFAULT 'html'::ajax_data_type NOT NULL,
-    "Token" boolean DEFAULT false NOT NULL,
+    "Data_Type" ajax_data_type NOT NULL,
     "Module_ID" integer NOT NULL,
-    "Get" boolean DEFAULT true NOT NULL,
-    "Post" boolean DEFAULT false NOT NULL
+    "Get" boolean,
+    "Post" boolean,
+    "Active" boolean DEFAULT true NOT NULL,
+    "Cache" boolean DEFAULT false NOT NULL
 );
 
 
@@ -1407,14 +1460,7 @@ COMMENT ON COLUMN ajax."Identified" IS 'Идентификатор';
 -- Name: COLUMN ajax."Data_Type"; Type: COMMENT; Schema: core; Owner: -
 --
 
-COMMENT ON COLUMN ajax."Data_Type" IS 'Тип возвращаемых данных (html,text,json)';
-
-
---
--- Name: COLUMN ajax."Token"; Type: COMMENT; Schema: core; Owner: -
---
-
-COMMENT ON COLUMN ajax."Token" IS 'Проверять ли токен';
+COMMENT ON COLUMN ajax."Data_Type" IS 'Тип возвращаемых данных (json,html,text,json_page)';
 
 
 --
@@ -1428,14 +1474,28 @@ COMMENT ON COLUMN ajax."Module_ID" IS 'Привязка к модулю';
 -- Name: COLUMN ajax."Get"; Type: COMMENT; Schema: core; Owner: -
 --
 
-COMMENT ON COLUMN ajax."Get" IS 'Обработка GET данных';
+COMMENT ON COLUMN ajax."Get" IS 'Обработка GET данных (если json_page)';
 
 
 --
 -- Name: COLUMN ajax."Post"; Type: COMMENT; Schema: core; Owner: -
 --
 
-COMMENT ON COLUMN ajax."Post" IS 'Обработка POST данных';
+COMMENT ON COLUMN ajax."Post" IS 'Обработка POST данных (если json_page)';
+
+
+--
+-- Name: COLUMN ajax."Active"; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON COLUMN ajax."Active" IS 'Активность';
+
+
+--
+-- Name: COLUMN ajax."Cache"; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON COLUMN ajax."Cache" IS 'Использовать кэширование';
 
 
 --
@@ -1907,6 +1967,136 @@ ALTER SEQUENCE packjs_seq OWNED BY packjs."ID";
 
 
 --
+-- Name: page; Type: TABLE; Schema: core; Owner: -; Tablespace: 
+--
+
+CREATE TABLE page (
+    "ID" integer NOT NULL,
+    "Name" character varying(255) NOT NULL,
+    "Url" character varying(255) NOT NULL,
+    "Content" pg_catalog.text,
+    "Parent" integer,
+    "Tags" pg_catalog.text,
+    "Html_ID" integer,
+    "Last_Modified" timestamp without time zone DEFAULT now() NOT NULL,
+    "Meta_Title" character varying(255),
+    "Meta_Description" pg_catalog.text,
+    "Meta_Keywords" pg_catalog.text,
+    "Active" boolean DEFAULT true NOT NULL
+);
+
+
+--
+-- Name: TABLE page; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON TABLE page IS 'Страницы';
+
+
+--
+-- Name: COLUMN page."ID"; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON COLUMN page."ID" IS 'Порядковый номер';
+
+
+--
+-- Name: COLUMN page."Name"; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON COLUMN page."Name" IS 'Наименование';
+
+
+--
+-- Name: COLUMN page."Url"; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON COLUMN page."Url" IS 'Урл';
+
+
+--
+-- Name: COLUMN page."Content"; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON COLUMN page."Content" IS 'Содержимое';
+
+
+--
+-- Name: COLUMN page."Parent"; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON COLUMN page."Parent" IS 'Корень';
+
+
+--
+-- Name: COLUMN page."Tags"; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON COLUMN page."Tags" IS 'Тэги';
+
+
+--
+-- Name: COLUMN page."Html_ID"; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON COLUMN page."Html_ID" IS 'Привязка к основному шаблону';
+
+
+--
+-- Name: COLUMN page."Last_Modified"; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON COLUMN page."Last_Modified" IS 'Дата последнего изменения';
+
+
+--
+-- Name: COLUMN page."Meta_Title"; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON COLUMN page."Meta_Title" IS 'Тэг title';
+
+
+--
+-- Name: COLUMN page."Meta_Description"; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON COLUMN page."Meta_Description" IS 'Тэг meta name=description';
+
+
+--
+-- Name: COLUMN page."Meta_Keywords"; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON COLUMN page."Meta_Keywords" IS 'Тэг meta name=keywords';
+
+
+--
+-- Name: COLUMN page."Active"; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON COLUMN page."Active" IS 'Активность';
+
+
+--
+-- Name: page_seq; Type: SEQUENCE; Schema: core; Owner: -
+--
+
+CREATE SEQUENCE page_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: page_seq; Type: SEQUENCE OWNED BY; Schema: core; Owner: -
+--
+
+ALTER SEQUENCE page_seq OWNED BY page."ID";
+
+
+--
 -- Name: param; Type: TABLE; Schema: core; Owner: -; Tablespace: 
 --
 
@@ -2184,6 +2374,72 @@ COMMENT ON COLUMN search_index_tags."Tags_ID" IS 'Номер тэга';
 
 
 --
+-- Name: search_log; Type: TABLE; Schema: core; Owner: -; Tablespace: 
+--
+
+CREATE TABLE search_log (
+    "ID" integer NOT NULL,
+    "Query" character varying(255) NOT NULL,
+    "Date" timestamp without time zone DEFAULT now(),
+    "IP" cidr NOT NULL
+);
+
+
+--
+-- Name: TABLE search_log; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON TABLE search_log IS 'Поиск. Логирование.';
+
+
+--
+-- Name: COLUMN search_log."ID"; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON COLUMN search_log."ID" IS 'Порядковый номер';
+
+
+--
+-- Name: COLUMN search_log."Query"; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON COLUMN search_log."Query" IS 'Запрос';
+
+
+--
+-- Name: COLUMN search_log."Date"; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON COLUMN search_log."Date" IS 'Дата';
+
+
+--
+-- Name: COLUMN search_log."IP"; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON COLUMN search_log."IP" IS 'IP-адрес';
+
+
+--
+-- Name: search_log_seq; Type: SEQUENCE; Schema: core; Owner: -
+--
+
+CREATE SEQUENCE search_log_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: search_log_seq; Type: SEQUENCE OWNED BY; Schema: core; Owner: -
+--
+
+ALTER SEQUENCE search_log_seq OWNED BY search_log."ID";
+
+
+--
 -- Name: search_tags; Type: TABLE; Schema: core; Owner: -; Tablespace: 
 --
 
@@ -2247,9 +2503,10 @@ ALTER SEQUENCE search_tags_seq OWNED BY search_tags."ID";
 
 CREATE TABLE seo_redirect (
     "ID" integer NOT NULL,
-    "From" character varying(255) NOT NULL,
-    "To" character varying(255) NOT NULL,
-    "Location" boolean DEFAULT true NOT NULL
+    "From" pg_catalog.text NOT NULL,
+    "To" pg_catalog.text NOT NULL,
+    "Location" boolean DEFAULT true NOT NULL,
+    "Tags" character varying(255)[] DEFAULT NULL::character varying[]
 );
 
 
@@ -2278,7 +2535,21 @@ COMMENT ON COLUMN seo_redirect."From" IS 'Источник';
 -- Name: COLUMN seo_redirect."To"; Type: COMMENT; Schema: core; Owner: -
 --
 
-COMMENT ON COLUMN seo_redirect."To" IS 'Делать переход на другой урл';
+COMMENT ON COLUMN seo_redirect."To" IS 'Назначение';
+
+
+--
+-- Name: COLUMN seo_redirect."Location"; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON COLUMN seo_redirect."Location" IS 'Делать переход на другой урл';
+
+
+--
+-- Name: COLUMN seo_redirect."Tags"; Type: COMMENT; Schema: core; Owner: -
+--
+
+COMMENT ON COLUMN seo_redirect."Tags" IS 'Тэги';
 
 
 --
@@ -2578,12 +2849,11 @@ CREATE TABLE "user" (
     "ID" integer NOT NULL,
     "Name" character varying(255) NOT NULL,
     "Email" character varying(127) NOT NULL,
-    "Password" character(32),
+    "Password" character varying,
     "Group_ID" integer NOT NULL,
     "Active" boolean DEFAULT false NOT NULL,
     "Password_Change_Code" character varying(32),
     "Password_Change_Date" timestamp without time zone,
-    "Salt" character(4) NOT NULL,
     "Visit_Last_Admin" character varying(255)
 );
 
@@ -2649,13 +2919,6 @@ COMMENT ON COLUMN "user"."Password_Change_Code" IS 'Код на восстано
 --
 
 COMMENT ON COLUMN "user"."Password_Change_Date" IS 'Дата последнего изменения пароля';
-
-
---
--- Name: COLUMN "user"."Salt"; Type: COMMENT; Schema: core; Owner: -
---
-
-COMMENT ON COLUMN "user"."Salt" IS 'Соля для пароля';
 
 
 --
@@ -2823,170 +3086,6 @@ COMMENT ON COLUMN user_session."User_ID" IS 'Привязка к пользов�
 SET search_path = public, pg_catalog;
 
 --
--- Name: articles; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE articles (
-    "ID" integer NOT NULL,
-    "Date" date NOT NULL,
-    "Title" character varying(255) NOT NULL,
-    "Url" character varying(127) NOT NULL,
-    "Anons" text,
-    "Content" text,
-    "Tags" character varying(255),
-    "Last_Modified" timestamp without time zone DEFAULT now() NOT NULL
-);
-
-
---
--- Name: TABLE articles; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON TABLE articles IS 'Статьи';
-
-
---
--- Name: COLUMN articles."ID"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN articles."ID" IS 'Порядковый номер';
-
-
---
--- Name: COLUMN articles."Date"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN articles."Date" IS 'Дата';
-
-
---
--- Name: COLUMN articles."Title"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN articles."Title" IS 'Заголовок';
-
-
---
--- Name: COLUMN articles."Url"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN articles."Url" IS 'Урл';
-
-
---
--- Name: COLUMN articles."Anons"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN articles."Anons" IS 'Анонс';
-
-
---
--- Name: COLUMN articles."Content"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN articles."Content" IS 'Содержимое';
-
-
---
--- Name: COLUMN articles."Tags"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN articles."Tags" IS 'Теги';
-
-
---
--- Name: COLUMN articles."Last_Modified"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN articles."Last_Modified" IS 'Дата последнего изменения';
-
-
---
--- Name: articles_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE articles_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: articles_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE articles_seq OWNED BY articles."ID";
-
-
---
--- Name: faq; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE faq (
-    "ID" integer NOT NULL,
-    "Question" text NOT NULL,
-    "Answer" text NOT NULL,
-    "Sort" integer NOT NULL
-);
-
-
---
--- Name: TABLE faq; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON TABLE faq IS 'Вопросы и ответы';
-
-
---
--- Name: COLUMN faq."ID"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN faq."ID" IS 'Порядковый номер';
-
-
---
--- Name: COLUMN faq."Question"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN faq."Question" IS 'Вопрос';
-
-
---
--- Name: COLUMN faq."Answer"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN faq."Answer" IS 'Ответ';
-
-
---
--- Name: COLUMN faq."Sort"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN faq."Sort" IS 'Сортировка';
-
-
---
--- Name: faq_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE faq_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: faq_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE faq_seq OWNED BY faq."ID";
-
-
---
 -- Name: menu; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3024,10 +3123,12 @@ COMMENT ON COLUMN menu."Name" IS 'Наименование';
 CREATE TABLE menu_item (
     "ID" integer NOT NULL,
     "Name" character varying(255) NOT NULL,
-    "Url" character varying(127) NOT NULL,
+    "Url" character varying(255) NOT NULL,
     "Parent" integer,
     "Menu_ID" integer NOT NULL,
-    "Sort" integer NOT NULL
+    "Order" integer NOT NULL,
+    "Icon" character varying(255) NOT NULL,
+    "Active" boolean DEFAULT true NOT NULL
 );
 
 
@@ -3074,10 +3175,24 @@ COMMENT ON COLUMN menu_item."Menu_ID" IS 'Привязка к меню';
 
 
 --
--- Name: COLUMN menu_item."Sort"; Type: COMMENT; Schema: public; Owner: -
+-- Name: COLUMN menu_item."Order"; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN menu_item."Sort" IS 'Сортировка';
+COMMENT ON COLUMN menu_item."Order" IS 'Сортировка';
+
+
+--
+-- Name: COLUMN menu_item."Icon"; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN menu_item."Icon" IS 'Иконка';
+
+
+--
+-- Name: COLUMN menu_item."Active"; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN menu_item."Active" IS 'Активность';
 
 
 --
@@ -3116,195 +3231,6 @@ CREATE SEQUENCE menu_seq
 --
 
 ALTER SEQUENCE menu_seq OWNED BY menu."ID";
-
-
---
--- Name: news; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE news (
-    "ID" integer NOT NULL,
-    "Date" date NOT NULL,
-    "Title" character varying(255) NOT NULL,
-    "Url" character varying(127) NOT NULL,
-    "Anons" text,
-    "Content" text,
-    "Tags" character varying(255) DEFAULT ''::character varying NOT NULL,
-    "Last_Modified" timestamp without time zone DEFAULT now() NOT NULL
-);
-
-
---
--- Name: TABLE news; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON TABLE news IS 'Новости';
-
-
---
--- Name: COLUMN news."ID"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN news."ID" IS 'Порядковый номер';
-
-
---
--- Name: COLUMN news."Date"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN news."Date" IS 'Дата';
-
-
---
--- Name: COLUMN news."Title"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN news."Title" IS 'Заголовок';
-
-
---
--- Name: COLUMN news."Url"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN news."Url" IS 'Урл';
-
-
---
--- Name: COLUMN news."Anons"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN news."Anons" IS 'Анонс';
-
-
---
--- Name: COLUMN news."Content"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN news."Content" IS 'Содержимое';
-
-
---
--- Name: COLUMN news."Tags"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN news."Tags" IS 'Теги';
-
-
---
--- Name: COLUMN news."Last_Modified"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN news."Last_Modified" IS 'Дата последнего изменения';
-
-
---
--- Name: news_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE news_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: news_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE news_seq OWNED BY news."ID";
-
-
---
--- Name: page; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE page (
-    "ID" integer NOT NULL,
-    "Name" character varying(255) NOT NULL,
-    "Url" character varying(127) NOT NULL,
-    "Content" text,
-    "Parent" integer,
-    "Tags" character varying(255),
-    "Last_Modified" timestamp without time zone DEFAULT now() NOT NULL,
-    "Html_ID" integer
-);
-
-
---
--- Name: TABLE page; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON TABLE page IS 'Страницы';
-
-
---
--- Name: COLUMN page."ID"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN page."ID" IS 'Порядковый номер';
-
-
---
--- Name: COLUMN page."Name"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN page."Name" IS 'Наименование';
-
-
---
--- Name: COLUMN page."Url"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN page."Url" IS 'Урл';
-
-
---
--- Name: COLUMN page."Content"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN page."Content" IS 'Содержимое';
-
-
---
--- Name: COLUMN page."Parent"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN page."Parent" IS 'Корень';
-
-
---
--- Name: COLUMN page."Tags"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN page."Tags" IS 'Теги';
-
-
---
--- Name: COLUMN page."Last_Modified"; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN page."Last_Modified" IS 'Дата последнего изменения';
-
-
---
--- Name: page_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE page_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: page_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE page_seq OWNED BY page."ID";
 
 
 SET search_path = core, pg_catalog;
@@ -3369,6 +3295,13 @@ ALTER TABLE ONLY packjs ALTER COLUMN "ID" SET DEFAULT nextval('packjs_seq'::regc
 -- Name: ID; Type: DEFAULT; Schema: core; Owner: -
 --
 
+ALTER TABLE ONLY page ALTER COLUMN "ID" SET DEFAULT nextval('page_seq'::regclass);
+
+
+--
+-- Name: ID; Type: DEFAULT; Schema: core; Owner: -
+--
+
 ALTER TABLE ONLY param ALTER COLUMN "ID" SET DEFAULT nextval('param_seq'::regclass);
 
 
@@ -3391,6 +3324,13 @@ ALTER TABLE ONLY proc ALTER COLUMN "Order" SET DEFAULT currval('proc_seq'::regcl
 --
 
 ALTER TABLE ONLY search_index ALTER COLUMN "ID" SET DEFAULT nextval('search_index_seq'::regclass);
+
+
+--
+-- Name: ID; Type: DEFAULT; Schema: core; Owner: -
+--
+
+ALTER TABLE ONLY search_log ALTER COLUMN "ID" SET DEFAULT nextval('search_log_seq'::regclass);
 
 
 --
@@ -3448,27 +3388,6 @@ SET search_path = public, pg_catalog;
 -- Name: ID; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY articles ALTER COLUMN "ID" SET DEFAULT nextval('articles_seq'::regclass);
-
-
---
--- Name: ID; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY faq ALTER COLUMN "ID" SET DEFAULT nextval('faq_seq'::regclass);
-
-
---
--- Name: Sort; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY faq ALTER COLUMN "Sort" SET DEFAULT currval('faq_seq'::regclass);
-
-
---
--- Name: ID; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE ONLY menu ALTER COLUMN "ID" SET DEFAULT nextval('menu_seq'::regclass);
 
 
@@ -3480,24 +3399,10 @@ ALTER TABLE ONLY menu_item ALTER COLUMN "ID" SET DEFAULT nextval('menu_item_seq'
 
 
 --
--- Name: Sort; Type: DEFAULT; Schema: public; Owner: -
+-- Name: Order; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY menu_item ALTER COLUMN "Sort" SET DEFAULT currval('menu_item_seq'::regclass);
-
-
---
--- Name: ID; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY news ALTER COLUMN "ID" SET DEFAULT nextval('news_seq'::regclass);
-
-
---
--- Name: ID; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY page ALTER COLUMN "ID" SET DEFAULT nextval('page_seq'::regclass);
+ALTER TABLE ONLY menu_item ALTER COLUMN "Order" SET DEFAULT currval('menu_item_seq'::regclass);
 
 
 SET search_path = core, pg_catalog;
@@ -3524,21 +3429,11 @@ COPY admin ("ID", "Name", "Identified", "Sort", "Get", "Post", "Visible", "Modul
 21	Переименовать	rename	21	f	t	f	3	f	f
 24	Добавить	add	23	t	t	f	3	f	f
 25	Создать папку	mkdir	24	f	t	f	3	f	f
-27	Добавить	add	27	t	t	f	9	f	f
-29	Удалить	delete	29	f	t	f	9	f	f
-31	Главная страница	home	31	t	t	f	9	f	f
-32	Страница 404	404	32	t	t	f	9	f	f
-33	Страница 403	403	33	t	t	f	9	f	f
-26	Управление	list	26	t	f	t	9	f	f
 17	Управление	ls	17	t	f	t	3	f	f
 7	Управление	user	7	t	f	t	2	f	f
-30	Другие страницы	other	30	t	f	t	9	f	f
-28	Редактировать	edit	28	t	t	f	9	f	f
 44	Удалить robots.txt	robots_delete	44	f	t	f	10	f	f
 1	Модули	module	1	t	f	t	1	f	t
 15	Сменить пароль	passwd	16	t	t	t	2	f	t
-47	Добавить меню	menu_add	47	t	t	f	11	f	f
-48	Редактировать меню	menu_edit	48	t	t	f	11	f	f
 36	Добавить адрес	url_add	36	t	t	f	10	f	f
 38	Удалить адрес	url_delete	38	f	t	f	10	f	f
 37	Редактировать адрес	url_edit	37	t	t	f	10	f	f
@@ -3547,24 +3442,6 @@ COPY admin ("ID", "Name", "Identified", "Sort", "Get", "Post", "Visible", "Modul
 41	Редактировать переадресацию	redirect_edit	41	t	t	f	10	f	f
 42	Удалить переадресацию	redirect_delete	42	f	t	f	10	f	f
 78	Правка шаблон	html_content	79	t	t	f	17	f	f
-51	Добавить пункт меню	item_add	51	t	t	f	11	f	f
-52	Редактировать пункт меню	item_edit	52	t	t	f	11	f	f
-53	Удалить пункт меню	item_delete	53	f	t	f	11	f	f
-46	Правка меню	menu	46	t	f	t	11	f	f
-50	Управление	item	50	t	f	t	11	f	f
-49	Удалить меню	menu_delete	49	f	t	f	11	f	f
-56	Управление	list	56	t	f	t	12	f	f
-58	Редактировать	edit	58	t	t	f	12	f	f
-59	Удалить	delete	59	f	t	f	12	f	f
-57	Добавить	add	57	t	t	t	12	f	f
-60	Управление	list	60	t	f	t	13	f	f
-61	Добавить	add	61	t	t	t	13	f	f
-62	Редактировать	edit	62	t	t	f	13	f	f
-63	Удалить	delete	63	f	t	f	13	f	f
-65	Управление	list	65	t	f	t	15	f	f
-67	Редактировать	edit	67	t	t	f	15	f	f
-66	Добавить	add	66	t	t	t	15	f	f
-68	Удалить	delete	68	f	t	f	15	f	f
 140	Задания	to	145	t	f	t	32	f	t
 43	robots.txt	robots	43	t	t	t	10	f	f
 81	Правка exe	exe_content	82	t	t	f	17	f	f
@@ -3574,10 +3451,7 @@ COPY admin ("ID", "Name", "Identified", "Sort", "Get", "Post", "Visible", "Modul
 82	Управление	url	77	t	f	t	17	f	f
 150	Удалить поручение	from_delete	151	f	t	f	32	f	t
 23	Скачать	download	22	f	t	f	3	t	f
-69	Сортировка вверх	sort	69	f	t	f	15	f	f
-54	Пункт меню вверх	item_sort	54	f	t	f	11	f	f
 45	Другие страницы	other	45	t	t	t	10	f	f
-35	Продвижение	url	35	t	f	t	10	f	f
 149	Редактировать поручение	from_edit	150	t	t	f	32	f	t
 142	Управление	list	140	t	f	t	32	f	f
 143	Дать поручение	from_add	149	t	t	f	32	f	t
@@ -3587,10 +3461,32 @@ COPY admin ("ID", "Name", "Identified", "Sort", "Get", "Post", "Visible", "Modul
 146	Редактировать	edit	142	t	t	f	32	f	f
 145	Добавить	add	141	t	t	t	32	f	f
 147	Удалить	delete	143	f	t	f	32	f	f
+238	Правка куска кода	html_part_content	238	t	t	f	17	f	f
 229	Другие страницы	other_page	229	t	t	t	1	f	f
 230	Главная страница	home	230	t	t	f	1	f	f
 231	Страница 404	404	231	t	t	f	1	f	f
 232	Страница 403	403	232	t	t	f	1	f	f
+35	Продвижение	url	35	t	t	t	10	f	f
+367	Отчёт	log	367	t	t	t	54	f	f
+368	Отчёт. Статистика	log_stats	368	t	t	t	54	f	f
+369	Отчёт. Удалить запись	log_delete	369	f	t	f	54	f	f
+370	Отчёт. Статистика. Удалить запись	log_stats_delete	370	f	t	f	54	f	f
+371	Управление	list	371	t	f	t	74	f	f
+373	Добавить	add	372	t	t	f	74	f	f
+374	Редактировать	edit	373	t	t	f	74	f	f
+375	Удалить	delete	374	f	t	f	74	f	f
+377	Мета	meta	376	f	t	f	74	f	f
+372	Настройки	settings	377	t	t	t	74	f	f
+378	Другие страницы	other	378	t	t	t	74	f	f
+423	Правка меню	menu	423	t	f	t	83	f	f
+424	Добавить меню	menu_add	424	t	t	f	83	f	f
+425	Редактировать меню	menu_edit	425	t	t	f	83	f	f
+426	Удалить меню	menu_delete	426	f	t	f	83	f	f
+427	Управление	item	427	t	f	t	83	f	f
+428	Добавить пункт меню	item_add	428	t	t	f	83	f	f
+429	Редактировать пункт меню	item_edit	429	t	t	f	83	f	f
+430	Удалить пункт меню	item_delete	430	f	t	f	83	f	f
+431	Пункт меню. Сортировка	item_order	431	f	t	f	83	f	f
 \.
 
 
@@ -3598,14 +3494,15 @@ COPY admin ("ID", "Name", "Identified", "Sort", "Get", "Post", "Visible", "Modul
 -- Name: admin_seq; Type: SEQUENCE SET; Schema: core; Owner: -
 --
 
-SELECT pg_catalog.setval('admin_seq', 232, true);
+SELECT pg_catalog.setval('admin_seq', 431, true);
 
 
 --
 -- Data for Name: ajax; Type: TABLE DATA; Schema: core; Owner: -
 --
 
-COPY ajax ("ID", "Name", "Identified", "Data_Type", "Token", "Module_ID", "Get", "Post") FROM stdin;
+COPY ajax ("ID", "Name", "Identified", "Data_Type", "Module_ID", "Get", "Post", "Active", "Cache") FROM stdin;
+25	Индексатор	indexer	text	54	\N	\N	t	f
 \.
 
 
@@ -3613,7 +3510,7 @@ COPY ajax ("ID", "Name", "Identified", "Data_Type", "Token", "Module_ID", "Get",
 -- Name: ajax_seq; Type: SEQUENCE SET; Schema: core; Owner: -
 --
 
-SELECT pg_catalog.setval('ajax_seq', 98, true);
+SELECT pg_catalog.setval('ajax_seq', 31, true);
 
 
 --
@@ -3621,20 +3518,15 @@ SELECT pg_catalog.setval('ajax_seq', 98, true);
 --
 
 COPY exe ("ID", "Name", "Identified", "Module_ID", "Active", "Cache_Route", "Cache_Page") FROM stdin;
-12	Страница 404	404	9	t	t	t
-11	Главная страница	home	9	t	t	t
-10	Описание	content	9	t	t	t
-13	Страница 403	403	9	t	t	t
 179	Главная страница	home	1	t	t	t
 180	Страница 404	404	1	t	t	t
 181	Страница 403	403	1	t	t	t
-16	Список	list	13	t	t	t
-17	Содержание	content	13	t	t	t
-14	Список	list	12	t	t	t
-15	Содержание	content	12	t	t	t
-21	Список	list	15	t	t	t
 46	Карта сайта	sitemap	25	t	t	t
 187	Поиск по сайту	find	54	t	t	f
+211	Содержание страницы	content	74	t	t	t
+212	Главная страница	home	74	t	t	t
+213	Страница 404	404	74	t	t	t
+214	Страница 403	403	74	t	t	t
 \.
 
 
@@ -3642,7 +3534,7 @@ COPY exe ("ID", "Name", "Identified", "Module_ID", "Active", "Cache_Route", "Cac
 -- Name: exe_seq; Type: SEQUENCE SET; Schema: core; Owner: -
 --
 
-SELECT pg_catalog.setval('exe_seq', 187, true);
+SELECT pg_catalog.setval('exe_seq', 224, true);
 
 
 --
@@ -3651,7 +3543,6 @@ SELECT pg_catalog.setval('exe_seq', 187, true);
 
 COPY html ("ID", "Name", "Identified") FROM stdin;
 5	По умолчанию	default
-6	Главная	home
 \.
 
 
@@ -3659,7 +3550,7 @@ COPY html ("ID", "Name", "Identified") FROM stdin;
 -- Name: html_seq; Type: SEQUENCE SET; Schema: core; Owner: -
 --
 
-SELECT pg_catalog.setval('html_seq', 18, true);
+SELECT pg_catalog.setval('html_seq', 21, true);
 
 
 --
@@ -3667,8 +3558,9 @@ SELECT pg_catalog.setval('html_seq', 18, true);
 --
 
 COPY inc ("ID", "Name", "Identified", "Module_ID", "Active") FROM stdin;
-6	Верхнее	top	11	t
 39	Форма поиска	form	54	t
+51	Левое меню	left	83	t
+52	Левое меню для мобильной версии	left_mob	83	t
 \.
 
 
@@ -3676,7 +3568,7 @@ COPY inc ("ID", "Name", "Identified", "Module_ID", "Active") FROM stdin;
 -- Name: inc_seq; Type: SEQUENCE SET; Schema: core; Owner: -
 --
 
-SELECT pg_catalog.setval('inc_seq', 39, true);
+SELECT pg_catalog.setval('inc_seq', 52, true);
 
 
 --
@@ -3684,7 +3576,6 @@ SELECT pg_catalog.setval('inc_seq', 39, true);
 --
 
 COPY module ("ID", "Name", "Identified", "Description", "Version", "Active", "Access", "Page_Info_Function") FROM stdin;
-11	Меню	menu	Многоуровневое меню	1.0	t	no	\N
 1	Сервис	_service	Сведения о модулях.\r\nСведения о системе.\r\nСведения о PHP.\r\nСведения о PostgreSQL.	1.0	t	no	\N
 2	Пользователи	_user	Управление пользователями	1.0	t	no	\N
 3	Проводник	_explorer	Управление статическими файлами	1.0	t	no	\N
@@ -3692,11 +3583,9 @@ COPY module ("ID", "Name", "Identified", "Description", "Version", "Active", "Ac
 32	Задачи	_task		1.0	t	no	\N
 17	HTML-код	_html_code	HTML-вёрстка	1.0	t	no	\N
 10	Поисковая оптимизация	_seo	Управление тегами title, meta. Правка файла robots.txt. Переадресация.	1.0	t	no	\N
-9	Страницы	page	Странице на сайте	1.0	t	no	Page::page_info
-13	Статьи	articles		1.0	t	no	Articles::page_info
-12	Новости	news		1.0	t	no	News::page_info
-15	Вопрос-Ответ	faq	Часто задаваемые вопросы	1.0	t	no	Faq::page_info
 54	Поиск	_search	Поиск по сайту. Два режима работы обычный и через sphinx.	1.0	t	no	_Search::page_info
+74	Страницы	_page	Основной модуль для создания страниц	2.0	t	no	_Page::page_info
+83	Меню	menu	Много-уровневое меню	2.0	t	no	\N
 \.
 
 
@@ -3704,7 +3593,7 @@ COPY module ("ID", "Name", "Identified", "Description", "Version", "Active", "Ac
 -- Name: module_seq; Type: SEQUENCE SET; Schema: core; Owner: -
 --
 
-SELECT pg_catalog.setval('module_seq', 54, true);
+SELECT pg_catalog.setval('module_seq', 83, true);
 
 
 --
@@ -3712,6 +3601,11 @@ SELECT pg_catalog.setval('module_seq', 54, true);
 --
 
 COPY packjs ("ID", "Identified", "Name", "Description", "Version", "Url", "Category") FROM stdin;
+5	tinymce	TinyMCE	WYSIWYG редактор	4.1.9	http://www.tinymce.com/	editor
+1	codemirror	CodeMirror	Редактор с подсветкой синтаксиса	5.0.0	http://codemirror.net/	
+6	jquery_ui	jQuery UI	Библиотека для создания пользовательского интерфейса	1.11.4	https://jqueryui.com/	
+2	datepick	jQuery Datepicker	Календарь для выбора даты, альтернатива jQuery-UI Datepicker. 	5.0.0.	http://keith-wood.name/datepick.html	
+10	datepicker	jQuery UI Datepicker	Календарь для выбора даты	1.11.4	https://jqueryui.com/datepicker/	calendar
 \.
 
 
@@ -3720,6 +3614,7 @@ COPY packjs ("ID", "Identified", "Name", "Description", "Version", "Url", "Categ
 --
 
 COPY packjs_depend ("Packjs_ID", "Depend_ID", "Order") FROM stdin;
+10	6	1
 \.
 
 
@@ -3727,7 +3622,29 @@ COPY packjs_depend ("Packjs_ID", "Depend_ID", "Order") FROM stdin;
 -- Name: packjs_seq; Type: SEQUENCE SET; Schema: core; Owner: -
 --
 
-SELECT pg_catalog.setval('packjs_seq', 17, true);
+SELECT pg_catalog.setval('packjs_seq', 12, true);
+
+
+--
+-- Data for Name: page; Type: TABLE DATA; Schema: core; Owner: -
+--
+
+COPY page ("ID", "Name", "Url", "Content", "Parent", "Tags", "Html_ID", "Last_Modified", "Meta_Title", "Meta_Description", "Meta_Keywords", "Active") FROM stdin;
+102	Модули	modules	<p>Модули в Znarus разделены на две категории: системные и обычные. Системные модули предоставляют базовую функциональность по CMS, и не могут быть удалены. Обычные модули предоставляют уникальную функциональность для сайта, их легко создать и можно удалить.</p>\r\n<h2>Системные модули</h2>\r\n<ul>\r\n<li><strong>Пользователи</strong> - Даёт возможность управлять пользователями и группами &laquo;Панели управления&raquo;. Также позволяет управляет доступом группы пользователей, на отдельные элементы &laquo;Панели управления&raquo;.</li>\r\n<li><strong>Проводник</strong> - Управление статическими файлами на сайте.</li>\r\n<li><strong>HTML-код</strong> - Правка файлов с шаблонам сайт. Позволяет определить по урлу, какие шаблоны влияют на отображение страницы.</li>\r\n<li><strong>Поиск</strong> - Индексирует страницы сайта и предоставляет форму для полнотекстового поиска по сайту. Может использовать PostgreSQL с полнотекстовыми индексами или движок Sphinx.</li>\r\n<li><strong>Поисковая оптимизация</strong> - Возможность правки мета-данных по странице, в зависимости от урла, установка переадресаций, правка robots.txt и др.</li>\r\n<li><strong>Сервис</strong> - Показ сведений по программному обеспечению установленному на хостинге.</li>\r\n<li><strong>Карта сайта</strong> - Создание sitemap.xml и генерация страницы &laquo;Карта-сайта&raquo;.</li>\r\n<li><strong>Задачи</strong> - Возможность раздачи задания между пользователями &laquo;Панели управления&raquo; и контроль за выполнением.</li>\r\n<li><strong>Страницы</strong> - Простой модуль для размещения страниц на сайте.</li>\r\n</ul>\r\n<h2>Обычные модули</h2>\r\n<ul>\r\n<li><strong>Меню</strong> - размещение на сайте многомерного и одномерного меню.</li>\r\n</ul>	\N	\N	\N	2017-04-24 17:39:20.680654	\N	\N	\N	t
+99	Установка	install	<p>Если хостинг содержит всё необходимое программное обеспечение, необходимо:</p>\r\n<ul>\r\n<li>Создать базу PostgreSQL и поместить в неё SQL-данные лежащие в файл &laquo;sql/dump.sql&raquo;</li>\r\n<li>Поправить файл &laquo;app/conf/conf.php&raquo; согласно свои настройкам.</li>\r\n</ul>	\N		\N	2017-04-24 19:46:20.642078	\N	\N	\N	t
+100	Требования к хостингу	hosting	<h2>Требования к хостингу</h2>\r\n<ul>\r\n<li>Операционная система Linux</li>\r\n<li>PHP 7</li>\r\n<li>PostgreSQL 9.4 и выше</li>\r\n</ul>\r\n<h2>Обязательные модули PHP</h2>\r\n<ul>\r\n<li>pgsql</li>\r\n<li>zip</li>\r\n<li>mbstring</li>\r\n<li>curl</li>\r\n<li>openssl</li>\r\n</ul>\r\n<h2>Модули PHP (опционально)</h2>\r\n<ul>\r\n<li>db4 или qdbm (если включено кэширование через dba)</li>\r\n<li>memcache или memcached (если включено кэширование через memcache)</li>\r\n<li>gd (если работаете с изображением)</li>\r\n<li>mysql (если поиск через sphinx)</li>\r\n</ul>	\N		\N	2017-04-24 17:45:54.493215	\N	\N	\N	t
+101	Лицензия	licence	<h2>The MIT License</h2>\r\n<p class="mono">Copyright &copy; 2011 Sergeev Denis, https://github.com/hharek<br /> Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:<br /> The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.<br /> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>\r\n<hr />\r\n<h2>Лицензия MIT</h2>\r\n<p class="mono">Copyright &copy; 2011 Сергеев Денис, https://github.com/hharek<br /> Данная лицензия разрешает лицам, получившим копию данного программного обеспечения и сопутствующей документации (в дальнейшем именуемыми &laquo;Программное Обеспечение&raquo;), безвозмездно использовать Программное Обеспечение без ограничений, включая неограниченное право на использование, копирование, изменение, добавление, публикацию, распространение, сублицензирование и/или продажу копий Программного Обеспечения, также как и лицам, которым предоставляется данное Программное Обеспечение, при соблюдении следующих условий:<br /> Указанное выше уведомление об авторском праве и данные условия должны быть включены во все копии или значимые части данного Программного Обеспечения.<br /> ДАННОЕ ПРОГРАММНОЕ ОБЕСПЕЧЕНИЕ ПРЕДОСТАВЛЯЕТСЯ &laquo;КАК ЕСТЬ&raquo;, БЕЗ КАКИХ-ЛИБО ГАРАНТИЙ, ЯВНО ВЫРАЖЕННЫХ ИЛИ ПОДРАЗУМЕВАЕМЫХ, ВКЛЮЧАЯ, НО НЕ ОГРАНИЧИВАЯСЬ ГАРАНТИЯМИ ТОВАРНОЙ ПРИГОДНОСТИ, СООТВЕТСТВИЯ ПО ЕГО КОНКРЕТНОМУ НАЗНАЧЕНИЮ И ОТСУТСТВИЯ НАРУШЕНИЙ ПРАВ. НИ В КАКОМ СЛУЧАЕ АВТОРЫ ИЛИ ПРАВООБЛАДАТЕЛИ НЕ НЕСУТ ОТВЕТСТВЕННОСТИ ПО ИСКАМ О ВОЗМЕЩЕНИИ УЩЕРБА, УБЫТКОВ ИЛИ ДРУГИХ ТРЕБОВАНИЙ ПО ДЕЙСТВУЮЩИМ КОНТРАКТАМ, ДЕЛИКТАМ ИЛИ ИНОМУ, ВОЗНИКШИМ ИЗ, ИМЕЮЩИМ ПРИЧИНОЙ ИЛИ СВЯЗАННЫМ С ПРОГРАММНЫМ ОБЕСПЕЧЕНИЕМ ИЛИ ИСПОЛЬЗОВАНИЕМ ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ ИЛИ ИНЫМИ ДЕЙСТВИЯМИ С ПРОГРАММНЫМ ОБЕСПЕЧЕНИЕМ.</p>	\N		\N	2017-04-24 17:54:05.687663	\N	\N	\N	t
+104	Панель разработки	constr	<p>&laquo;Панель разработки&raquo; позволяет увидеть разработчику сайта текущие установленные модули и другую техническую информацию по сайту.</p>	\N		\N	2017-04-24 17:54:52.534593	\N	\N	\N	t
+103	Панель управления	admin	<p>&laquo;Панель управления&raquo; предназначена для создания и управления страницами сайта. Страница &laquo;Панели управления&raquo; расположена по урлу &laquo;/admin/&raquo; (можно поменять в настройках). Для доступа к ней нужно указать &laquo;E-mail&raquo; и &laquo;Пароль&raquo;. Обладая правами &laquo;Администратора&raquo; (по умолчанию root) можно через &laquo;Панель управления&raquo; создать группы и пользователей. Для каждой группы пользователей можно задать права на осуществления тех или иных действий. В CMS есть пользователь &laquo;Администратор&raquo;, который обладает всеми привилегиями.</p>\r\n<p>На разных сайтах функционал &laquo;Панели управления&raquo; отличается, это зависит от количества установленных модулей на сайте. Панель управления позволяет создавать страницы без знания HTML и участия программиста, для этого в ней присутствует редактор (WYSIWYG-редактор) с удобным интерфейсом напоминающий Word или LibreOffice Writer. Через редактор оператор сможет загружать рисунки и править тексты. на сайте. Панель управления защищена от популярных атак типа CSRF и SQL-инъекции.</p>	\N		\N	2017-04-24 17:45:09.917549	\N	\N	\N	t
+98	Описание	about	<p><strong>Znarus</strong> - это система для создания и управления вашим сайтом. Для управления содержимым сайта используется &laquo;Панель управления&raquo;, а для управления модулями CMS используется &laquo;Панель разработчика&raquo;. Znarus является свободным программным обеспечением с открытым исходным кодом и открытой лицензией MIT. В основе её используется язык программирование PHP и система управления базой данных PostgreSQL.</p>\r\n<h2>Преимущества:</h2>\r\n<ul>\r\n<li>Быстрая, за счёт использования</li>\r\n<li>Удобный и понятный интерфейс панели управления</li>\r\n<li>Обладает встроенными инструментами для развёртывания поиска по сайту</li>\r\n<li>Хранит историю ранее изменённых документов</li>\r\n<li>Встроенный LESS-обработчик для CSS</li>\r\n<li>Встроенные модуля для работы с SEO</li>\r\n<li>Панель разработчика позволяет понять какое кол-во модулей установлено на сайте</li>\r\n<li>Возможность встраивать CMS в любой html-код.</li>\r\n</ul>	\N		\N	2017-04-24 17:56:38.632373	\N	\N	\N	t
+\.
+
+
+--
+-- Name: page_seq; Type: SEQUENCE SET; Schema: core; Owner: -
+--
+
+SELECT pg_catalog.setval('page_seq', 104, true);
 
 
 --
@@ -3736,46 +3653,51 @@ SELECT pg_catalog.setval('packjs_seq', 17, true);
 
 COPY param ("ID", "Name", "Identified", "Type", "Value", "Module_ID") FROM stdin;
 126	Sphinx. Хост	sphinx_host	string	127.0.0.1	54
-124	Тип поискового движка (pgsql, sphinx)	type	string	pgsql	54
-34	Файл CSS по умолчанию	css_default	string	/css/content.css	\N
-19	Шаблон по умолчанию	html_default	string	default	\N
-5	Страница 403. Модуль	403_module	string	page	\N
-111	Страница 403. Урл админки	403_admin_url	string	#page/403	\N
-21	Страница 404. Заголовок	404_title	string	Страница не найдена	9
-1	Главная страница. Модуль	home_module	string	page	\N
-6	Страница 403. Exe	403_exe	string	403	\N
-2	Главная страница. Exe	home_exe	string	home	\N
 115	Главная страница. Тэги	home_tags	string	Главная страница, Добро пожаловать	1
-4	Страница 404. Exe	404_exe	string	404	\N
-122	Страница 404. Шаблон	404_html	string		9
-109	Главная страница. Урл админки	home_admin_url	string	#page/home	\N
-3	Страница 404. Модуль	404_module	string	page	\N
 118	Страница 403. Тэги	403_tags	string	Доступ запрещён, Ошибка 403, 403 Forbidden, 403 error	1
 119	Страница 404. Тэги	404_tags	string	Страница не найдена, Ошибка 404, Not Found, 404 error	1
 116	Главная страница. Заголовок	home_title	string	Добро пожаловать	1
 117	Страница 404. Заголовок	404_title	string	Страница не найдена	1
-110	Страница 404. Урл админки	404_admin_url	string	#page/404	\N
 120	Страница 403. Заголовок	403_title	string	Доступ запрещён	1
-113	Страница 404. Тэги	404_tags	string	Страница не найдена, Страница 404, Not Found	9
 125	Кол-во результатов на страницу	limit	int	10	54
 127	Sphinx. Порт	sphinx_port	int	9312	54
-114	Страница 403. Тэги	403_tags	string	Доступ запрещён, Access Denied, страница 403	9
-123	Страница 403. Шаблон	403_html	string		9
-53	Дата последнего изменения	last_modified	string	2015-06-14 01:12:16	15
-20	Главная страница. Заголовок	home_title	string	Добро пожаловать	9
-112	Главная страница. Тэги	home_tags	string	тег 1	9
-121	Главная страница. Шаблон	home_html	string	home	9
-128	Sphinx. Наименование индекса	sphinx_index	string	example	54
-86	Сессия в конструкторе	constr_session	string	a:5:{s:2:"ID";s:32:"fff53a21ebf31c4914143299e7010b8b";s:2:"IP";s:32:"9ec226bb04ae774434c107948c0db5bd";s:7:"Browser";s:32:"6a286da3b897ca08af5014870326fb03";s:4:"Date";s:19:"2015-06-14 01:51:34";s:7:"User_ID";i:0;}	\N
-88	Последняя посещаемая страница в конструкторе	constr_visit_last	string	#module/list	\N
-103	Главная страница. Тэг title	home_title	string		10
-22	Страница 403. Заголовок	403_title	string	Доступ запрещён	9
-104	Главная страница. Тэг meta name="keywords"	home_keywords	string		10
+128	Sphinx. Наименование индекса	sphinx_index	string	znarus	54
+124	Тип поискового движка (pgsql, sphinx)	type	string	pgsql	54
+34	Файл CSS по умолчанию	css_default	string	/css/admin.css	\N
+5	Страница 403. Модуль	403_module	string	_page	\N
+110	Страница 404. Урл админки	404_admin_url	string	#_page/other#tab_404	\N
+187	Показывать поле «Родитель» в админке	admin_parent_show	bool	1	74
+1	Главная страница. Модуль	home_module	string	_page	\N
+3	Страница 404. Модуль	404_module	string	_page	\N
+190	Страница 404. Заголовок	404_title	string	Страница не найдена	74
+2	Главная страница. Exe	home_exe	string	home	\N
+197	Страница 404. Идентификатор шаблона	404_html_identified	string		74
+4	Страница 404. Exe	404_exe	string	404	\N
+191	Страница 403. Заголовок	403_title	string	Доступ запрещён	74
+186	Показывать поле «Шаблон» в админке	admin_html_show	bool	1	74
+6	Страница 403. Exe	403_exe	string	403	\N
+19	Шаблон по умолчанию	html_default	string	default	\N
+111	Страница 403. Урл админки	403_admin_url	string	#_page/other#tab_403	\N
+109	Главная страница. Урл админки	home_admin_url	string	#_page/other#tab_home	\N
+196	Страница 403. Идентификатор шаблона	403_html_identified	string		74
 105	Страница 404. Тэг title	404_title	string		10
 106	Страница 404. Тэг meta name="keywords"	404_keywords	string		10
 107	Страница 403. Тэг title	403_title	string		10
 108	Страница 403. Тэг meta name="keywords"	403_keywords	string		10
-89	Последняя посещаемая страница в адмнике root-ом	admin_root_visit_last	string	#_service/module	\N
+183	Урл формировать автоматически	url_auto	bool	0	74
+185	Префикс для урлов создаваемых автоматически	url_auto_prefix	string	a	74
+88	Последняя посещаемая страница в конструкторе	constr_visit_last	string	#module/edit?id=74	\N
+193	Длина автоматического урла	url_auto_length	int	3	74
+103	Главная страница. Тэг title	home_title	string	CMS Znarus	10
+104	Главная страница. Тэг meta name="keywords"	home_keywords	string	znarus, cms, создание сайта	10
+189	Главная. Заголовок	home_title	string	CMS Znarus	74
+198	Главная страница. Идентификатор шаблона	home_html_identified	string		74
+194	Формировать урл на основе транслита имени	url_translit	bool	1	74
+184	Транслитерация с русскими и англ. символами	url_translit_rus	bool	0	74
+195	Делать транслитерацию при редактировании	url_translit_edit	bool	0	74
+89	Последняя посещаемая страница в адмнике root-ом	admin_root_visit_last	string	#_page/list	\N
+192	Урл. Иерархический	url_hierarchy	bool	0	74
+86	Сессия в конструкторе	constr_session	string	a:5:{s:2:"ID";s:32:"30286f2ae6391a94e0b7c44e1971a362";s:2:"IP";s:32:"bc7f5a2b4952eae9d61dca557314e40e";s:7:"Browser";s:32:"f005c4cebeab0f0ea05f396c78189705";s:4:"Date";s:19:"2017-04-24 19:17:29";s:7:"User_ID";i:0;}	\N
 \.
 
 
@@ -3783,7 +3705,7 @@ COPY param ("ID", "Name", "Identified", "Type", "Value", "Module_ID") FROM stdin
 -- Name: param_seq; Type: SEQUENCE SET; Schema: core; Owner: -
 --
 
-SELECT pg_catalog.setval('param_seq', 128, true);
+SELECT pg_catalog.setval('param_seq', 207, true);
 
 
 --
@@ -3799,7 +3721,7 @@ COPY proc ("ID", "Name", "Identified", "Module_ID", "Active", "Order") FROM stdi
 -- Name: proc_seq; Type: SEQUENCE SET; Schema: core; Owner: -
 --
 
-SELECT pg_catalog.setval('proc_seq', 31, true);
+SELECT pg_catalog.setval('proc_seq', 32, true);
 
 
 --
@@ -3807,15 +3729,14 @@ SELECT pg_catalog.setval('proc_seq', 31, true);
 --
 
 COPY search_index ("ID", "Url", "Title", "Content", "Tags", "FTS") FROM stdin;
-1	/страница-1	Страница 1	<p>Первая страница</p>	тэг 3	'-1':2A '1':4C '3':8B 'перв':5 'страниц':1A,3C,6 'тэг':7B
-2	/статьи	Статьи	Полезные статьи	статьи, полезные статьи	'полезн':3,6B 'стат':1A,2C,4,5B,7B
-3	/статьи/статья-2	Статья 2	<p>Описание статьи 2</p>\nДата: 13.06.2015\nАнонс: Анонс статьи 2	тег 1	'-2':3A '1':16B '13.06.2015':10 '2':5C,8,14 'анонс':11,12 'дат':9 'описан':6 'стат':1A,2A,4C,7,13 'тег':15B
-4	/статьи/статья-1	Статья 1	<p>Описание статьи 1</p>\nДата: 12.06.2015\nАнонс: Анонс статьи 1	тег 1, тег 2, тег 3	'-1':3A '1':5C,8,14,16B '12.06.2015':10 '2':18B '3':20B 'анонс':11,12 'дат':9 'описан':6 'стат':1A,2A,4C,7,13 'тег':15B,17B,19B
-5	/новости	Новости	Последние новости. Новости сайта	новости, новости сайта, последние новости	'новост':1A,2C,4,5,7B,8B,11B 'последн':3,10B 'сайт':6,9B
-6	/новости/новость-2	Новость 2	<p>Описание новости 2</p>\nДата: 13.06.2015\nАнонс: Анонс новости 2	тег 2, тег 3	'-2':3A '13.06.2015':10 '2':5C,8,14,16B '3':18B 'анонс':11,12 'дат':9 'новост':1A,2A,4C,7,13 'описан':6 'тег':15B,17B
-7	/новости/новость-1	Новость 1	<p>Описание новости 1</p>\nДата: 12.06.2015\nАнонс: Анонс новости 1	тег 1, тег 2	'-1':3A '1':5C,8,14,16B '12.06.2015':10 '2':18B 'анонс':11,12 'дат':9 'новост':1A,2A,4C,7,13 'описан':6 'тег':15B,17B
-8	/вопрос-ответ	Вопрос-ответ	Часто задаваемые вопросы. FAQ. ЧАВО \n\n\nВопрос 1 Ответ 1\n\nВопрос 2 Ответ 2	вопрос-ответ, чаво, часто задаваемые вопросы, faq, F.A.Q., ответы на вопросы, вопросы и ответы, ФАК	'1':13,15 '2':17,19 'f.a.q':28B 'faq':10,27B 'вопрос':2A,5C,9,12,16,21B,26B,31B,32B 'вопрос-ответ':1A,4C,20B 'задава':8,25B 'ответ':3A,6C,14,18,22B,29B,34B 'фак':35B 'чав':11,23B 'част':7,24B
-9	/поиск	Поиск по сайту	Здесь вы можете воспользоваться поиском чтобы найти необходимую информацию.	поиск по сайту, найти, поиск	'воспользова':8 'информац':13 'может':7 'найт':11,17B 'необходим':12 'поиск':1A,2C,9,14B,18B 'сайт':4C,16B
+1	/s	Поиск по сайту	Здесь вы можете воспользоваться поиском чтобы найти необходимую информацию.	поиск по сайту, найти, поиск	'/s':1A 'воспользова':8 'информац':13 'может':7 'найт':11,17B 'необходим':12 'поиск':2C,9,14B,18B 'сайт':4C,16B
+2	/licence	Лицензия	<h2>The MIT License</h2>\r\n<p class="mono">Copyright &copy; 2011 Sergeev Denis, https://github.com/hharek<br /> Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:<br /> The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.<br /> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>\r\n<hr />\r\n<h2>Лицензия MIT</h2>\r\n<p class="mono">Copyright &copy; 2011 Сергеев Денис, https://github.com/hharek<br /> Данная лицензия разрешает лицам, получившим копию данного программного обеспечения и сопутствующей документации (в дальнейшем именуемыми &laquo;Программное Обеспечение&raquo;), безвозмездно использовать Программное Обеспечение без ограничений, включая неограниченное право на использование, копирование, изменение, добавление, публикацию, распространение, сублицензирование и/или продажу копий Программного Обеспечения, также как и лицам, которым предоставляется данное Программное Обеспечение, при соблюдении следующих условий:<br /> Указанное выше уведомление об авторском праве и данные условия должны быть включены во все копии или значимые части данного Программного Обеспечения.<br /> ДАННОЕ ПРОГРАММНОЕ ОБЕСПЕЧЕНИЕ ПРЕДОСТАВЛЯЕТСЯ &laquo;КАК ЕСТЬ&raquo;, БЕЗ КАКИХ-ЛИБО ГАРАНТИЙ, ЯВНО ВЫРАЖЕННЫХ ИЛИ ПОДРАЗУМЕВАЕМЫХ, ВКЛЮЧАЯ, НО НЕ ОГРАНИЧИВАЯСЬ ГАРАНТИЯМИ ТОВАРНОЙ ПРИГОДНОСТИ, СООТВЕТСТВИЯ ПО ЕГО КОНКРЕТНОМУ НАЗНАЧЕНИЮ И ОТСУТСТВИЯ НАРУШЕНИЙ ПРАВ. НИ В КАКОМ СЛУЧАЕ АВТОРЫ ИЛИ ПРАВООБЛАДАТЕЛИ НЕ НЕСУТ ОТВЕТСТВЕННОСТИ ПО ИСКАМ О ВОЗМЕЩЕНИИ УЩЕРБА, УБЫТКОВ ИЛИ ДРУГИХ ТРЕБОВАНИЙ ПО ДЕЙСТВУЮЩИМ КОНТРАКТАМ, ДЕЛИКТАМ ИЛИ ИНОМУ, ВОЗНИКШИМ ИЗ, ИМЕЮЩИМ ПРИЧИНОЙ ИЛИ СВЯЗАННЫМ С ПРОГРАММНЫМ ОБЕСПЕЧЕНИЕМ ИЛИ ИСПОЛЬЗОВАНИЕМ ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ ИЛИ ИНЫМИ ДЕЙСТВИЯМИ С ПРОГРАММНЫМ ОБЕСПЕЧЕНИЕМ.</p>		'/hharek':12,183 '/licence':1A '2011':7,178 'action':150 'and/or':55 'aris':156 'associ':30 'author':134 'charg':19 'claim':142 'condit':78 'connect':162 'contract':152 'copi':25,49,57,92 'copyright':6,81,136,177 'damag':143 'deal':36,171 'deni':9 'distribut':53 'document':31 'event':131 'express':110 'file':32 'fit':122 'follow':77 'free':17 'furnish':70 'github.com':11,182 'github.com/hharek':10,181 'grant':16 'herebi':15 'holder':137 'impli':112 'includ':42,89,113 'kind':109 'liabil':146 'liabl':139 'licens':5 'limit':44,116 'merchant':121 'merg':51 'mit':4,176 'modifi':50 'noninfring':128 'notic':82,86 'obtain':23 'otherwis':155 'particular':125 'permiss':13,85 'permit':63 'person':22,64 'portion':95 'provid':102 'publish':52 'purpos':126 'restrict':41 'right':46 'sell':56 'sergeev':8 'shall':87,132 'softwar':28,34,39,60,68,98,100,165,174 'subject':74 'sublicens':54 'substanti':94 'tort':153 'use':48,168 'warranti':106,119 'whether':147 'without':40,43,105 'автор':293 'авторск':241 'безвозмездн':201 'включ':207,248,273 'возмещен':302 'возникш':314 'выражен':270 'выш':238 'гарант':268,277 'дальн':197 'дан':184,190,230,244,255,258 'действ':309,329 'деликт':311 'денис':180 'добавлен':214 'документац':195 'должн':246 'друг':306 'значим':253 'изменен':213 'именуем':198 'имеющ':316 'ин':313,328 'иск':300 'использова':202 'использован':211,324 'как':266,291 'каких-либ':265 'конкретн':283 'контракт':310 'коп':189,221,251 'копирован':212 'котор':228 'либ':267 'лиц':187,227 'лиценз':2C,175,185 'назначен':284 'нарушен':287 'неограничен':208 'несут':297 'обеспечен':192,200,204,223,232,257,260,322,326,332 'ограничен':206 'ограничив':276 'ответствен':298 'отсутств':286 'подразумева':272 'получ':188 'прав':209,242,288 'правообладател':295 'предоставля':229,261 'пригодн':279 'причин':317 'программн':191,199,203,222,231,256,259,321,325,331 'продаж':220 'публикац':215 'разреша':186 'распространен':216 'связа':319 'серге':179 'след':235 'случа':292 'соблюден':234 'соответств':280 'сопутств':194 'сублицензирован':217 'такж':224 'товарн':278 'требован':307 'убытк':304 'уведомлен':239 'указа':237 'услов':236,245 'ущерб':303 'част':254 'явн':269
+3	/modules	Модули	<p>Модули в Znarus разделены на две категории: системные и обычные. Системные модули предоставляют базовую функциональность по CMS, и не могут быть удалены. Обычные модули предоставляют уникальную функциональность для сайта, их легко создать и можно удалить.</p>\r\n<h2>Системные модули</h2>\r\n<ul>\r\n<li><strong>Пользователи</strong> - Даёт возможность управлять пользователями и группами &laquo;Панели управления&raquo;. Также позволяет управляет доступом группы пользователей, на отдельные элементы &laquo;Панели управления&raquo;.</li>\r\n<li><strong>Проводник</strong> - Управление статическими файлами на сайте.</li>\r\n<li><strong>HTML-код</strong> - Правка файлов с шаблонам сайт. Позволяет определить по урлу, какие шаблоны влияют на отображение страницы.</li>\r\n<li><strong>Поиск</strong> - Индексирует страницы сайта и предоставляет форму для полнотекстового поиска по сайту. Может использовать PostgreSQL с полнотекстовыми индексами или движок Sphinx.</li>\r\n<li><strong>Поисковая оптимизация</strong> - Возможность правки мета-данных по странице, в зависимости от урла, установка переадресаций, правка robots.txt и др.</li>\r\n<li><strong>Сервис</strong> - Показ сведений по программному обеспечению установленному на хостинге.</li>\r\n<li><strong>Карта сайта</strong> - Создание sitemap.xml и генерация страницы &laquo;Карта-сайта&raquo;.</li>\r\n<li><strong>Задачи</strong> - Возможность раздачи задания между пользователями &laquo;Панели управления&raquo; и контроль за выполнением.</li>\r\n<li><strong>Страницы</strong> - Простой модуль для размещения страниц на сайте.</li>\r\n</ul>\r\n<h2>Обычные модули</h2>\r\n<ul>\r\n<li><strong>Меню</strong> - размещение на сайте многомерного и одномерного меню.</li>\r\n</ul>		'/modules':1A 'cms':19 'html':67 'html-код':66 'postgresql':98 'robots.txt':121 'sitemap.xml':136 'sphinx':104 'znarus':5 'базов':16 'влия':80 'возможн':42,107,144 'выполнен':154 'генерац':138 'групп':46,53 'дан':111 'даёт':41 'две':8 'движок':103 'доступ':52 'др':123 'зависим':115 'задан':146 'задач':143 'индекс':101 'индексир':85 'использова':97 'как':78 'карт':133,141 'карта-сайт':140 'категор':9 'код':68 'контрол':152 'легк':33 'мен':165,172 'мет':110 'мета-да':109 'многомерн':169 'могут':22 'модул':2C,3,14,26,39,157,164 'обеспечен':129 'обычн':12,25,163 'одномерн':171 'определ':75 'оптимизац':106 'отдельн':56 'отображен':82 'панел':47,58,149 'переадресац':119 'позволя':50,74 'поиск':84,93 'поисков':105 'показ':125 'полнотекстов':92,100 'пользовател':40,44,54,148 'правк':69,108,120 'предоставля':15,27,89 'проводник':60 'программн':128 'прост':156 'раздач':145 'раздел':6 'размещен':159,166 'сайт':31,65,73,87,95,134,142,162,168 'сведен':126 'сервис':124 'системн':10,13,38 'созда':34 'создан':135 'статическ':62 'страниц':83,86,113,139,155,160 'такж':49 'удал':24,37 'уникальн':28 'управлен':48,59,61,150 'управля':43,51 'урл':77,117 'установк':118 'установлен':130 'файл':63,70 'форм':90 'функциональн':17,29 'хостинг':132 'шаблон':72,79 'элемент':57
+4	/about	Описание	<p><strong>Znarus</strong> - это система для создания и управления вашим сайтом. Для управления содержимым сайта используется &laquo;Панель управления&raquo;, а для управления модулями CMS используется &laquo;Панель разработчика&raquo;. Znarus является свободным программным обеспечением с открытым исходным кодом и открытой лицензией MIT. В основе её используется язык программирование PHP и система управления базой данных PostgreSQL.</p>\r\n<h2>Преимущества:</h2>\r\n<ul>\r\n<li>Быстрая, за счёт использования</li>\r\n<li>Удобный и понятный интерфейс панели управления</li>\r\n<li>Обладает встроенными инструментами для развёртывания поиска по сайту</li>\r\n<li>Хранит историю ранее изменённых документов</li>\r\n<li>Встроенный LESS-обработчик для CSS</li>\r\n<li>Встроенные модуля для работы с SEO</li>\r\n<li>Панель разработчика позволяет понять какое кол-во модулей установлено на сайте</li>\r\n<li>Возможность встраивать CMS в любой html-код.</li>\r\n</ul>		'/about':1A 'cms':23,103 'css':82 'html':107 'html-код':106 'less':79 'less-обработчик':78 'mit':39 'php':46 'postgresql':52 'seo':88 'znarus':3,27 'баз':50 'быстр':54 'ваш':10 'возможн':101 'встраива':102 'встроен':65,77,83 'дан':51 'документ':76 'её':42 'изменён':75 'инструмент':66 'интерфейс':61 'использ':16,24,43 'использован':57 'истор':73 'исходн':34 'как':93 'код':35,108 'кол':95 'кол-в':94 'лиценз':38 'люб':105 'модул':22,84,97 'обеспечен':31 'облада':64 'обработчик':80 'описан':2C 'основ':41 'открыт':33,37 'панел':17,25,62,89 'позволя':91 'поиск':69 'поня':92 'понятн':60 'преимуществ':53 'программирован':45 'программн':30 'работ':86 'развёртыван':68 'разработчик':26,90 'ран':74 'сайт':11,15,71,100 'свободн':29 'систем':5,48 'содержим':14 'создан':7 'счёт':56 'удобн':58 'управлен':9,13,18,21,49,63 'установл':98 'хран':72 'эт':4 'явля':28 'язык':44
+5	/constr	Панель разработки	<p>&laquo;Панель разработки&raquo; позволяет увидеть разработчику сайта текущие установленные модули и другую техническую информацию по сайту.</p>		'/constr':1A 'друг':14 'информац':16 'модул':12 'панел':2C,4 'позволя':6 'разработк':3C,5 'разработчик':8 'сайт':9,18 'текущ':10 'техническ':15 'увидет':7 'установлен':11
+6	/admin	Панель управления	<p>&laquo;Панель управления&raquo; предназначена для создания и управления страницами сайта. Страница &laquo;Панели управления&raquo; расположена по урлу &laquo;/admin/&raquo; (можно поменять в настройках). Для доступа к ней нужно указать &laquo;E-mail&raquo; и &laquo;Пароль&raquo;. Обладая правами &laquo;Администратора&raquo; (по умолчанию root) можно через &laquo;Панель управления&raquo; создать группы и пользователей. Для каждой группы пользователей можно задать права на осуществления тех или иных действий. В CMS есть пользователь &laquo;Администратор&raquo;, который обладает всеми привилегиями.</p>\r\n<p>На разных сайтах функционал &laquo;Панели управления&raquo; отличается, это зависит от количества установленных модулей на сайте. Панель управления позволяет создавать страницы без знания HTML и участия программиста, для этого в ней присутствует редактор (WYSIWYG-редактор) с удобным интерфейсом напоминающий Word или LibreOffice Writer. Через редактор оператор сможет загружать рисунки и править тексты. на сайте. Панель управления защищена от популярных атак типа CSRF и SQL-инъекции.</p>		'/admin':1A,19 'cms':63 'csrf':132 'e':31 'e-mail':30 'html':93 'libreoffic':112 'mail':32 'root':40 'sql':135 'sql-инъекц':134 'word':110 'writer':113 'wysiwyg':104 'wysiwyg-редактор':103 'администратор':37,66 'атак':130 'всем':69 'групп':46,51 'действ':61 'доступ':25 'завис':79 'загружа':118 'зада':54 'защищ':127 'знан':92 'ин':60 'интерфейс':108 'инъекц':136 'кажд':50 'количеств':81 'котор':67 'модул':83 'напомина':109 'настройк':23 'нужн':28 'облад':35 'облада':68 'оператор':116 'осуществлен':57 'отлича':77 'панел':2C,4,14,43,75,86,125 'парол':34 'позволя':88 'пользовател':48,52,65 'поменя':21 'популярн':129 'прав':36,55,121 'предназнач':6 'привилег':70 'присутств':101 'программист':96 'разн':72 'располож':16 'редактор':102,105,115 'рисунк':119 'сайт':12,73,85,124 'сможет':117 'созда':45 'создава':89 'создан':8 'страниц':11,13,90 'текст':122 'тех':58 'тип':131 'удобн':107 'указа':29 'умолчан':39 'управлен':3C,5,10,15,44,76,87,126 'урл':18 'установлен':82 'участ':95 'функциона':74 'эт':78
+7	/hosting	Требования к хостингу	<h2>Требования к хостингу</h2>\r\n<ul>\r\n<li>Операционная система Linux</li>\r\n<li>PHP 7</li>\r\n<li>PostgreSQL 9.4 и выше</li>\r\n</ul>\r\n<h2>Обязательные модули PHP</h2>\r\n<ul>\r\n<li>pgsql</li>\r\n<li>zip</li>\r\n<li>mbstring</li>\r\n<li>curl</li>\r\n<li>openssl</li>\r\n</ul>\r\n<h2>Модули PHP (опционально)</h2>\r\n<ul>\r\n<li>db4 или qdbm (если включено кэширование через dba)</li>\r\n<li>memcache или memcached (если включено кэширование через memcache)</li>\r\n<li>gd (если работаете с изображением)</li>\r\n<li>mysql (если поиск через sphinx)</li>\r\n</ul>		'/hosting':1A '7':12 '9.4':14 'curl':23 'db4':28 'dba':35 'gd':44 'linux':10 'mbstring':22 'memcach':36,38,43 'mysql':49 'openssl':24 'pgsql':20 'php':11,19,26 'postgresql':13 'qdbm':30 'sphinx':53 'zip':21 'включ':32,40 'выш':16 'изображен':48 'кэширован':33,41 'модул':18,25 'обязательн':17 'операцион':8 'опциональн':27 'поиск':51 'работа':46 'систем':9 'требован':2C,5 'хостинг':4C,7
+8	/install	Установка	<p>Если хостинг содержит всё необходимое программное обеспечение, необходимо:</p>\r\n<ul>\r\n<li>Создать базу PostgreSQL и поместить в неё SQL-данные лежащие в файл &laquo;sql/dump.sql&raquo;</li>\r\n<li>Поправить файл &laquo;app/conf/conf.php&raquo; согласно свои настройкам.</li>\r\n</ul>		'/install':1A 'app/conf/conf.php':27 'postgresql':13 'sql':19 'sql-дан':18 'sql/dump.sql':24 'баз':12 'всё':6 'дан':20 'лежа':21 'настройк':30 'необходим':7,10 'неё':17 'обеспечен':9 'помест':15 'поправ':25 'программн':8 'сво':29 'согласн':28 'содерж':5 'созда':11 'установк':2C 'файл':23,26 'хостинг':4
 \.
 
 
@@ -3823,7 +3744,7 @@ COPY search_index ("ID", "Url", "Title", "Content", "Tags", "FTS") FROM stdin;
 -- Name: search_index_seq; Type: SEQUENCE SET; Schema: core; Owner: -
 --
 
-SELECT pg_catalog.setval('search_index_seq', 9, true);
+SELECT pg_catalog.setval('search_index_seq', 8, true);
 
 
 --
@@ -3832,31 +3753,142 @@ SELECT pg_catalog.setval('search_index_seq', 9, true);
 
 COPY search_index_tags ("Index_ID", "Tags_ID") FROM stdin;
 1	1
-2	2
-2	3
-3	4
-4	4
-4	5
-4	6
-5	7
-5	8
-5	9
-6	5
-6	6
-7	4
-7	5
-8	10
-8	11
-8	12
-8	13
-8	14
-8	15
-8	16
-8	17
-9	18
-9	19
-9	20
+1	2
+1	3
 \.
+
+
+--
+-- Data for Name: search_log; Type: TABLE DATA; Schema: core; Owner: -
+--
+
+COPY search_log ("ID", "Query", "Date", "IP") FROM stdin;
+1	проверка	2017-02-07 13:00:13.547945	127.0.0.1/32
+2	поиск	2017-02-15 18:13:25.876563	127.0.0.1/32
+3	штукатурка vetonit tt	2017-02-15 18:13:37.654148	127.0.0.1/32
+4	автомат	2017-02-15 19:55:33.754281	127.0.0.1/32
+5	автомат	2017-02-15 19:55:46.563484	127.0.0.1/32
+6	байпас	2017-02-15 19:56:01.61185	127.0.0.1/32
+7	байпас	2017-02-15 19:56:33.071221	127.0.0.1/32
+8	байпас	2017-02-15 19:58:15.048717	127.0.0.1/32
+9	байпас	2017-02-15 19:59:41.808821	127.0.0.1/32
+10	байпас	2017-02-15 20:00:46.552558	127.0.0.1/32
+11	байпас	2017-02-15 20:01:12.00737	127.0.0.1/32
+12	байпас	2017-02-15 20:01:56.253954	127.0.0.1/32
+13	байпас	2017-02-15 20:05:01.748176	127.0.0.1/32
+14	байпас	2017-02-15 20:05:59.555173	127.0.0.1/32
+15	автомат	2017-02-16 12:02:20.224505	127.0.0.1/32
+16	автомат	2017-02-16 12:02:47.119347	127.0.0.1/32
+17	автомат	2017-02-16 12:03:43.202964	127.0.0.1/32
+18	автомат	2017-02-16 12:03:58.305718	127.0.0.1/32
+19	автомат	2017-02-16 12:04:06.288478	127.0.0.1/32
+20	автомат	2017-02-16 12:04:16.916863	127.0.0.1/32
+21	автомат	2017-02-16 12:07:27.942113	127.0.0.1/32
+22	автомат	2017-02-16 12:10:42.061865	127.0.0.1/32
+23	автомат	2017-02-16 12:12:54.38051	127.0.0.1/32
+24	автомат	2017-02-16 12:13:42.642082	127.0.0.1/32
+25	автомат	2017-02-16 12:14:22.57765	127.0.0.1/32
+26	автомат	2017-02-16 12:15:34.532042	127.0.0.1/32
+27	автомат	2017-02-16 12:15:43.449942	127.0.0.1/32
+28	автомат	2017-02-16 12:16:17.308171	127.0.0.1/32
+29	автомат	2017-02-16 12:17:27.146503	127.0.0.1/32
+30	автомат	2017-02-16 12:17:47.195366	127.0.0.1/32
+31	автомат	2017-02-16 12:18:29.47866	127.0.0.1/32
+32	автомат	2017-02-16 12:19:09.599033	127.0.0.1/32
+33	автомат	2017-02-16 12:21:06.668971	127.0.0.1/32
+34	автомат	2017-02-16 12:21:23.02255	127.0.0.1/32
+35	автомат	2017-02-16 12:21:33.753305	127.0.0.1/32
+36	автомат	2017-02-16 12:21:40.319602	127.0.0.1/32
+37	автомат	2017-02-16 12:21:49.093585	127.0.0.1/32
+38	автомат	2017-02-16 12:21:53.595177	127.0.0.1/32
+39	автомат	2017-02-16 12:22:25.194159	127.0.0.1/32
+40	автомат	2017-02-16 12:23:05.970628	127.0.0.1/32
+41	автомат	2017-02-16 12:24:14.028015	127.0.0.1/32
+42	автомат	2017-02-16 12:24:28.18465	127.0.0.1/32
+43	автомат	2017-02-16 12:25:01.075366	127.0.0.1/32
+44	автомат	2017-02-16 12:25:08.433367	127.0.0.1/32
+45	автомат	2017-02-16 12:25:45.291318	127.0.0.1/32
+46	автомат	2017-02-16 12:25:54.859642	127.0.0.1/32
+47	автомат	2017-02-16 12:26:40.439048	127.0.0.1/32
+48	автомат	2017-02-16 12:27:52.065749	127.0.0.1/32
+49	автомат	2017-02-16 12:27:59.266189	127.0.0.1/32
+50	автомат	2017-02-16 12:28:11.526182	127.0.0.1/32
+51	автомат	2017-02-16 12:28:19.148526	127.0.0.1/32
+52	автомат	2017-02-16 12:28:27.858796	127.0.0.1/32
+53	автомат	2017-02-16 12:28:34.405767	127.0.0.1/32
+54	автомат	2017-02-16 12:28:45.531158	127.0.0.1/32
+55	автомат	2017-02-16 12:30:03.493629	127.0.0.1/32
+56	автоматфыва	2017-02-16 12:30:30.301119	127.0.0.1/32
+57	автоматфыва	2017-02-16 12:31:01.526029	127.0.0.1/32
+58	автоматфыва	2017-02-16 12:31:19.374319	127.0.0.1/32
+59	автоматфыва	2017-02-16 12:31:28.771825	127.0.0.1/32
+60	автоматфыва	2017-02-16 12:31:39.297543	127.0.0.1/32
+61	автоматфыва	2017-02-16 12:31:53.835159	127.0.0.1/32
+62	автоматфыва	2017-02-16 12:32:16.605083	127.0.0.1/32
+63	автомат	2017-02-16 12:32:29.060636	127.0.0.1/32
+64	автомат	2017-02-16 12:34:08.214736	127.0.0.1/32
+65	автомат	2017-02-16 12:34:26.982433	127.0.0.1/32
+66	автомат	2017-02-16 12:34:36.580781	127.0.0.1/32
+67	автомат	2017-02-16 12:35:27.08023	127.0.0.1/32
+68	автомат	2017-02-16 12:36:27.735833	127.0.0.1/32
+69	автомат	2017-02-16 12:36:36.457989	127.0.0.1/32
+70	авторм	2017-02-16 15:27:14.069802	127.0.0.1/32
+71	автомат	2017-02-16 15:27:18.606405	127.0.0.1/32
+72	автомат	2017-02-16 15:27:31.713134	127.0.0.1/32
+73	автомат	2017-02-16 15:28:54.170207	127.0.0.1/32
+74	автомат	2017-02-16 15:29:16.12866	127.0.0.1/32
+75	автомат	2017-02-16 15:29:31.730275	127.0.0.1/32
+76	мастер	2017-02-16 18:31:53.210693	127.0.0.1/32
+77	электрика	2017-02-20 09:10:54.080371	5.18.174.183/32
+78	электрика	2017-02-20 09:14:38.943726	5.18.174.183/32
+79	сантехника	2017-02-20 09:15:05.110926	5.18.174.183/32
+80	фум-лента	2017-02-20 09:15:32.630913	5.18.174.183/32
+81	унитаз	2017-02-20 16:41:38.000517	5.18.174.183/32
+82	плитка	2017-02-20 21:35:42.493066	5.18.174.183/32
+83	плитка	2017-02-20 21:35:49.79999	5.18.174.183/32
+84	вакансии	2017-03-15 15:42:18.85488	5.251.177.216/32
+85	декаративни плитка	2017-03-29 19:20:32.424234	94.19.98.176/32
+86	сделать унитаз	2017-04-14 05:15:12.413992	92.255.176.208/32
+87	слово	2017-04-24 19:20:35.588852	127.0.0.1/32
+88	слово	2017-04-24 19:21:19.451209	127.0.0.1/32
+89	установка	2017-04-24 19:21:27.239082	127.0.0.1/32
+90	лиц	2017-04-24 19:22:06.138854	127.0.0.1/32
+91	znarus	2017-04-24 19:22:12.195274	127.0.0.1/32
+92	znarus	2017-04-24 19:26:16.591827	127.0.0.1/32
+93	znarus	2017-04-24 19:26:39.377498	127.0.0.1/32
+94	znarus	2017-04-24 19:26:54.638664	127.0.0.1/32
+95	znarus	2017-04-24 19:27:04.462641	127.0.0.1/32
+96	znarus	2017-04-24 19:27:22.093899	127.0.0.1/32
+97	znarus	2017-04-24 19:27:45.704446	127.0.0.1/32
+98	znarus	2017-04-24 19:27:57.69535	127.0.0.1/32
+99	znarus1	2017-04-24 19:28:53.609634	127.0.0.1/32
+100	znarus	2017-04-24 19:29:20.421798	127.0.0.1/32
+101	znarus	2017-04-24 19:29:50.639517	127.0.0.1/32
+102	znarus	2017-04-24 19:29:54.397685	127.0.0.1/32
+103	znarus	2017-04-24 19:30:19.735163	127.0.0.1/32
+104	znarus	2017-04-24 19:30:42.362313	127.0.0.1/32
+105	ыфва	2017-04-24 19:32:21.615037	127.0.0.1/32
+106	ыфва	2017-04-24 19:35:57.615734	127.0.0.1/32
+107	ыфва	2017-04-24 19:36:54.240718	127.0.0.1/32
+108	сло	2017-04-24 19:36:59.274548	127.0.0.1/32
+109	слово	2017-04-24 19:37:03.578543	127.0.0.1/32
+110	лицензия	2017-04-24 19:37:08.515227	127.0.0.1/32
+111	лицензия	2017-04-24 19:38:22.216185	127.0.0.1/32
+112	лицензия	2017-04-24 19:39:06.974341	127.0.0.1/32
+113	лицензия	2017-04-24 19:39:15.185573	127.0.0.1/32
+114	лицензия	2017-04-24 19:39:23.711198	127.0.0.1/32
+115	dump	2017-04-24 19:45:46.528803	127.0.0.1/32
+116	dump.sql	2017-04-24 19:45:50.206162	127.0.0.1/32
+117	дамп	2017-04-24 19:45:54.164372	127.0.0.1/32
+118	postgresql	2017-04-24 19:46:01.787885	127.0.0.1/32
+\.
+
+
+--
+-- Name: search_log_seq; Type: SEQUENCE SET; Schema: core; Owner: -
+--
+
+SELECT pg_catalog.setval('search_log_seq', 118, true);
 
 
 --
@@ -3864,26 +3896,9 @@ COPY search_index_tags ("Index_ID", "Tags_ID") FROM stdin;
 --
 
 COPY search_tags ("ID", "Name", "Count") FROM stdin;
-1	тэг 3	1
-2	статьи	1
-3	полезные статьи	1
-7	новости	1
-8	новости сайта	1
-9	последние новости	1
-6	тег 3	2
-4	тег 1	3
-5	тег 2	3
-10	вопрос-ответ	1
-11	чаво	1
-12	часто задаваемые вопросы	1
-13	faq	1
-14	F.A.Q.	1
-15	ответы на вопросы	1
-16	вопросы и ответы	1
-17	ФАК	1
-18	поиск по сайту	1
-19	найти	1
-20	поиск	1
+1	поиск по сайту	1
+2	найти	1
+3	поиск	1
 \.
 
 
@@ -3891,14 +3906,14 @@ COPY search_tags ("ID", "Name", "Count") FROM stdin;
 -- Name: search_tags_seq; Type: SEQUENCE SET; Schema: core; Owner: -
 --
 
-SELECT pg_catalog.setval('search_tags_seq', 20, true);
+SELECT pg_catalog.setval('search_tags_seq', 3, true);
 
 
 --
 -- Data for Name: seo_redirect; Type: TABLE DATA; Schema: core; Owner: -
 --
 
-COPY seo_redirect ("ID", "From", "To", "Location") FROM stdin;
+COPY seo_redirect ("ID", "From", "To", "Location", "Tags") FROM stdin;
 \.
 
 
@@ -3906,7 +3921,7 @@ COPY seo_redirect ("ID", "From", "To", "Location") FROM stdin;
 -- Name: seo_redirect_seq; Type: SEQUENCE SET; Schema: core; Owner: -
 --
 
-SELECT pg_catalog.setval('seo_redirect_seq', 20, true);
+SELECT pg_catalog.setval('seo_redirect_seq', 1, false);
 
 
 --
@@ -3921,7 +3936,7 @@ COPY seo_url ("ID", "Url", "Title", "Keywords", "Description") FROM stdin;
 -- Name: seo_url_seq; Type: SEQUENCE SET; Schema: core; Owner: -
 --
 
-SELECT pg_catalog.setval('seo_url_seq', 11, true);
+SELECT pg_catalog.setval('seo_url_seq', 1, false);
 
 
 --
@@ -3944,15 +3959,15 @@ SELECT pg_catalog.setval('task_seq', 2, true);
 --
 
 COPY text ("ID", "Name", "Identified", "Value", "Module_ID") FROM stdin;
-8	Содержимое страницы 404	404_content	<p>Запрашиваемой страницы не существует. Возможно страница была перемещена или удалена с сайта. Проверьте правильность указания адреса.</p>\r\n<p>Попробуйте воспользоваться <strong><a href="/поиск">поиском</a> </strong>или <strong><a href="/карта-сайта">картой сайта</a></strong> (на карте сайта указаны все страницы, которые только могут быть на нашем сайте), чтобы найти необходимую страницу.</p>\r\n<p>&nbsp;</p>\r\n<p>&nbsp;</p>	9
 35	Главная страница. Содержание	home_content	<p>Добро пожаловать</p>	1
 36	Страница 404. Содержание	404_content	<p>Страница не найдена.</p>	1
 37	Страница 403. Содержание	403_content	<p>Доступ запрещён.</p>	1
-7	Содержание главной страницы	home_content	<p>Главная страница сайта</p>	9
-9	Содежимое страницы 403	403_content	<p>Доступ запрещён.&nbsp; </p>	9
-32	Главная страница. Тэг meta name="description"	home_description		10
+41	Страница 404. Содержание	404_content	<p>Страница не найдена.</p>	74
+42	Страница 403. Содержание	403_content	<p>К сожалению, данная страница для Вас не доступна.</p>	74
+32	Главная страница. Тэг meta name="description"	home_description	CMS Znarus - быстрая и умная CMS	10
 33	Страница 404. Тэг meta name="description"	404_description		10
 34	Страница 403. meta name="description"	403_description		10
+40	Главная. Содержание	home_content	<p><strong>Znarus</strong> - это система для создания и управления вашим сайтом. Для управления содержимым сайта используется &laquo;Панель управления&raquo;, а для управления модулями CMS используется &laquo;Панель разработчика&raquo;. Znarus является свободным программным обеспечением с открытым исходным кодом и открытой лицензией MIT. В основе её используется язык программирование PHP и система управления базой данных PostgreSQL.</p>\r\n<h2>Преимущества:</h2>\r\n<ul>\r\n<li>Быстрая, за счёт использования</li>\r\n<li>Удобный и понятный интерфейс панели управления</li>\r\n<li>Обладает встроенными инструментами для развёртывания поиска по сайту</li>\r\n<li>Хранит историю ранее изменённых документов</li>\r\n<li>Встроенный LESS-обработчик для CSS</li>\r\n<li>Встроенные модуля для работы с SEO</li>\r\n<li>Панель разработчика позволяет понять какое кол-во модулей установлено на сайте</li>\r\n<li>Возможность встраивать CMS в любой html-код.</li>\r\n</ul>	74
 \.
 
 
@@ -3960,15 +3975,14 @@ COPY text ("ID", "Name", "Identified", "Value", "Module_ID") FROM stdin;
 -- Name: text_seq; Type: SEQUENCE SET; Schema: core; Owner: -
 --
 
-SELECT pg_catalog.setval('text_seq', 37, true);
+SELECT pg_catalog.setval('text_seq', 46, true);
 
 
 --
 -- Data for Name: user; Type: TABLE DATA; Schema: core; Owner: -
 --
 
-COPY "user" ("ID", "Name", "Email", "Password", "Group_ID", "Active", "Password_Change_Code", "Password_Change_Date", "Salt", "Visit_Last_Admin") FROM stdin;
-19	Оператор	info@example.com	93cb92cff46d8086432815fc96b88dc1	1	t	\N	2015-06-14 02:14:05.936947	916b	#_service/module
+COPY "user" ("ID", "Name", "Email", "Password", "Group_ID", "Active", "Password_Change_Code", "Password_Change_Date", "Visit_Last_Admin") FROM stdin;
 \.
 
 
@@ -3978,6 +3992,8 @@ COPY "user" ("ID", "Name", "Email", "Password", "Group_ID", "Active", "Password_
 
 COPY user_group ("ID", "Name") FROM stdin;
 1	Операторы
+3	Администраторы
+4	Верстальщик
 \.
 
 
@@ -3986,32 +4002,63 @@ COPY user_group ("ID", "Name") FROM stdin;
 --
 
 COPY user_group_priv ("Admin_ID", "Group_ID") FROM stdin;
-65	1
-66	1
-67	1
-68	1
-69	1
-50	1
-51	1
-52	1
-53	1
-54	1
-56	1
-57	1
-58	1
-59	1
-60	1
-61	1
-62	1
-63	1
-26	1
-27	1
-28	1
-29	1
-30	1
-31	1
-32	1
-33	1
+82	4
+77	4
+78	4
+79	4
+80	4
+81	4
+238	4
+367	4
+367	1
+368	4
+368	1
+369	4
+369	1
+370	4
+370	1
+35	4
+36	4
+37	4
+38	4
+39	4
+40	4
+41	4
+42	4
+43	4
+44	4
+45	4
+7	3
+8	3
+9	3
+10	3
+11	3
+12	3
+13	3
+16	3
+14	3
+17	4
+18	4
+19	4
+20	4
+21	4
+23	4
+24	4
+25	4
+371	4
+371	1
+373	4
+373	1
+374	4
+374	1
+375	4
+375	1
+377	4
+377	1
+372	4
+372	1
+378	4
+378	1
 \.
 
 
@@ -4019,14 +4066,14 @@ COPY user_group_priv ("Admin_ID", "Group_ID") FROM stdin;
 -- Name: user_group_seq; Type: SEQUENCE SET; Schema: core; Owner: -
 --
 
-SELECT pg_catalog.setval('user_group_seq', 20, true);
+SELECT pg_catalog.setval('user_group_seq', 4, true);
 
 
 --
 -- Name: user_seq; Type: SEQUENCE SET; Schema: core; Owner: -
 --
 
-SELECT pg_catalog.setval('user_seq', 19, true);
+SELECT pg_catalog.setval('user_seq', 5, true);
 
 
 --
@@ -4034,51 +4081,18 @@ SELECT pg_catalog.setval('user_seq', 19, true);
 --
 
 COPY user_session ("ID", "Date", "IP", "Browser", "User_ID") FROM stdin;
+a68646d02330cf7668b3dd71d8cc51e6	2017-04-24 19:40:44	8c08ae167bcae38e5b794bce1deb0f61	db6702d15b2cd35b27d7d2be214632ea	\N
 \.
 
 
 SET search_path = public, pg_catalog;
 
 --
--- Data for Name: articles; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY articles ("ID", "Date", "Title", "Url", "Anons", "Content", "Tags", "Last_Modified") FROM stdin;
-2	2015-06-13	Статья 2	статья-2	Анонс статьи 2	<p>Описание статьи 2</p>	тег 1	2015-06-14 02:10:33.46792
-1	2015-06-12	Статья 1	статья-1	Анонс статьи 1	<p>Описание статьи 1</p>	тег 1, тег 2, тег 3	2015-06-14 02:10:48.063252
-\.
-
-
---
--- Name: articles_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('articles_seq', 2, true);
-
-
---
--- Data for Name: faq; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY faq ("ID", "Question", "Answer", "Sort") FROM stdin;
-1	Вопрос 1	Ответ 1	1
-2	Вопрос 2	Ответ 2	2
-\.
-
-
---
--- Name: faq_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('faq_seq', 2, true);
-
-
---
 -- Data for Name: menu; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY menu ("ID", "Name") FROM stdin;
-1	Верхнее
+1	Левое
 \.
 
 
@@ -4086,12 +4100,14 @@ COPY menu ("ID", "Name") FROM stdin;
 -- Data for Name: menu_item; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY menu_item ("ID", "Name", "Url", "Parent", "Menu_ID", "Sort") FROM stdin;
-3	ЧАВо	/вопрос-ответ	\N	1	4
-4	Главная	/	\N	1	1
-1	Новости	/новости	\N	1	2
-2	Статьи	/статьи	\N	1	3
-5	Поиск	/поиск	\N	1	5
+COPY menu_item ("ID", "Name", "Url", "Parent", "Menu_ID", "Order", "Icon", "Active") FROM stdin;
+3	Требования	/hosting	\N	1	3	server	t
+4	Лицензия	/licence	\N	1	4	file-text-o	t
+5	Модули	/modules	\N	1	5	sitemap	t
+6	Панель управления	/admin	\N	1	6	wrench	t
+7	Панель разработки	/constr	\N	1	7	puzzle-piece	t
+1	Описание	/about	\N	1	1	info	t
+2	Установка	/install	\N	1	2	cog	t
 \.
 
 
@@ -4099,7 +4115,7 @@ COPY menu_item ("ID", "Name", "Url", "Parent", "Menu_ID", "Sort") FROM stdin;
 -- Name: menu_item_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('menu_item_seq', 5, true);
+SELECT pg_catalog.setval('menu_item_seq', 7, true);
 
 
 --
@@ -4107,39 +4123,6 @@ SELECT pg_catalog.setval('menu_item_seq', 5, true);
 --
 
 SELECT pg_catalog.setval('menu_seq', 1, true);
-
-
---
--- Data for Name: news; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY news ("ID", "Date", "Title", "Url", "Anons", "Content", "Tags", "Last_Modified") FROM stdin;
-2	2015-06-13	Новость 2	новость-2	Анонс новости 2	<p>Описание новости 2</p>	тег 2, тег 3	2015-06-14 02:11:29.758717
-1	2015-06-12	Новость 1	новость-1	Анонс новости 1	<p>Описание новости 1</p>	тег 1, тег 2	2015-06-14 02:11:40.15436
-\.
-
-
---
--- Name: news_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('news_seq', 2, true);
-
-
---
--- Data for Name: page; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY page ("ID", "Name", "Url", "Content", "Parent", "Tags", "Last_Modified", "Html_ID") FROM stdin;
-1	Страница 1	страница-1	<p>Первая страница</p>	\N	тэг 3	2015-06-14 02:16:33.307194	\N
-\.
-
-
---
--- Name: page_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('page_seq', 1, true);
 
 
 SET search_path = core, pg_catalog;
@@ -4313,6 +4296,14 @@ ALTER TABLE ONLY packjs_depend
 
 
 --
+-- Name: page_PK; Type: CONSTRAINT; Schema: core; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY page
+    ADD CONSTRAINT "page_PK" PRIMARY KEY ("ID");
+
+
+--
 -- Name: param_PK; Type: CONSTRAINT; Schema: core; Owner: -; Tablespace: 
 --
 
@@ -4382,6 +4373,14 @@ ALTER TABLE ONLY search_index
 
 ALTER TABLE ONLY search_index_tags
     ADD CONSTRAINT "search_index_tags_PK" PRIMARY KEY ("Index_ID", "Tags_ID");
+
+
+--
+-- Name: search_log_PK; Type: CONSTRAINT; Schema: core; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY search_log
+    ADD CONSTRAINT "search_log_PK" PRIMARY KEY ("ID");
 
 
 --
@@ -4523,38 +4522,6 @@ ALTER TABLE ONLY user_session
 SET search_path = public, pg_catalog;
 
 --
--- Name: articles_PK; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY articles
-    ADD CONSTRAINT "articles_PK" PRIMARY KEY ("ID");
-
-
---
--- Name: articles_UN_Title; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY articles
-    ADD CONSTRAINT "articles_UN_Title" UNIQUE ("Title");
-
-
---
--- Name: articles_UN_Url; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY articles
-    ADD CONSTRAINT "articles_UN_Url" UNIQUE ("Url");
-
-
---
--- Name: faq_PK; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY faq
-    ADD CONSTRAINT "faq_PK" PRIMARY KEY ("ID");
-
-
---
 -- Name: menu_PK; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -4563,75 +4530,11 @@ ALTER TABLE ONLY menu
 
 
 --
--- Name: menu_UN_Name; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY menu
-    ADD CONSTRAINT "menu_UN_Name" UNIQUE ("Name");
-
-
---
 -- Name: menu_item_PK; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY menu_item
     ADD CONSTRAINT "menu_item_PK" PRIMARY KEY ("ID");
-
-
---
--- Name: menu_item_UN_Name; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY menu_item
-    ADD CONSTRAINT "menu_item_UN_Name" UNIQUE ("Name", "Parent", "Menu_ID");
-
-
---
--- Name: news_PK; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY news
-    ADD CONSTRAINT "news_PK" PRIMARY KEY ("ID");
-
-
---
--- Name: news_UN_Title; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY news
-    ADD CONSTRAINT "news_UN_Title" UNIQUE ("Title");
-
-
---
--- Name: news_UN_Url; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY news
-    ADD CONSTRAINT "news_UN_Url" UNIQUE ("Url");
-
-
---
--- Name: page_PK; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY page
-    ADD CONSTRAINT "page_PK" PRIMARY KEY ("ID");
-
-
---
--- Name: page_UN_Name; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY page
-    ADD CONSTRAINT "page_UN_Name" UNIQUE ("Name", "Parent");
-
-
---
--- Name: page_UN_Url; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY page
-    ADD CONSTRAINT "page_UN_Url" UNIQUE ("Url", "Parent");
 
 
 SET search_path = core, pg_catalog;
@@ -4644,11 +4547,64 @@ CREATE UNIQUE INDEX "exe_UN_Identified" ON exe USING btree (lower(("Identified")
 
 
 --
+-- Name: page_UN1; Type: INDEX; Schema: core; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX "page_UN1" ON page USING btree ("Name", "Parent") WHERE ("Parent" IS NOT NULL);
+
+
+--
+-- Name: page_UN1_NULL; Type: INDEX; Schema: core; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX "page_UN1_NULL" ON page USING btree ("Name") WHERE ("Parent" IS NULL);
+
+
+--
+-- Name: page_UN2; Type: INDEX; Schema: core; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX "page_UN2" ON page USING btree ("Url", "Parent") WHERE ("Parent" IS NOT NULL);
+
+
+--
+-- Name: page_UN2_NULL; Type: INDEX; Schema: core; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX "page_UN2_NULL" ON page USING btree ("Url") WHERE ("Parent" IS NULL);
+
+
+--
 -- Name: search_index_FTS; Type: INDEX; Schema: core; Owner: -; Tablespace: 
 --
 
 CREATE INDEX "search_index_FTS" ON search_index USING gin ("FTS");
 
+
+SET search_path = public, pg_catalog;
+
+--
+-- Name: menu_UN_1; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX "menu_UN_1" ON menu USING btree ("Name");
+
+
+--
+-- Name: menu_item_UN1; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX "menu_item_UN1" ON menu_item USING btree ("Name", "Parent", "Menu_ID") WHERE ("Parent" IS NOT NULL);
+
+
+--
+-- Name: menu_item_UN1_NULL; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX "menu_item_UN1_NULL" ON menu_item USING btree ("Name", "Menu_ID") WHERE ("Parent" IS NULL);
+
+
+SET search_path = core, pg_catalog;
 
 --
 -- Name: search_index_upd; Type: TRIGGER; Schema: core; Owner: -
@@ -4703,6 +4659,22 @@ ALTER TABLE ONLY packjs_depend
 
 ALTER TABLE ONLY packjs_depend
     ADD CONSTRAINT "packjs_depend_FK_Packjs_ID" FOREIGN KEY ("Packjs_ID") REFERENCES packjs("ID") ON DELETE CASCADE;
+
+
+--
+-- Name: page_FK_Html_ID; Type: FK CONSTRAINT; Schema: core; Owner: -
+--
+
+ALTER TABLE ONLY page
+    ADD CONSTRAINT "page_FK_Html_ID" FOREIGN KEY ("Html_ID") REFERENCES html("ID") ON DELETE SET NULL;
+
+
+--
+-- Name: page_FK_Parent; Type: FK CONSTRAINT; Schema: core; Owner: -
+--
+
+ALTER TABLE ONLY page
+    ADD CONSTRAINT "page_FK_Parent" FOREIGN KEY ("Parent") REFERENCES page("ID") ON DELETE CASCADE;
 
 
 --
@@ -4796,11 +4768,11 @@ ALTER TABLE ONLY user_session
 SET search_path = public, pg_catalog;
 
 --
--- Name: menu_FK_Menu_ID; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: menu_item_FK_Menu_ID; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY menu_item
-    ADD CONSTRAINT "menu_FK_Menu_ID" FOREIGN KEY ("Menu_ID") REFERENCES menu("ID") ON DELETE CASCADE;
+    ADD CONSTRAINT "menu_item_FK_Menu_ID" FOREIGN KEY ("Menu_ID") REFERENCES menu("ID") ON DELETE CASCADE;
 
 
 --
@@ -4809,22 +4781,6 @@ ALTER TABLE ONLY menu_item
 
 ALTER TABLE ONLY menu_item
     ADD CONSTRAINT "menu_item_FK_Parent" FOREIGN KEY ("Parent") REFERENCES menu_item("ID") ON DELETE CASCADE;
-
-
---
--- Name: page_FK_Html_ID; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY page
-    ADD CONSTRAINT "page_FK_Html_ID" FOREIGN KEY ("Html_ID") REFERENCES core.html("ID") ON DELETE SET NULL;
-
-
---
--- Name: page_FK_Parent; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY page
-    ADD CONSTRAINT "page_FK_Parent" FOREIGN KEY ("Parent") REFERENCES page("ID") ON DELETE CASCADE;
 
 
 --

@@ -62,9 +62,9 @@ JS;
 	 */
 	public static function is($id)
 	{
-		if (!Chf::uint($id))
+		if (!Type::check("uint", $id))
 		{
-			throw new Exception("Номер Пакета JavaScript у задан неверно. " . Chf::error());
+			throw new Exception("Номер Пакета JavaScript у задан неверно. " . Type::get_last_error());
 		}
 
 		$query = 
@@ -317,7 +317,7 @@ SQL;
 	 */
 	public static function get_id_by_identified($identified)
 	{
-		if (empty($identified) or !Chf::identified($identified))
+		if (empty($identified) or !Type::check("identified", $identified))
 		{
 			throw new Exception("Идентификатор задан неверно.");
 		}
@@ -540,7 +540,7 @@ SQL;
 		foreach ($depend_ar as $identified)
 		{
 			$identified = trim($identified);
-			if (empty($identified) or !Chf::identified($identified))
+			if (empty($identified) or !Type::check("identified", $identified))
 			{
 				throw new Exception("Зависемости указаны неверно.");
 			}

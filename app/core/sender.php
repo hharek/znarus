@@ -18,27 +18,27 @@ class _Sender
 		{
 			throw new Exception("Почтовый ящик не указан.");
 		}
-		if (!Chf::email($email))
+		if (!Type::check("email", ($email)))
 		{
-			throw new Exception("Почтовый ящик указан неверно. " . Chf::error());
+			throw new Exception("Почтовый ящик указан неверно. " . Type::get_last_error());
 		}
 
 		if (empty($subject))
 		{
 			throw new Exception("Заголовок сообщения не указан.");
 		}
-		if (!Chf::string($subject))
+		if (!Type::check("string", ($subject)))
 		{
-			throw new Exception("Заголовок сообщения указан неверно. " . Chf::error());
+			throw new Exception("Заголовок сообщения указан неверно. " . Type::get_last_error());
 		}
 
 		if (empty($message))
 		{
 			throw new Exception("Сообщение не указано.");
 		}
-		if (!Chf::html($message))
+		if (!Type::check("html", $message))
 		{
-			throw new Exception("Сообщение указано неверно. " . Chf::error());
+			throw new Exception("Сообщение указано неверно. " . Type::get_last_error());
 		}
 
 		/* Отправлять ли  */
@@ -67,6 +67,7 @@ class _Sender
 
 			if (SENDER_SMTP_AUTH === true)
 			{
+				$phpmailer->SMTPAuth = true;
 				$phpmailer->Username = SENDER_SMTP_AUTH_USERNAME;
 				$phpmailer->Password = SENDER_SMTP_AUTH_PASSWORD;
 			}

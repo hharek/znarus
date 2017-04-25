@@ -1,0 +1,127 @@
+<center>
+	<div class="std_button tab_button" tab="home">
+		<div class="icon_list"></div>
+		Главная
+	</div>
+	
+	<div class="std_button tab_button" tab="404">
+		<div class="icon_list"></div>
+		Страница 404
+	</div>
+	
+	<div class="std_button tab_button" tab="403">
+		<div class="icon_list"></div>
+		Страница 403
+	</div>
+</center>
+<br/>
+
+<!-- Главная -->
+<div id="tab_home" class="tab">
+	<form action="#_page/other?type=home">
+		<table class="std_form">
+			<tr>
+				<td colspan="2" style="text-align: center;">
+					<input type="text" name="Home_Title" value="<?php echo htmlspecialchars(P::get("_page", "home_title")); ?>" />
+				</td>
+			</tr>
+			
+			<tr>
+				<td colspan="2" style="text-align: left;">
+					<textarea name="Home_Content"><?php echo htmlspecialchars(T::get("_page", "home_content")); ?></textarea>
+				</td>
+			</tr>
+			<tr>
+				<td>Шаблон</td>
+				<td>
+					<select name="Home_Html_Identified">
+						<option value=""></option>
+						<?php foreach ($html as $h): ?>
+							<option value="<?php echo $h['Identified']; ?>" <?php if(P::get("_page", "home_html_identified") === $h['Identified']): ?>selected<?php endif; ?>><?php echo $h['Name']; ?></option>
+						<?php endforeach; ?>
+					</select>
+				</td>
+			</tr>
+		</table>
+		<br/>
+		<center>
+			<div class="std_button submit">
+				<div class="icon_edit"></div>
+				Сохранить
+			</div>
+		</center>
+	</form>
+</div>
+
+<!-- Страница 404 -->
+<div id="tab_404" class="tab">
+	<form action="#_page/other?type=404">
+		<table class="std_form">
+			<tr>
+				<td colspan="2" style="text-align: center;">
+					<input type="text" name="404_Title" value="<?php echo htmlspecialchars(P::get("_page", "404_title")); ?>" />
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" style="text-align: left;">
+					<textarea name="404_Content"><?php echo htmlspecialchars(T::get("_page", "404_content")); ?></textarea>
+				</td>
+			</tr>
+			<tr>
+				<td>Шаблон</td>
+				<td>
+					<select name="404_Html_Identified">
+						<option value=""></option>
+						<?php foreach ($html as $h): ?>
+							<option value="<?php echo $h['Identified']; ?>" <?php if(P::get("_page", "404_html_identified") === $h['Identified']): ?>selected<?php endif; ?>><?php echo $h['Name']; ?></option>
+						<?php endforeach; ?>
+					</select>
+				</td>
+			</tr>
+		</table>
+		<br/>
+		<center>
+			<div class="std_button submit">
+				<div class="icon_edit"></div>
+				Сохранить
+			</div>
+		</center>
+	</form>
+</div>
+
+<!-- Страница 403 -->
+<div id="tab_403" class="tab">
+	<form action="#_page/other?type=403">
+		<table class="std_form">
+			<tr>
+				<td colspan="2" style="text-align: center;">
+					<input type="text" name="403_Title" value="<?php echo htmlspecialchars(P::get("_page", "403_title")); ?>" />
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" style="text-align: left;">
+					<textarea name="403_Content"><?php echo htmlspecialchars(T::get("_page", "403_content")); ?></textarea>
+				</td>
+			</tr>
+			<tr>
+				<td>Шаблон</td>
+				<td>
+					<select name="403_Html_Identified">
+						<option value=""></option>
+						<?php foreach ($html as $h): ?>
+							<option value="<?php echo $h['Identified']; ?>" <?php if(P::get("_page", "403_html_identified") === $h['Identified']): ?>selected<?php endif; ?>><?php echo $h['Name']; ?></option>
+						<?php endforeach; ?>
+					</select>
+				</td>
+			</tr>
+		</table>
+		<br/>
+		<center>
+			<div class="std_button submit">
+				<div class="icon_edit"></div>
+				Сохранить
+			</div>
+		</center>
+	</form>
+</div>
+

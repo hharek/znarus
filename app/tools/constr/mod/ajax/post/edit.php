@@ -6,8 +6,8 @@ $ajax = _Ajax::edit
 	$_POST['Name'], 
 	$_POST['Get'],
 	$_POST['Post'],
-	$_POST['Data_Type'], 
-	$_POST['Token']
+	$_POST['Cache'],
+	$_POST['Active']
 );
 
 mess_ok("ajax «{$ajax['Identified']} ({$ajax['Name']})» отредактирован.");

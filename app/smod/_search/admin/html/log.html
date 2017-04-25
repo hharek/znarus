@@ -1,0 +1,70 @@
+<!-- Форма поиска -->
+<form class="std_form" id="search">
+	<div class="center">
+		Поиск: 
+		<input type="text" name="word" value="<?php echo $word; ?>" style="min-width: 260px;" autofocus/>
+		<div class="std_button">
+			<div class="icon_view"></div>
+			Найти
+		</div>
+	</div>
+</form>
+
+<table class="std_list">
+	<col width="65%" />
+	<col width="25%" />
+	<col width="10%" />
+	<thead>
+		<tr>
+			<td>Запрос</td>
+			<td>Дата</td>
+			<td>Уд.</td>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($log as $val): ?>
+			<tr>
+				<td style="text-align: left; padding-left: 20px; ">
+					<?php echo $val['Query']; ?>
+				</td>
+				<td>
+					<?php echo date("d.m.Y - H:i", strtotime($val['Date'])); ?>
+				</td>
+				<td>
+					<div 
+						class="icon_delete delete" 
+						url="#_search/log_delete?id=<?php echo $val['ID']; ?>"
+						mess="Вы действительно хотите удалить запись «<?php echo $val['Query']; ?>»?"
+						style="margin: 0; vertical-align: middle;"
+					></div>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+
+<!-- Страницы -->
+<br/>
+<?php if ($page_all > 1): ?>
+	<div class="center">
+		<?php for ($i = 1; $i <= $page_all; $i++): ?>
+			<a href="#_search/log?word=<?php echo $word; ?>&page=<?php echo $i; ?>" class="page <?php if ($page === $i): ?>active<?php endif; ?>"><?php echo $i; ?></a>
+		<?php endfor; ?>
+	</div>
+<?php endif; ?>
+
+
+<script>
+$("#search .std_button").click(function()
+{
+	window.location.hash = "#_search/log?word=" + $("#search input[name=word]").val();
+});
+
+$("#search input").keyup(function(e)
+{
+	if(e.keyCode === 13)
+	{
+		window.location.hash = "#_search/log?word=" + $("#search input[name=word]").val();
+	}
+});
+</script>

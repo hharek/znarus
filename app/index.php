@@ -53,7 +53,7 @@ elseif
 )
 {
 	G::location("ajax");
-	require DIR_APP."/ajax/index.php";
+	require DIR_APP."/front/ajax/index.php";
 }
 /* Основной вывод */
 else

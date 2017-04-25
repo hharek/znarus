@@ -11,9 +11,9 @@ class _Module
 	 */
 	public static function is($id)
 	{
-		if (!Chf::uint($id))
+		if (!Type::check("uint", $id))
 		{
-			throw new Exception("Номер у модуля задан неверно. " . Chf::error());
+			throw new Exception("Номер у модуля задан неверно. " . Type::get_last_error());
 		}
 
 		$query = 
@@ -263,9 +263,9 @@ SQL;
 	 */
 	public static function is_identified($identified)
 	{
-		if (!Chf::identified($identified))
+		if (!Type::check("identified", $identified))
 		{
-			throw new Exception("Идентификатор у модуля задан неверно. " . Chf::error());
+			throw new Exception("Идентификатор у модуля задан неверно. " . Type::get_last_error());
 		}
 		$identified = strtolower($identified);
 
@@ -377,7 +377,7 @@ SQL;
 	public static function get_by_identified($identified)
 	{
 		/* Проверка */
-		if (!Chf::identified($identified))
+		if (!Type::check("identified", $identified))
 		{
 			throw new Exception("Идентификатор модуля задан неверно.");
 		}

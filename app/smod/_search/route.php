@@ -1,5 +1,5 @@
 <?php
-if(G::url_path() === "/поиск")
+if(G::url_path() === "/search")
 {
 	return "find";
 }

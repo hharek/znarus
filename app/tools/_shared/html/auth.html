@@ -42,11 +42,11 @@ if (JSENCRYPT_AUTH === true)
 				<!-- Поля -->
 				<div class="_field">
 					<?php if (G::location() === "constr"): ?>
-						<input type="text" name="Email" placeholder="Имя"/>
+						<input type="text" name="Email" placeholder="имя" required/>
 					<?php elseif (G::location() === "admin"): ?>
-						<input type="text" name="Email" placeholder="Почтовый ящик"/>
+						<input type="text" name="Email" placeholder="почтовый ящик" required/>
 					<?php endif; ?>
-					<input type="password" name="Password" placeholder="Пароль"/>
+					<input type="password" name="Password" placeholder="пароль" required/>
 				</div>
 
 				<!-- Кнопка -->
@@ -58,7 +58,7 @@ if (JSENCRYPT_AUTH === true)
 				<?php if (G::location() === "admin"): ?>
 					<!-- Забыли пароль -->
 					<div class="_restore">
-						<a href="?restore">Забыли пароль</a>
+						<a href="?restore">Забыли пароль?</a>
 					</div>
 				<?php endif; ?>
 

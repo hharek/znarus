@@ -46,7 +46,7 @@ function _autosave_enable()
 	
 	/* Данные по форме */
 	var url = "";
-	if($(form).attr("action") === undefined)
+	if ($(form).attr("action") === undefined)
 	{
 		url = window.location.hash;
 	}
@@ -55,18 +55,24 @@ function _autosave_enable()
 		url = $(form).attr("action");
 	}
 	
-	if(url.search("\\?") === -1)
+	/* Добавляем параметр «_autosave» */
+	var autosave_url = "?_autosave";
+	if (url.indexOf("?") !== -1)
 	{
-		url += "?_autosave";
+		autosave_url = "&_autosave";
 	}
-	else
+	
+	/* Если в урле присутствует символ «#» (вкладки), срезаем */
+	if (url.indexOf("#", 1) !== -1)
 	{
-		url += "&_autosave";
+		url = url.substr(0, url.indexOf("#", 1));
 	}
+	url += autosave_url;
 	
 	/* Ставим интервал */
 	_autosave_interval = setInterval(function()
 	{
+		$(document).trigger("_submit_prepare");	
 		_exe(url, new FormData(form));	
 	}, _autosave_time * 1000);
 }

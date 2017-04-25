@@ -20,6 +20,11 @@ function autoloader_core($class)
 	{
 		require DIR_APP . "/core/t.php";
 	}
+	
+	if($class === "Cache")
+	{
+		require DIR_APP . "/core/cache.php";
+	}
 }
 
 spl_autoload_register("autoloader_core");

@@ -12,11 +12,11 @@ class _Seo_Redirect
 	 */
 	public static function is($id)
 	{
-		if (!Chf::uint($id))
+		if (!Type::check("uint", $id))
 		{
-			throw new Exception("Номер у переадресации задан неверно. " . Chf::error());
+			throw new Exception("Номер у переадресации задан неверно. " . Type::get_last_error());
 		}
-
+		
 		$query = 
 <<<SQL
 SELECT 
@@ -39,12 +39,13 @@ SQL;
 	 * @param string $from
 	 * @param string $to
 	 * @param bool $location
+	 * @param string $tags
 	 * @return array
 	 */
-	public static function add($from, $to, $location)
+	public static function add($from, $to, $location, $tags = "")
 	{
 		/* Проверка */
-		self::_check($from, $to, $location);
+		self::_check($from, $to, $location, $tags);
 
 		/* Уникальность */
 		self::_unqiue($from);
@@ -54,7 +55,8 @@ SQL;
 		[
 			"From" => $from,
 			"To" => $to,
-			"Location" => $location
+			"Location" => $location,
+			"Tags" => $tags
 		];
 		$id = G::db_core()->insert("seo_redirect", $data, "ID");
 		
@@ -62,7 +64,7 @@ SQL;
 		G::cache_db_core()->delete_tag("seo_redirect");
 		_Cache_Front::delete(["url_path" => $from]);
 		_Cache_Front::delete(["url_path" => $to]);
-
+		
 		/* Данные добавленного */
 		return self::get($id);
 	}
@@ -74,13 +76,14 @@ SQL;
 	 * @param string $from
 	 * @param string $to
 	 * @param bool $location
+	 * @param string $tags
 	 * @return array
 	 */
-	public static function edit($id, $from, $to, $location)
+	public static function edit($id, $from, $to, $location, $tags = "")
 	{
 		/* Проверка */
 		self::is($id);
-		self::_check($from, $to, $location);
+		self::_check($from, $to, $location, $tags);
 
 		/* Уникальность */
 		self::_unqiue($from, $id);
@@ -90,7 +93,8 @@ SQL;
 		[
 			"From" => $from,
 			"To" => $to,
-			"Location" => $location
+			"Location" => $location,
+			"Tags" => $tags
 		];
 		G::db_core()->update("seo_redirect", $data, ["ID" => $id]);
 		
@@ -98,7 +102,7 @@ SQL;
 		G::cache_db_core()->delete_tag("seo_redirect");
 		_Cache_Front::delete(["url_path" => $from]);
 		_Cache_Front::delete(["url_path" => $to]);
-
+		
 		/* Данные редактируемого */
 		return self::get($id);
 	}
@@ -119,7 +123,7 @@ SQL;
 		G::cache_db_core()->delete_tag("seo_redirect");
 		_Cache_Front::delete(["url_path" => $old['From']]);
 		_Cache_Front::delete(["url_path" => $old['To']]);
-
+		
 		return $old;
 	}
 
@@ -139,13 +143,32 @@ SELECT
 	"ID",
 	"From",
 	"To",
-	"Location"::int
+	"Location"::int,
+	array_to_string ("Tags", ',', '*') as "Tags"
 FROM 
 	"seo_redirect"
 WHERE 
 	"ID" = $1
 SQL;
 		return G::db_core()->query($query, $id)->row();
+	}
+	
+	/**
+	 * Получить редирект по источнику
+	 * 
+	 * @param string $from
+	 * @return array
+	 */
+	public static function get_by_from($from)
+	{
+		$redirect = G::cache_db_core()->get("seo_redirect_" . md5($from));
+		if ($redirect === null)
+		{
+			$redirect = G::db_core()->seo_redirect_get_by_from($from)->row();
+			G::cache_db_core()->set("seo_redirect_" . md5($from), $redirect, "seo_redirect");
+		}
+		
+		return $redirect;
 	}
 
 	/**
@@ -154,15 +177,36 @@ SQL;
 	 * @param string $from
 	 * @return array
 	 */
-	public static function get_by_from($from = "")
+	public static function search($from = "", $page = 1)
 	{
 		/* Проверка */
 		$from = trim((string)$from);
-		if ($from !== "" and !Chf::url($from))
+		if ($from !== "" and !Type::check("text", $from))
 		{
 			throw new Exception("Источник указан неверно.");
 		}
 		$from = mb_strtolower($from);
+		
+		/* Страница */
+		$page = (int)$page;
+		if ($page < 1)
+		{
+			$page = 1;
+		}
+		$limit = 20;
+		$offset = ($page - 1) * $limit;
+		
+		/* Всего */
+		$query = 
+<<<SQL
+SELECT
+	COUNT(*) as "count"
+FROM 
+	"seo_redirect"
+WHERE 
+	"From" LIKE $1
+SQL;
+		$count = G::db_core()->query($query, "%" . $from . "%")->single();
 		
 		/* Выборка */
 		$query = 
@@ -178,44 +222,62 @@ WHERE
 	"From" LIKE $1
 ORDER BY
 	"From" ASC
+LIMIT {$limit}
+OFFSET {$offset}
 SQL;
-		return G::db_core()->query($query, "%" . $from . "%")->assoc();
+		$redirect = G::db_core()->query($query, "%" . $from . "%")->assoc();
+		
+		return 
+		[
+			"count" => $count,
+			"redirect" => $redirect
+		];
 	}
 	
 	/**
-	 * Все редиректы
+	 * Удалить редиректы по тэгу
 	 * 
-	 * @return array
+	 * @param string $tag
+	 * @return bool
 	 */
-	public static function get_all()
+	public static function delete_by_tag (string $tag) : bool
 	{
-		$redirect = G::cache_db_core()->get("seo_redirect_all");
-		if ($redirect === null)
+		if (!Type::check("url_part", $tag))
 		{
-			$redirect = G::db_core()->seo_redirect_all()->assoc();
-			G::cache_db_core()->set("seo_redirect_all", $redirect, "seo_redirect");
+			throw new Exception("Тэг задан неверно.");
 		}
 		
-		return $redirect;
+		$query = 
+<<<SQL
+DELETE
+FROM
+	"seo_redirect"
+WHERE
+	'{$tag}' = ANY("Tags")
+SQL;
+		G::db_core()->query($query);
+		
+		return true;
 	}
-
+	
 	/**
 	 * Проверка полей
 	 * 
 	 * @param string $from
 	 * @param string $to
 	 * @param bool $location
+	 * @param string $tags
 	 */
-	private static function _check(&$from, &$to, $location)
+	private static function _check(&$from, &$to, $location, &$tags)
 	{
-		Err::check_field($from, "url", false, "From", "Источник");
+		Err::check_field($from, "text", false, "From", "Источник");
 		$from = mb_strtolower($from);
 		if ($from === "/")
 		{
 			Err::add("Нельзя сделать переадресацию с главной страницы.", "From");
 		}
 		
-		Err::check_field($to, "url", false, "To", "Назначение");
+		Err::check_field($to, "text", false, "To", "Назначение");
 		$to = mb_strtolower($to);
 		
 		if ($from === $to)
@@ -224,6 +286,18 @@ SQL;
 		}
 		
 		Err::check_field($location, "bool", false, "Location", "Делать переход на другой урл");
+		
+		Err::check_field($tags, "tags", true, "Tags", "Тэги");
+		if (!empty($tags))
+		{
+			$tags = explode(",", $tags);
+			foreach ($tags as &$t) { $t = trim($t); }
+			$tags = "{" . implode(",", $tags) . "}";
+		}
+		else
+		{
+			$tags = null;
+		}
 		
 		Err::exception();
 	}

@@ -16,14 +16,14 @@
 			<td>Тип возвращаемых данных</td>
 			<td>
 				<select name="Data_Type">
+					<option value="json">json</option>
 					<option value="html">html</option>
 					<option value="text">text</option>
-					<option value="json">json</option>
-					<option value="json_std">json_std</option>
+					<option value="json_page">json_page</option>
 				</select>
 			</td>
 		</tr>
-		<tr>
+		<tr id="tr_get_post">
 			<td>GET</td>
 			<td>
 				<div style="width: 50px; float:left;">
@@ -34,19 +34,6 @@
 					POST
 					<input type="hidden" name="Post" value="0"/>
 					<input type="checkbox" name="Post" value="1" style="margin: 3px 3px 3px 18px;" />
-				</div>
-			</td>
-		</tr>
-		<tr>
-			<td>Проверять наличие токена</td>
-			<td>
-				<div style="width: 60px; float:left;">
-					<input type="radio" name="Token" value="1" />
-					Да
-				</div>
-				<div style="width: 150px; float: left;">
-					<input type="radio" name="Token" value="0" checked="checked"/>
-					Нет
 				</div>
 			</td>
 		</tr>
@@ -66,3 +53,23 @@
 		</tr>
 	</table>
 </form>
+
+<script>
+data_type_change();
+$("select[name=Data_Type]").change(data_type_change);
+
+/**
+ * Отображать GET и POST
+ */
+function data_type_change()
+{
+	if($("select[name=Data_Type]").val() === "json_page")
+	{
+		$("#tr_get_post").show();
+	}
+	else
+	{
+		$("#tr_get_post").hide();
+	}
+}
+</script>

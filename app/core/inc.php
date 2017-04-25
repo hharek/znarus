@@ -11,9 +11,9 @@ class _Inc
 	 */
 	public static function is($id)
 	{
-		if (!Chf::uint($id))
+		if (!Type::check("uint", $id))
 		{
-			throw new Exception("Номер у инка задан неверно. " . Chf::error());
+			throw new Exception("Номер у инка задан неверно. " . Type::get_last_error());
 		}
 
 		$query = 
@@ -133,6 +133,7 @@ SQL;
 		
 		/* Удалить кэш */
 		G::cache_db_core()->delete_tag("inc");
+		_Cache_Front::delete(["inc" => $module['Identified'] . "_" . $inc['Identified']]);
 
 		/* Данные изменённого */
 		return self::get($id);
@@ -176,6 +177,7 @@ SQL;
 		
 		/* Удалить кэш */
 		G::cache_db_core()->delete_tag("inc");
+		_Cache_Front::delete(["inc" => $module['Identified'] . "_" . $inc['Identified']]);
 
 		/* Данные удалённого */
 		return $inc;
@@ -245,12 +247,12 @@ SQL;
 	public static function get_by_identified($module_identified, $identified)
 	{
 		/* Проверка */
-		if (!Chf::identified($module_identified))
+		if (!Type::check("identified", $module_identified))
 		{
 			throw new Exception("Идентификатор модуля задан неверно.");
 		}
 		
-		if (!Chf::identified($identified))
+		if (!Type::check("identified", $identified))
 		{
 			throw new Exception("Идентификатор инка задан неверно.");
 		}

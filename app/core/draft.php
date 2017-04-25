@@ -33,11 +33,32 @@ class _Draft
 	private $_file_dir;
 	
 	/**
-	 * Ресурс dba
+	 * Файл dba
 	 * 
-	 * @var resource
+	 * @var string
 	 */
-	private $_dba;
+	private $_dba_file;
+	
+	/**
+	 * Тип dba файла (qdbm, db4).
+	 * 
+	 * @var string
+	 */
+	private $_dba_type = "qdbm";
+	
+	/**
+	 * Сжимать данные (http://php.net/zlib)
+	 * 
+	 * @var boolean
+	 */
+	private $_compress_enable = true;
+	
+	/**
+	 * Уровень сжатия от 0 до 9, -1 по умолчанию у zlib
+	 * 
+	 * @var int 
+	 */
+	private $_compress_level = -1;
 
 	/**
 	 * Конструктор
@@ -46,7 +67,7 @@ class _Draft
 	 * @param string $type (file|dba)
 	 * @param mixed $param
 	 */
-	public function __construct($salt, $type, $param)
+	public function __construct($salt, $type, $param, $compress = true)
 	{
 		/* Соль */
 		$this->_salt = (string)$salt;
@@ -78,15 +99,43 @@ class _Draft
 		/* Ресурс dba */
 		elseif ($type === "dba")
 		{
-			$dba = $param;
-			
-			if(get_resource_type($dba) !== "dba")
+			/* Разбираем параметры */
+			if (is_string($param))
 			{
-				throw new Exception("Параметры заданые неверно. Не является ресурсом «dba»");
+				$param = (array)$param;
 			}
 
-			$this->_dba = $dba;
+			$dba_file = $param[0];
+
+			$dba_type = $this->_dba_type;
+			if (isset($param[1]))
+			{
+				$dba_type = $param[1];
+			}
+
+			/* Проверяем тип */
+			if (!in_array($dba_type, ["qdbm","db4"]))
+			{
+				throw new Exception("Тип dba файла указан неверно. Доступно: qdbm, db4");
+			}
+			$this->_dba_type = $dba_type;
+
+			/* Проверяем файл dba */
+			if (!is_file($dba_file))
+			{
+				if (($dba = dba_open($dba_file, "c", $this->_dba_type)) === false)
+				{
+					throw new Exception("Файл dba указан неверно.");
+				}
+				dba_close($dba);
+			}
+
+			$this->_dba_file = $dba_file;
 		}
+		
+		/* Сжатие */
+		$compress = (bool)$compress;
+		$this->_compress_enable = $compress;
 	}
 
 	/**
@@ -109,7 +158,11 @@ class _Draft
 			/* Тип «dba» */
 			case "dba":
 			{
-				return dba_exists($this->_key($identified), $this->_dba);
+				$_dba = dba_open($this->_dba_file, "r", $this->_dba_type);
+				$result = dba_exists($this->_key($identified), $_dba);
+				dba_close($_dba);
+				
+				return $result;
 			}
 			break;
 		}
@@ -123,37 +176,44 @@ class _Draft
 	 */
 	public function get($identified)
 	{
+		$result = null;
+				
 		switch ($this->_type)
 		{
 			/* Тип «file» */
 			case "file":
 			{
-				if (is_file($this->_file_dir . "/" . $this->_key($identified)))
-				{
-					return unserialize(file_get_contents($this->_file_dir . "/" . $this->_key($identified)));
-				}
-				else
+				if (!is_file($this->_file_dir . "/" . $this->_key($identified)))
 				{
 					return;
 				}
+				
+				$result = file_get_contents($this->_file_dir . "/" . $this->_key($identified));
 			}
 			break;
 		
 			/* Тип «dba» */
 			case "dba":
 			{
-				$result = dba_fetch($this->_key($identified), $this->_dba);
-				if ($result !== false)
-				{
-					return unserialize($result);
-				}
-				else
+				$_dba = dba_open($this->_dba_file, "r", $this->_dba_type);
+				$result = dba_fetch($this->_key($identified), $_dba);
+				dba_close($_dba);
+				
+				if ($result === false)
 				{
 					return;
 				}
 			}
 			break;
 		}
+		
+		/* Распоковать строку */
+		if ($this->_compress_enable === true)
+		{
+			$result = gzdecode($result);
+		}
+		
+		return json_decode($result, true);
 	}
 
 	/**
@@ -164,19 +224,30 @@ class _Draft
 	 */
 	public function set($identified, $data)
 	{
+		/* Данные переводим в строку json */
+		$data = json_encode($data);
+		
+		/* Сжимать данные */
+		if ($this->_compress_enable === true)
+		{
+			$data = gzencode($data, $this->_compress_level);
+		}
+		
 		switch ($this->_type)
 		{
 			/* Тип «file» */
 			case "file":
 			{
-				file_put_contents($this->_file_dir . "/" . $this->_key($identified), serialize($data));
+				file_put_contents($this->_file_dir . "/" . $this->_key($identified), $data);
 			}
 			break;
 		
 			/* Тип «dba» */
 			case "dba":
 			{
-				dba_replace($this->_key($identified), serialize($data), $this->_dba);
+				$_dba = dba_open($this->_dba_file, "w", $this->_dba_type);
+				dba_replace($this->_key($identified), $data, $_dba);
+				dba_close($_dba);
 			}
 			break;
 		}
@@ -204,7 +275,9 @@ class _Draft
 			/* Тип «dba» */
 			case "dba":
 			{
-				dba_delete($this->_key($identified), $this->_dba);
+				$_dba = dba_open($this->_dba_file, "w", $this->_dba_type);
+				dba_delete($this->_key($identified), $_dba);
+				dba_close($_dba);
 			}
 			break;
 		}

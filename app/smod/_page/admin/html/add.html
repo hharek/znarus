@@ -1,0 +1,94 @@
+<form>
+	<table class="std_form">
+		<tr>
+			<td>Наименование</td>
+			<td>
+				<input type="text" name="Name"/>
+			</td>
+		</tr>
+		<?php if (!P::get("_page", "url_auto")): ?>
+			<tr>
+				<td>Адрес</td>
+				<td>
+					<input type="text" name="Url"/>
+				</td>
+			</tr>
+		<?php endif; ?>
+		<tr>
+			<td colspan="2">
+				<textarea name="Content"></textarea>
+			</td>
+		</tr>
+		<?php if (P::get("_page", "admin_parent_show")): ?>
+			<tr>
+				<td>Корень</td>
+				<td>
+					<select name="Parent">
+						<option value=""></option>
+						<?php parent_html(0, 0); ?>
+					</select>
+				</td>
+			</tr>
+		<?php endif; ?>
+		<?php if (P::get("_page", "admin_html_show")): ?>
+			<tr>
+				<td>Шаблон</td>
+				<td>
+					<select name="Html_ID">
+						<option value=""></option>
+						<?php foreach ($html as $h): ?>
+							<option value="<?php echo $h['ID']; ?>"><?php echo $h['Name']; ?></option>
+						<?php endforeach; ?>
+					</select>
+				</td>
+			</tr>
+		<?php endif; ?>
+	</table>
+	<br/>
+	<center>
+		<div class="std_button submit">
+			<div class="icon_add"></div>
+			Добавить
+		</div>
+	</center>
+</form>
+
+<?php
+/**
+ * Показать поле «Корень»
+ * 
+ * @param int $parent
+ * @param int $level
+ * @param int $current
+ */
+function parent_html(int $parent, int $level, int $current = 0)
+{
+	$child = _Page::child($parent);
+?>
+
+	<?php foreach ($child as $val): ?>
+
+		<option value="<?php echo $val['ID']; ?>"<?php if($val['ID'] == $current): ?> selected="selected"<?php endif; ?>>
+			<?php echo str_repeat("&nbsp;", $level * 4) . $val['Name']; ?>
+		</option>
+
+		<?php parent_html($val['ID'], $level + 1, $current); ?>
+
+	<?php endforeach; ?>
+
+<?php
+}
+?>
+
+<script>
+<?php if (!P::get("_page", "url_auto") and P::get("_page", "url_translit")): ?>
+$("input[name=Name]").on("keyup change", function()
+{
+	<?php if (P::get("_page", "url_translit_rus")): ?>
+		$("input[name=Url]").val(translit_rus($(this).val()));
+	<?php else: ?>
+		$("input[name=Url]").val(translit($(this).val()));
+	<?php endif; ?>
+});
+<?php endif; ?>
+</script>

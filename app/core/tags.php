@@ -14,7 +14,7 @@ class _Tags
 	{
 		/* Проверка */
 		$name = trim($name);
-		if (!Chf::string($name))
+		if (!Type::check("string", ($name)))
 		{
 			throw new Exception("Тег задан неверно.");
 		}
@@ -68,7 +68,7 @@ SQL;
 	{
 		/* Проверка */
 		$name = trim($name);
-		if (!Chf::string($name))
+		if (!Type::check("string", ($name)))
 		{
 			throw new Exception("Тег задан неверно.");
 		}

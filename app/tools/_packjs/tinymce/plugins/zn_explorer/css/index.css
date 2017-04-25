@@ -1,0 +1,131 @@
+/* Кнопки */
+.std_button
+{
+	border: 1px solid #c0c0c0;
+	border-radius: 10px;
+	display: inline-block;
+	background-color: #e3e3e3;
+	min-width: 120px;
+	height: 22px;
+	cursor: pointer;
+	padding: 4px 10px 4px 6px;
+	margin-left: 10px;
+	margin: 5px 10px 5px 0px;
+	color: #000;
+	text-align: center;
+}
+
+.std_button:hover
+{
+	background-color: #f0f0f0;
+}
+
+.std_button div
+{
+	float: left;
+	margin: 0px 5px 0px 0px;
+}
+
+/* Проводник */
+.explorer
+{
+	/*width: 600px;*/
+	margin: 0px auto;
+	/*border: 1px solid #7e7c7c;*/
+    font-size: 14px;
+    background-color: #f5ffe4;
+	font-family: monospace;
+}
+
+.explorer > .panel
+{
+	border-bottom: 1px solid #7e7c7c;
+	height: 40px;
+}
+
+.explorer > .panel .check_all
+{
+	width: 24px;
+	height: 24px;
+	margin: 3px 0px 0px 12px;
+}
+
+.explorer > .panel .check_all input
+{
+	margin: 10px 0px 0px 4px;
+}
+
+.explorer > .panel div, .panel a
+{
+	display: block;
+	float: left;
+	cursor: pointer;
+	margin: 8px 0px 0px 12px;
+}
+
+.explorer > .path
+{
+	border-bottom: 1px solid #7e7c7c;
+	height: 24px;
+	padding: 4px 0px 0px 10px;
+}
+
+.explorer > .list
+{
+	/*min-height: 400px;*/
+	padding: 0px 0px 10px 0px;
+}
+
+.explorer > .list .active
+{
+	background: #f6e0a4;
+}
+
+.explorer > .list .file
+{
+	padding: 3px 0px;
+	cursor: pointer;
+}
+
+.explorer > .list .file:hover
+{
+	background: #f6e0a4;
+}
+
+.explorer > .list .file .icon_dir
+{
+	float: left;
+}
+
+.explorer > .list .file .check
+{
+	width: 24px;
+	float: left;
+	margin: 3px 0px 0px 10px;
+}
+
+.explorer > .list .file .name
+{
+	margin: 3px 0px 0px 64px;
+}
+
+.explorer .upload
+{
+	width: 24px;
+	height: 24px;
+	margin: 0px auto 10px auto;
+	position: relative;
+}
+
+.explorer .upload input[type=file]
+{
+	z-index: 10;
+	width: 24px;
+	height: 24px;
+	display: block;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	opacity: 0.0;
+	cursor: pointer;
+}

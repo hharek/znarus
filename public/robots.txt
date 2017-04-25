@@ -1,0 +1,4 @@
+User-agent: *
+Host: example.com
+Allow: /
+Sitemap: http://example.com/sitemap.xml

@@ -1,40 +1,44 @@
-<form method="get" action="" class="classic_form">
-	<input type="text" name="query" class="input_form" value="<?php echo trim($query); ?>" style="width: 400px; display: block; margin: 0px auto;"/>
+<section class="search">
+	<form>
+		<input type="text" name="query" value="<?php echo trim($query); ?>" placeholder="Поиск"/>
+		<input type="submit" value="Поиск"/>
+	</form>
+	
 	<br/>
-	<input type="submit" value="Найти" class="submit_form" style="cursor: pointer; width: 200px; display: block; margin: 0px auto;"/>
-</form>
+	<div>
+		<?php if(!empty($query)): ?>
+			<?php if(empty($result)): ?>
+				<!-- Ничего не найдено -->
+				<p class="find-no">По слову «<strong><?php echo $query; ?></strong>» ничего не найдено.</p>
+			<?php else: ?>
+				<!-- Результат поиска -->
+				<ol start="<?php echo ($page - 1) * P::get("_search", "limit") + 1; ?>">
+					<?php foreach ($result['result'] as $val): ?>
+						<li>
+							<a href="<?php echo $val['url']; ?>" target="_blank">
+								<?php echo $val['title']; ?>
+							</a>
+							<div>
+								<?php echo $val['content']; ?>
+							</div>
+						</li>
+					<?php endforeach; ?>
+				</ol>
+				<?php if($page_all > 1): ?>
+					<!-- Страницы -->
+					<div class="page">
+						<?php for($i = 1; $i <= $page_all; $i++): ?>
 
-<br/>
-<?php if(!empty($query)): ?>
-	<?php if(empty($result)): ?>
-		<!-- Ничего не найдено -->
-		<p style="text-align: center;">По слову «<strong><?php echo $query; ?></strong>» ничего не найдено.</p>
-	<?php else: ?>
-		<!-- Результат поиска -->
-		<ol start="<?php echo ($page - 1) * P::get("_search", "limit") + 1; ?>">
-			<?php foreach ($result['result'] as $val): ?>
-				<li style="margin: 10px 0px 0px 0px;">
-					<a href="<?php echo $val['url']; ?>" target="_blank">
-						<?php echo $val['title']; ?>
-					</a>
-					<div>
-						<?php echo $val['content']; ?>
+							<?php if($i !== $page): ?>
+								<a href="?query=<?php echo $query; ?>&page=<?php echo $i; ?>"><?php echo $i; ?></a>
+							<?php else: ?>
+								<span><?php echo $i; ?></span>
+							<?php endif; ?>
+
+						<?php endfor; ?>
 					</div>
-				</li>
-			<?php endforeach; ?>
-		</ol>
-		<?php if($page_all > 1): ?>
-			<!-- Страницы -->
-			<div>
-				<?php for($i = 1; $i <= $page_all; $i++): ?>
-					<?php if($i !== $page): ?>
-						<a href="?query=<?php echo $query; ?>&page=<?php echo $i; ?>"><?php echo $i; ?></a>
-					<?php else: ?>
-						<span><?php echo $i; ?></span>
-					<?php endif; ?>
-
-				<?php endfor; ?>
-			</div>
-		<?php endif ?>
-	<?php endif; ?>
-<?php endif; ?>
+				<?php endif ?>
+			<?php endif; ?>
+		<?php endif; ?>
+	</div>
+</section>

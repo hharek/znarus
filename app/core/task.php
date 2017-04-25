@@ -11,9 +11,9 @@ class _Task
 	 */
 	public static function is($id)
 	{
-		if (!Chf::uint($id))
+		if (!Type::check("uint", $id))
 		{
-			throw new Exception("Номер у «Задания» задан неверно. " . Chf::error());
+			throw new Exception("Номер у «Задания» задан неверно. " . Type::get_last_error());
 		}
 
 		$query = 
@@ -129,9 +129,9 @@ SQL;
 	{
 		self::is($id);
 
-		if (!Chf::text($note))
+		if (!Type::check("text", $note))
 		{
-			throw new Exception("Примечание задано неверно. " . Chf::error());
+			throw new Exception("Примечание задано неверно. " . Type::get_last_error());
 		}
 
 		if (!in_array($status, ['create', 'done', 'fail']))

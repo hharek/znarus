@@ -2,7 +2,7 @@
 /* Включить chroot */
 G::file()->chroot_enable();
 
-if(!Chf::string($_POST['name']))
+if(!Type::check("string", ($_POST['name'])))
 {
 	throw new Exception("В имени файла присутствуют недопустимые символы. {$_POST['name']}");
 }
