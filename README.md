@@ -20,7 +20,7 @@ OPTIONAL:
 - Nginx с fast-cgi php
 - PHP 7
 - PHP-модули: pgsql, zip, mbstring, curl, openssl
-- PostgreSQL 9.3 и выше
+- PostgreSQL 9.4 и выше
 
 Необязательно:
 - Sphinx Search
